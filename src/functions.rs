@@ -75,3 +75,25 @@ pub fn get_log_channel(ctx: &Context, guildid: &GuildId) -> ChannelId {
         }
     }
 }
+
+
+pub fn get_log_type(ctx: &Context, guildid: &GuildId) -> i64 {
+    let data = ctx.data.read();
+
+    let pool = data.get::<DatabaseConnection>().unwrap();
+    let conn = pool.get().unwrap();
+
+    let gid = guildid.0 as i64;
+
+    match log_channels
+        .select(log_type)
+        .filter(guild_id.eq(gid))
+        .load::<i64>(&conn)
+    {
+        Ok(vec) => vec[0],
+        Err(e) => {
+            println!("{:?}", e);
+            0
+        }
+    }
+}

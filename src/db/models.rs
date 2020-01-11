@@ -5,4 +5,5 @@ pub struct LogChannel {
     pub id: i64,
     pub guild_id: i64,
     pub channel_id: i64,
+    pub log_type: i64,
 }

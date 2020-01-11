@@ -26,3 +26,11 @@ pub struct ShardManagerContainer;
 impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
+
+pub enum LogType {
+	MessageDeleted = 1 << 1,
+	MessageEdited = 1 << 2,
+	UserJoined = 1 << 3,
+	UserLeft = 1 << 4,
+	All = (1 << 4) - 1,
+}

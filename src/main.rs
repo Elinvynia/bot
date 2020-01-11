@@ -42,7 +42,12 @@ impl EventHandler for Handler {
             .unwrap()
             .read()
             .guild_id;
+
         if !check_log_channel(&ctx, &guildid) {
+            return;
+        }
+
+        if get_log_type(&ctx, &guildid) & LogType::MessageDeleted as i64 != LogType::MessageDeleted as i64 {
             return;
         }
 
