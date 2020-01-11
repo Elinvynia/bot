@@ -1,5 +1,3 @@
-use diesel::sqlite::Sqlite;
-use diesel::debug_query;
 use diesel::prelude::*;
 
 use crate::data::*;
@@ -43,18 +41,13 @@ pub fn check_log_channel(ctx: &Context, guildid: &GuildId) -> bool {
 
     let gid = guildid.0 as i64;
 
-    println!("{:?}", debug_query::<Sqlite, _>(&log_channels.select(channel_id).filter(guild_id.eq(&gid))));
-    println!("{:?}", log_channels.select(channel_id).filter(guild_id.eq(&gid)).execute(&conn));
-
-    match log_channels.select(channel_id).filter(guild_id.eq(&gid)).execute(&conn) {
-        Ok(0) => {
-            println!("no log channel");
-            false
-        }
-        Ok(v) => {
-            println!("log channel{:?}", v);
-            true
-        }
+    match log_channels
+        .select(channel_id)
+        .filter(guild_id.eq(&gid))
+        .load::<i64>(&conn)
+    {
+        Ok(arr) if !arr.is_empty() => true,
+        Ok(_) => false,
         Err(e) => {
             println!("{:?}", e);
             false
@@ -70,8 +63,12 @@ pub fn get_log_channel(ctx: &Context, guildid: &GuildId) -> ChannelId {
 
     let gid = guildid.0 as i64;
 
-    match log_channels.select(channel_id).filter(guild_id.eq(gid)).execute(&conn) {
-        Ok(cid) => ChannelId(cid as u64),
+    match log_channels
+        .select(channel_id)
+        .filter(guild_id.eq(gid))
+        .load::<i64>(&conn)
+    {
+        Ok(l) => ChannelId(l[0] as u64),
         Err(e) => {
             println!("{:?}", e);
             ChannelId(0)

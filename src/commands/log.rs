@@ -2,6 +2,7 @@ use diesel::dsl::{insert_into, update};
 use diesel::prelude::*;
 
 use crate::data::*;
+use crate::db::models::LogChannel;
 use crate::db::schema::log_channels::dsl::*;
 
 use serenity::framework::standard::{macros::command, CommandResult};
@@ -19,10 +20,14 @@ fn log(ctx: &mut Context, msg: &Message) -> CommandResult {
     let cid = msg.channel_id.0 as i64;
     let gid = msg.guild_id.unwrap().0 as i64;
 
-    match log_channels.filter(guild_id.eq(&gid)).execute(&conn) {
-        Ok(0) => {
-            match insert_into(log_channels)
-                .values((channel_id.eq(&cid), guild_id.eq(&gid)))
+    match log_channels
+        .filter(guild_id.eq(&gid))
+        .load::<LogChannel>(&conn)
+    {
+        Ok(arr) if !arr.is_empty() => {
+            match update(log_channels)
+                .filter(guild_id.eq(&gid))
+                .set((channel_id.eq(&cid), guild_id.eq(&gid)))
                 .execute(&conn)
             {
                 Ok(_) => {
@@ -38,9 +43,8 @@ fn log(ctx: &mut Context, msg: &Message) -> CommandResult {
             }
         }
         Ok(_) => {
-            match update(log_channels)
-                .filter(guild_id.eq(&gid))
-                .set((channel_id.eq(&cid), guild_id.eq(&gid)))
+            match insert_into(log_channels)
+                .values((channel_id.eq(&cid), guild_id.eq(&gid)))
                 .execute(&conn)
             {
                 Ok(_) => {

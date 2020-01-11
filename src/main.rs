@@ -43,13 +43,10 @@ impl EventHandler for Handler {
             .read()
             .guild_id;
         if !check_log_channel(&ctx, &guildid) {
-            println!("no log channel");
             return;
         }
 
         let log_channel = get_log_channel(&ctx, &guildid);
-
-        println!("got log channel");
 
         if let Some(x) = ctx.cache.read().message(&channel, &deleted_message_id) {
             let _ = log_channel.say(
