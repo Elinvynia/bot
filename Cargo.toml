@@ -1,0 +1,12 @@
+[package]
+name = "bot"
+version = "0.0.1"
+authors = ["Elinvynia <59487684+Elinvynia@users.noreply.github.com>"]
+edition = "2018"
+
+
+[dependencies]
+serenity = { git = "https://github.com/serenity-rs/serenity.git", branch = "current" }
+diesel = { version = "1.4.3", features = ["sqlite", "r2d2"] }
+dotenv = "0.15.0"
+libsqlite3-sys = { version = "*", features = ["bundled"] }
