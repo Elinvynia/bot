@@ -12,6 +12,7 @@ use serenity::prelude::*;
 
 #[command]
 #[only_in(guilds)]
+#[owners_only]
 #[min_args(0)]
 #[max_args(2)]
 fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
