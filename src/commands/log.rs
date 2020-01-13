@@ -38,13 +38,19 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                 match &log_kind[..] {
                     "delete" => {
                         previous_type |= LogType::MessageDeleted as i64;
-                        let _ = update(log_channels).filter(guild_id.eq(&gid)).set(log_type.eq(previous_type)).execute(&conn);
                         let _ = log_channel.say(&ctx.http, "Deleted messages will now be logged!");
                     },
                     "edit" => {
                         previous_type |= LogType::MessageEdited as i64;
-                        let _ = update(log_channels).filter(guild_id.eq(&gid)).set(log_type.eq(previous_type)).execute(&conn);
                         let _ = log_channel.say(&ctx.http, "Edited messages will now be logged!");
+                        },
+                    "join" => {
+                        previous_type |= LogType::UserJoined as i64;
+                        let _ = log_channel.say(&ctx.http, "Join messages will now be logged!");
+                        },
+                    "leave" => {
+                        previous_type |= LogType::UserLeft as i64;
+                        let _ = log_channel.say(&ctx.http, "Leave messages will now be logged!");
                         },
                     _ => return Ok(())
                 };
@@ -53,13 +59,19 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                 match &log_kind[..] {
                     "delete" => {
                         previous_type &= !(LogType::MessageDeleted as i64);
-                        let _ = update(log_channels).filter(guild_id.eq(&gid)).set(log_type.eq(previous_type)).execute(&conn);
                         let _ = log_channel.say(&ctx.http, "Deleted messages will no longer be logged!");
                     },
                     "edit" => {
                         previous_type &= !(LogType::MessageEdited as i64);
-                        let _ = update(log_channels).filter(guild_id.eq(&gid)).set(log_type.eq(previous_type)).execute(&conn);
                         let _ = log_channel.say(&ctx.http, "Edited messages will no longer be logged!");
+                        },
+                    "join" => {
+                        previous_type &= !(LogType::UserJoined as i64);
+                        let _ = log_channel.say(&ctx.http, "Join messages will no longer be logged!");
+                        },
+                    "leave" => {
+                        previous_type &= !(LogType::UserLeft as i64);
+                        let _ = log_channel.say(&ctx.http, "Leave messages will no longer be logged!");
                         },
                     _ => return Ok(())
                 };
@@ -67,6 +79,7 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             _ => return Ok(())
         }
         
+        let _ = update(log_channels).filter(guild_id.eq(&gid)).set(log_type.eq(previous_type)).execute(&conn);
         return Ok(())
     }
     
