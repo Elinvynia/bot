@@ -35,7 +35,7 @@ fn main() {
 
     let pool = Pool::builder()
         .build(ConnectionManager::<SqliteConnection>::new(
-            "../db/db.sqlite3",
+            "db/db.sqlite3",
         ))
         .unwrap();
 
