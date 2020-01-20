@@ -10,6 +10,7 @@ pub fn log_dm(ctx: &mut Context, message: &Message) {
     if message.guild_id.is_some() {
         return;
     }
+    
     let data = ctx.data.read();
 
     if &message.author.id == data.get::<BotId>().unwrap() {
@@ -28,7 +29,7 @@ pub fn log_dm(ctx: &mut Context, message: &Message) {
             .unwrap()
             .say(
                 &ctx.http,
-                format!("{} from {}", &message.content, &message.author),
+                format!("DM from {}:\n{}", &message.author, &message.content),
             );
     }
 }

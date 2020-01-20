@@ -30,8 +30,8 @@ use serenity::{
 
 fn main() {
     dotenv().ok();
-    let token = env::var("DISCORD_TOKEN").expect("Token not found in environment");
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+    let token = env::var("DISCORD_TOKEN").expect("DISCORD_TOKEN not found in environment");
+    let mut client = Client::new(&token, Handler).expect("Error creating client");
 
     let pool = Pool::builder()
         .build(ConnectionManager::<SqliteConnection>::new(

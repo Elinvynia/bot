@@ -105,7 +105,7 @@ impl EventHandler for Handler {
             &ctx.http, |m| {
                 if let Some(avatar) = user.avatar_url() {
                     m.content(format!(
-                        "User left:\nTag: {}\nID: {}",
+                        "User joined:\nTag: {}\nID: {}",
                         user.tag(),
                         user.id
                     ));
@@ -116,7 +116,7 @@ impl EventHandler for Handler {
                 }
                 else {
                     m.content(format!(
-                        "User left:\nTag: {}\nID: {}\nDefault avatar.",
+                        "User joined:\nTag: {}\nID: {}\nDefault avatar.",
                         user.tag(),
                         user.id
                     ));
