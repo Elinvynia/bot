@@ -99,29 +99,21 @@ impl EventHandler for Handler {
             return;
         }
 
-        let log_channel = get_log_channel(&ctx, &guildid);
         let user = new_member.user.read();
+        let mut picture: Vec<u8> = vec![];
+        let log_channel = get_log_channel(&ctx, &guildid);
         let _ = log_channel.send_message(
-            &ctx.http, |m| {
-                if let Some(avatar) = user.avatar_url() {
-                    m.content(format!(
+            &ctx.http, |message| {
+                    let avatar = user.face().replace("size=1024", "size=128");
+                    let mut req = reqwest::blocking::get(&avatar).unwrap();
+                    let _ = std::io::copy(&mut req, &mut picture);
+                    message.content(format!(
                         "User joined:\nTag: {}\nID: {}",
                         user.tag(),
                         user.id
                     ));
-                    m.embed(|e| {
-                        let url = format!("{}{}", avatar, "?size=128");
-                        e.image(url)
-                    });
-                }
-                else {
-                    m.content(format!(
-                        "User joined:\nTag: {}\nID: {}\nDefault avatar.",
-                        user.tag(),
-                        user.id
-                    ));
-                }
-                m
+                    message.add_file((picture.as_slice(), format!("{}{}", user.tag(), ".webp").as_str()));
+                    message
             }
         );
     }
@@ -135,28 +127,20 @@ impl EventHandler for Handler {
             return;
         }
 
+        let mut picture: Vec<u8> = vec![];
         let log_channel = get_log_channel(&ctx, &guildid);
         let _ = log_channel.send_message(
-            &ctx.http, |m| {
-                if let Some(avatar) = user.avatar_url() {
-                    m.content(format!(
-                        "User left:\nTag: {}\nID: {}",
+            &ctx.http, |message| {
+                    let avatar = user.face().replace("size=1024", "size=128");
+                    let mut req = reqwest::blocking::get(&avatar).unwrap();
+                    let _ = std::io::copy(&mut req, &mut picture);
+                    message.content(format!(
+                        "User joined:\nTag: {}\nID: {}",
                         user.tag(),
                         user.id
                     ));
-                    m.embed(|e| {
-                        let url = format!("{}{}", avatar, "?size=128");
-                        e.image(url)
-                    });
-                }
-                else {
-                    m.content(format!(
-                        "User left:\nTag: {}\nID: {}\nDefault avatar.",
-                        user.tag(),
-                        user.id
-                    ));
-                }
-                m
+                    message.add_file((picture.as_slice(), format!("{}{}", user.tag(), ".webp").as_str()));
+                    message
             }
         );
     }

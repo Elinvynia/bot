@@ -6,7 +6,8 @@ edition = "2018"
 
 
 [dependencies]
-serenity = { git = "https://github.com/serenity-rs/serenity.git", branch = "current" }
-diesel = { version = "1.4.3", features = ["sqlite", "r2d2"] }
+serenity = "0.8.0"
 dotenv = "0.15.0"
+reqwest = "0.10.1"
+diesel = { version = "1.4.3", features = ["sqlite", "r2d2"] }
 libsqlite3-sys = { version = "*", features = ["bundled"] }
