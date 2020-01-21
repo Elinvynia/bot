@@ -17,6 +17,9 @@ struct Config;
 pub mod ban;
 use ban::*;
 
+pub mod kick;
+use kick::*;
+
 #[group]
-#[commands(ban)]
+#[commands(ban, kick)]
 struct Admin;
