@@ -21,6 +21,7 @@ use std::sync::Arc;
 
 use serenity::{
     framework::StandardFramework,
+    model::prelude::*,
     prelude::*,
 };
 
@@ -32,6 +33,7 @@ fn main() {
     let token = env::var("DISCORD_TOKEN").expect("DISCORD_TOKEN not found in environment");
     let mut client = Client::new(&token, Handler).expect("Error creating client");
 
+    let id: Option<UserId>;
 
     let owners = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
@@ -41,6 +43,7 @@ fn main() {
             let mut data = client.data.write();
             data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
             data.insert::<BotId>(info.id);
+            id = Some(info.id);
             let x = vec![info.owner.id];
             data.insert::<BotOwners>(x);
 
@@ -58,7 +61,7 @@ fn main() {
 
     client.with_framework(
         StandardFramework::new()
-            .configure(|c| c.owners(owners).prefix("!"))
+            .configure(|c| c.owners(owners).on_mention(id).prefix("!"))
             .normal_message(log_dm)
             .group(&CONFIG_GROUP)
             .group(&ADMIN_GROUP)
