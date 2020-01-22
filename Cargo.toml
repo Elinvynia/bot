@@ -9,5 +9,5 @@ edition = "2018"
 serenity = "0.8.0"
 dotenv = "0.15.0"
 reqwest = "0.10.1"
-diesel = { version = "1.4.3", features = ["sqlite", "r2d2"] }
-libsqlite3-sys = { version = "*", features = ["bundled"] }
+log = "0.4.8"
+rusqlite = { version = "0.21.0", features = ["bundled"] }

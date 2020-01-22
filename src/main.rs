@@ -4,16 +4,12 @@ use commands::*;
 mod data;
 use data::*;
 
-mod functions;
-use functions::*;
-
-#[macro_use]
-extern crate diesel;
-
-use diesel::r2d2::{ConnectionManager, Pool};
-use diesel::sqlite::SqliteConnection;
+mod util;
+use util::*;
 
 mod db;
+use db::*;
+
 mod events;
 use events::Handler;
 
@@ -30,14 +26,12 @@ use serenity::{
 
 fn main() {
     dotenv().ok();
+
+    create_db();
+
     let token = env::var("DISCORD_TOKEN").expect("DISCORD_TOKEN not found in environment");
     let mut client = Client::new(&token, Handler).expect("Error creating client");
 
-    let pool = Pool::builder()
-        .build(ConnectionManager::<SqliteConnection>::new(
-            "db/db.sqlite3",
-        ))
-        .unwrap();
 
     let owners = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
@@ -47,7 +41,6 @@ fn main() {
             let mut data = client.data.write();
             data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
             data.insert::<BotId>(info.id);
-            data.insert::<DatabaseConnection>(pool);
             let x = vec![info.owner.id];
             data.insert::<BotOwners>(x);
 

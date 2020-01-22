@@ -8,7 +8,7 @@ use ping::*;
 struct General;
 
 pub mod log;
-use log::*;
+use self::log::*;
 
 #[group]
 #[commands(log)]

@@ -1,4 +1,4 @@
-use crate::functions::*;
+use crate::util::*;
 use crate::data::*;
 
 use std::sync::Arc;
@@ -24,15 +24,11 @@ impl EventHandler for Handler {
             .read()
             .guild_id;
 
-        if !check_log_channel(&ctx, &guildid) {
+        if get_log_type(&guildid).unwrap() & LogType::MessageDeleted as i64 != LogType::MessageDeleted as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::MessageDeleted as i64 != LogType::MessageDeleted as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
 
         if let Some(x) = ctx.cache.read().message(&channel, &deleted_message_id) {
             let data = ctx.data.read();
@@ -68,16 +64,12 @@ impl EventHandler for Handler {
         if new_m.guild_id.is_none() {
             return;
         }
-        
-        if !check_log_channel(&ctx, &guildid) {
+
+        if get_log_type(&guildid).unwrap() & LogType::MessageEdited as i64 != LogType::MessageEdited as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::MessageEdited as i64 != LogType::MessageEdited as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.say(
             &ctx.http,
             format!(
@@ -91,17 +83,13 @@ impl EventHandler for Handler {
 
 
     fn guild_member_addition(&self, ctx: Context, guildid: GuildId, new_member: Member) {
-        if !check_log_channel(&ctx, &guildid) {
-            return;
-        }
-
-        if get_log_type(&ctx, &guildid) & LogType::UserJoined as i64 != LogType::UserJoined as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::UserJoined as i64 != LogType::UserJoined as i64 {
             return;
         }
 
         let user = new_member.user.read();
         let mut picture: Vec<u8> = vec![];
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.send_message(
             &ctx.http, |message| {
                     let avatar = user.face().replace("size=1024", "size=128");
@@ -119,16 +107,12 @@ impl EventHandler for Handler {
     }
 
     fn guild_member_removal(&self, ctx: Context, guildid: GuildId, user: User, _member: Option<Member>) {
-        if !check_log_channel(&ctx, &guildid) {
-            return;
-        }
-
-        if get_log_type(&ctx, &guildid) & LogType::UserLeft as i64 != LogType::UserLeft as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::UserLeft as i64 != LogType::UserLeft as i64 {
             return;
         }
 
         let mut picture: Vec<u8> = vec![];
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.send_message(
             &ctx.http, |message| {
                     let avatar = user.face().replace("size=1024", "size=128");
@@ -146,15 +130,11 @@ impl EventHandler for Handler {
     }
 
     fn guild_ban_addition(&self, ctx: Context, guildid: GuildId, user: User) {
-        if !check_log_channel(&ctx, &guildid) {
+        if get_log_type(&guildid).unwrap() & LogType::UserBanned as i64 != LogType::UserBanned as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::UserBanned as i64 != LogType::UserBanned as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.send_message(
             &ctx.http, |m| {
                 if let Some(avatar) = user.avatar_url() {
@@ -183,15 +163,12 @@ impl EventHandler for Handler {
     fn channel_create(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
         let c = channel.read();
         let guildid = c.guild_id;
-        if !check_log_channel(&ctx, &guildid) {
+
+        if get_log_type(&guildid).unwrap() & LogType::ChannelCreated as i64 != LogType::ChannelCreated as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::ChannelCreated as i64 != LogType::ChannelCreated as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.say(
             &ctx.http,
             format!(
@@ -203,15 +180,12 @@ impl EventHandler for Handler {
     fn channel_delete(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
         let c = channel.read();
         let guildid = c.guild_id;
-        if !check_log_channel(&ctx, &guildid) {
+
+        if get_log_type(&guildid).unwrap() & LogType::ChannelDeleted as i64 != LogType::ChannelDeleted as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::ChannelDeleted as i64 != LogType::ChannelDeleted as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.say(
             &ctx.http,
             format!(
@@ -229,15 +203,12 @@ impl EventHandler for Handler {
             .unwrap()
             .read()
             .guild_id;
-        if !check_log_channel(&ctx, &guildid) {
+
+        if get_log_type(&guildid).unwrap() & LogType::CategoryCreated as i64 != LogType::CategoryDeleted as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::CategoryCreated as i64 != LogType::CategoryDeleted as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.say(
             &ctx.http,
             format!(
@@ -256,15 +227,12 @@ impl EventHandler for Handler {
             .unwrap()
             .read()
             .guild_id;
-        if !check_log_channel(&ctx, &guildid) {
+
+        if get_log_type(&guildid).unwrap() & LogType::CategoryDeleted as i64 != LogType::CategoryDeleted as i64 {
             return;
         }
 
-        if get_log_type(&ctx, &guildid) & LogType::CategoryDeleted as i64 != LogType::CategoryDeleted as i64 {
-            return;
-        }
-
-        let log_channel = get_log_channel(&ctx, &guildid);
+        let log_channel = get_log_channel(&guildid).unwrap();
         let _ = log_channel.say(
             &ctx.http,
             format!(
