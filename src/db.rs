@@ -20,6 +20,15 @@ pub fn create_db() {
                 error!("{}", e);
             }
         }
+        match connection.execute(
+            "CREATE TABLE IF NOT EXISTS prefix (guild_id TEXT PRIMARY KEY, prefix TEXT NOT NULL);",
+            NO_PARAMS,
+        ) {
+            Ok(_) => (),
+            Err(e) => {
+                error!("{}", e);
+            }
+        }
     } else {
         error!(
             "Could not open connection to database ({})",

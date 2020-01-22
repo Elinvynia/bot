@@ -3,8 +3,11 @@ use serenity::framework::standard::macros::group;
 pub mod ping;
 use ping::*;
 
+pub mod prefix;
+use prefix::*;
+
 #[group]
-#[commands(ping)]
+#[commands(ping, prefix)]
 struct General;
 
 pub mod log;

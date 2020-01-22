@@ -57,7 +57,21 @@ fn main() {
 
     client.with_framework(
         StandardFramework::new()
-            .configure(|c| c.owners(owners).on_mention(id).prefix("!"))
+            .configure(|c| {
+                c.owners(owners).on_mention(id).dynamic_prefix(|_, msg| {
+                    if msg.is_private() {
+                        return Some("!".to_string());
+                    }
+                    if let Some(guild_id) = msg.guild_id {
+                        let prefix =
+                            get_prefix(&guild_id).map_or_else(|_| "!".to_string(), |pref| pref);
+                        println!("{:?}", prefix);
+                        return Some(prefix);
+                    } else {
+                        return Some("!".to_string());
+                    }
+                })
+            })
             .normal_message(log_dm)
             .group(&CONFIG_GROUP)
             .group(&ADMIN_GROUP)
