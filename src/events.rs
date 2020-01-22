@@ -24,11 +24,10 @@ impl EventHandler for Handler {
             .read()
             .guild_id;
 
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::MessageDeleted as i64 != LogType::MessageDeleted as i64 {
             return;
@@ -60,11 +59,10 @@ impl EventHandler for Handler {
         let new_m = new.unwrap();
         let guildid = new_m.guild_id.unwrap();
 
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         let data = ctx.data.read();
         if new_m.author.id == *data.get::<BotId>().unwrap() {
@@ -92,11 +90,10 @@ impl EventHandler for Handler {
 
 
     fn guild_member_addition(&self, ctx: Context, guildid: GuildId, new_member: Member) {
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::UserJoined as i64 != LogType::UserJoined as i64 {
             return;
@@ -121,11 +118,10 @@ impl EventHandler for Handler {
     }
 
     fn guild_member_removal(&self, ctx: Context, guildid: GuildId, user: User, _member: Option<Member>) {
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::UserLeft as i64 != LogType::UserLeft as i64 {
             return;
@@ -149,11 +145,10 @@ impl EventHandler for Handler {
     }
 
     fn guild_ban_addition(&self, ctx: Context, guildid: GuildId, user: User) {
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::UserBanned as i64 != LogType::UserBanned as i64 {
             return;
@@ -188,11 +183,10 @@ impl EventHandler for Handler {
         let c = channel.read();
         let guildid = c.guild_id;
 
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::ChannelCreated as i64 != LogType::ChannelCreated as i64 {
             return;
@@ -210,11 +204,10 @@ impl EventHandler for Handler {
         let c = channel.read();
         let guildid = c.guild_id;
 
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::ChannelDeleted as i64 != LogType::ChannelDeleted as i64 {
             return;
@@ -238,11 +231,10 @@ impl EventHandler for Handler {
             .read()
             .guild_id;
 
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::CategoryCreated as i64 != LogType::CategoryDeleted as i64 {
             return;
@@ -267,11 +259,10 @@ impl EventHandler for Handler {
             .read()
             .guild_id;
 
-        let log_c = get_log_channel(&guildid);
-        if log_c.is_err() {
-            return;
-        }
-        let log_channel = log_c.unwrap();
+        let log_channel = match get_log_channel(&guildid) {
+          Ok(l) => l,
+          Err(_) => return,
+        };
 
         if get_log_type(&guildid).unwrap() & LogType::CategoryDeleted as i64 != LogType::CategoryDeleted as i64 {
             return;
