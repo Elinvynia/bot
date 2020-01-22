@@ -1,3 +1,4 @@
+use log::error;
 use crate::data::*;
 use serenity::{
     client::bridge::gateway::ShardId,
@@ -12,7 +13,7 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
         None => {
-            let _ = msg.reply(&ctx, "There was a problem getting the shard manager");
+            error!("There was a problem getting the shard manager.");
             return Ok(());
         }
     };
@@ -22,12 +23,15 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
-            let _ = msg.reply(&ctx, "No shard found");
+            error!("No shard found.");
             return Ok(());
         }
     };
 
-    let _ = msg.reply(&ctx, &format!("The shard latency is {:?}", runner.latency));
+    match runner.latency {
+        Some(x) => { let _ = msg.channel_id.say(&ctx, &format!("The shard latency is {}ms.", x.as_millis())); },
+        None => { let _ = msg.channel_id.say(&ctx, "Please wait until the shard measures the latency."); }
+    };
 
     Ok(())
 }
