@@ -1,5 +1,5 @@
-use crate::util::*;
 use crate::data::*;
+use crate::util::*;
 
 use std::sync::Arc;
 
@@ -25,11 +25,13 @@ impl EventHandler for Handler {
             .guild_id;
 
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::MessageDeleted as i64 != LogType::MessageDeleted as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::MessageDeleted as i64
+            != LogType::MessageDeleted as i64
+        {
             return;
         }
 
@@ -50,7 +52,13 @@ impl EventHandler for Handler {
         }
     }
 
-    fn message_update(&self, ctx: Context, old: Option<Message>, new: Option<Message>, _event: MessageUpdateEvent) {
+    fn message_update(
+        &self,
+        ctx: Context,
+        old: Option<Message>,
+        new: Option<Message>,
+        _event: MessageUpdateEvent,
+    ) {
         if old.is_none() || new.is_none() {
             return;
         }
@@ -60,8 +68,8 @@ impl EventHandler for Handler {
         let guildid = new_m.guild_id.unwrap();
 
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
         let data = ctx.data.read();
@@ -73,7 +81,9 @@ impl EventHandler for Handler {
             return;
         }
 
-        if get_log_type(&guildid).unwrap() & LogType::MessageEdited as i64 != LogType::MessageEdited as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::MessageEdited as i64
+            != LogType::MessageEdited as i64
+        {
             return;
         }
 
@@ -84,43 +94,52 @@ impl EventHandler for Handler {
                 new_m.author,
                 new_m.channel(&ctx.cache).unwrap(),
                 old_m.content,
-                new_m.content)
+                new_m.content
+            ),
         );
     }
 
-
     fn guild_member_addition(&self, ctx: Context, guildid: GuildId, new_member: Member) {
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::UserJoined as i64 != LogType::UserJoined as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::UserJoined as i64
+            != LogType::UserJoined as i64
+        {
             return;
         }
 
         let user = new_member.user.read();
         let mut picture: Vec<u8> = vec![];
-        let _ = log_channel.send_message(
-            &ctx.http, |message| {
-                    let avatar = user.face().replace("size=1024", "size=128");
-                    let mut req = reqwest::blocking::get(&avatar).unwrap();
-                    let _ = std::io::copy(&mut req, &mut picture);
-                    message.content(format!(
-                        "User joined:\nTag: {}\nID: {}",
-                        user.tag(),
-                        user.id
-                    ));
-                    message.add_file((picture.as_slice(), format!("{}{}", user.tag(), ".webp").as_str()));
-                    message
-            }
-        );
+        let _ = log_channel.send_message(&ctx.http, |message| {
+            let avatar = user.face().replace("size=1024", "size=128");
+            let mut req = reqwest::blocking::get(&avatar).unwrap();
+            let _ = std::io::copy(&mut req, &mut picture);
+            message.content(format!(
+                "User joined:\nTag: {}\nID: {}",
+                user.tag(),
+                user.id
+            ));
+            message.add_file((
+                picture.as_slice(),
+                format!("{}{}", user.tag(), ".webp").as_str(),
+            ));
+            message
+        });
     }
 
-    fn guild_member_removal(&self, ctx: Context, guildid: GuildId, user: User, _member: Option<Member>) {
+    fn guild_member_removal(
+        &self,
+        ctx: Context,
+        guildid: GuildId,
+        user: User,
+        _member: Option<Member>,
+    ) {
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
         if get_log_type(&guildid).unwrap() & LogType::UserLeft as i64 != LogType::UserLeft as i64 {
@@ -128,55 +147,55 @@ impl EventHandler for Handler {
         }
 
         let mut picture: Vec<u8> = vec![];
-        let _ = log_channel.send_message(
-            &ctx.http, |message| {
-                    let avatar = user.face().replace("size=1024", "size=128");
-                    let mut req = reqwest::blocking::get(&avatar).unwrap();
-                    let _ = std::io::copy(&mut req, &mut picture);
-                    message.content(format!(
-                        "User joined:\nTag: {}\nID: {}",
-                        user.tag(),
-                        user.id
-                    ));
-                    message.add_file((picture.as_slice(), format!("{}{}", user.tag(), ".webp").as_str()));
-                    message
-            }
-        );
+        let _ = log_channel.send_message(&ctx.http, |message| {
+            let avatar = user.face().replace("size=1024", "size=128");
+            let mut req = reqwest::blocking::get(&avatar).unwrap();
+            let _ = std::io::copy(&mut req, &mut picture);
+            message.content(format!(
+                "User joined:\nTag: {}\nID: {}",
+                user.tag(),
+                user.id
+            ));
+            message.add_file((
+                picture.as_slice(),
+                format!("{}{}", user.tag(), ".webp").as_str(),
+            ));
+            message
+        });
     }
 
     fn guild_ban_addition(&self, ctx: Context, guildid: GuildId, user: User) {
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::UserBanned as i64 != LogType::UserBanned as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::UserBanned as i64
+            != LogType::UserBanned as i64
+        {
             return;
         }
 
-        let _ = log_channel.send_message(
-            &ctx.http, |m| {
-                if let Some(avatar) = user.avatar_url() {
-                    m.content(format!(
-                        "User banned:\nTag: {}\nID: {}",
-                        user.tag(),
-                        user.id
-                    ));
-                    m.embed(|e| {
-                        let url = format!("{}{}", avatar, "?size=128");
-                        e.image(url)
-                    });
-                }
-                else {
-                    m.content(format!(
-                        "User left:\nTag: {}\nID: {}\nDefault avatar.",
-                        user.tag(),
-                        user.id
-                    ));
-                }
-                m
+        let _ = log_channel.send_message(&ctx.http, |m| {
+            if let Some(avatar) = user.avatar_url() {
+                m.content(format!(
+                    "User banned:\nTag: {}\nID: {}",
+                    user.tag(),
+                    user.id
+                ));
+                m.embed(|e| {
+                    let url = format!("{}{}", avatar, "?size=128");
+                    e.image(url)
+                });
+            } else {
+                m.content(format!(
+                    "User left:\nTag: {}\nID: {}\nDefault avatar.",
+                    user.tag(),
+                    user.id
+                ));
             }
-        );
+            m
+        });
     }
 
     fn channel_create(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
@@ -184,20 +203,17 @@ impl EventHandler for Handler {
         let guildid = c.guild_id;
 
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::ChannelCreated as i64 != LogType::ChannelCreated as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::ChannelCreated as i64
+            != LogType::ChannelCreated as i64
+        {
             return;
         }
 
-        let _ = log_channel.say(
-            &ctx.http,
-            format!(
-                "Channel created: {}",
-                c.name)
-        );
+        let _ = log_channel.say(&ctx.http, format!("Channel created: {}", c.name));
     }
 
     fn channel_delete(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
@@ -205,74 +221,64 @@ impl EventHandler for Handler {
         let guildid = c.guild_id;
 
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::ChannelDeleted as i64 != LogType::ChannelDeleted as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::ChannelDeleted as i64
+            != LogType::ChannelDeleted as i64
+        {
             return;
         }
 
-        let _ = log_channel.say(
-            &ctx.http,
-            format!(
-                "Channel deleted: {}",
-                c.name)
-        );
+        let _ = log_channel.say(&ctx.http, format!("Channel deleted: {}", c.name));
     }
 
     fn category_create(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
         let c = category.read();
-        let guildid = c.id
-            .to_channel(&ctx)
-            .unwrap()
-            .guild()
-            .unwrap()
-            .read()
-            .guild_id;
+        let guildid =
+            c.id.to_channel(&ctx)
+                .unwrap()
+                .guild()
+                .unwrap()
+                .read()
+                .guild_id;
 
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::CategoryCreated as i64 != LogType::CategoryDeleted as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::CategoryCreated as i64
+            != LogType::CategoryDeleted as i64
+        {
             return;
         }
 
-        let _ = log_channel.say(
-            &ctx.http,
-            format!(
-                "Category created: {}",
-                c.name)
-        );
+        let _ = log_channel.say(&ctx.http, format!("Category created: {}", c.name));
     }
-
 
     fn category_delete(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
         let c = category.read();
-        let guildid = c.id
-            .to_channel(&ctx)
-            .unwrap()
-            .guild()
-            .unwrap()
-            .read()
-            .guild_id;
+        let guildid =
+            c.id.to_channel(&ctx)
+                .unwrap()
+                .guild()
+                .unwrap()
+                .read()
+                .guild_id;
 
         let log_channel = match get_log_channel(&guildid) {
-          Ok(l) => l,
-          Err(_) => return,
+            Ok(l) => l,
+            Err(_) => return,
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::CategoryDeleted as i64 != LogType::CategoryDeleted as i64 {
+        if get_log_type(&guildid).unwrap() & LogType::CategoryDeleted as i64
+            != LogType::CategoryDeleted as i64
+        {
             return;
         }
 
-        let _ = log_channel.say(
-            &ctx.http,
-            format!(
-                "Category deleted: {}",
-                c.name)
-        );
+        let _ = log_channel.say(&ctx.http, format!("Category deleted: {}", c.name));
     }
 }

@@ -1,15 +1,11 @@
 use log::error;
 use rusqlite::{Connection, NO_PARAMS};
-use std::{
-    fs::File,
-    path::Path,
-    error::Error,
-};
+use std::{error::Error, fs::File, path::Path};
 
 pub fn create_db() {
     let db = Path::new("db.sqlite3");
     if !db.exists() {
-		match File::create(&db) {
+        match File::create(&db) {
             Ok(_) => (),
             Err(e) => error!("Failed to create database file: {}", e),
         }
@@ -24,9 +20,7 @@ pub fn create_db() {
                 error!("{}", e);
             }
         }
-    } 
-
-    else {
+    } else {
         error!(
             "Could not open connection to database ({})",
             &db.to_string_lossy()

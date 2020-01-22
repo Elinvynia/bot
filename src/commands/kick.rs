@@ -1,7 +1,7 @@
 use serenity::{
-    prelude::*,
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
+    prelude::*,
     utils::parse_username,
 };
 

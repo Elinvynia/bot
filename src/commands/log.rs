@@ -1,9 +1,9 @@
-use crate::util::*;
 use crate::data::*;
 use crate::db::*;
+use crate::util::*;
 
 use serenity::{
-    framework::standard::{macros::command, CommandResult, Args},
+    framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
     prelude::*,
 };
@@ -21,17 +21,22 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 
     if args.len() == 0 {
         if let Ok(_) = get_log_channel(&msg.guild_id.unwrap()) {
-            let _ = conn.execute("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;",
-                                            &[&cid.to_string(), &gid.to_string()]);
+            let _ = conn.execute(
+                "UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;",
+                &[&cid.to_string(), &gid.to_string()],
+            );
             let log_channel = get_log_channel(&msg.guild_id.unwrap()).unwrap();
             let _ = log_channel.say(&ctx.http, "Log channel updated!");
             return Ok(());
-        
-        }
-
-        else {
-            let _ = conn.execute("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)",
-                                            &[&gid.to_string(), &cid.to_string(), &(LogType::All as u64).to_string()]);
+        } else {
+            let _ = conn.execute(
+                "INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)",
+                &[
+                    &gid.to_string(),
+                    &cid.to_string(),
+                    &(LogType::All as u64).to_string(),
+                ],
+            );
             let _ = msg.channel_id.say(&ctx.http, "Log channel set!");
             return Ok(());
         };
@@ -51,59 +56,61 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                     "all" => {
                         log_type |= LogType::All as i64;
                         message = "All messages will now be logged!".to_string();
-                    },
+                    }
                     "delete" => {
                         log_type |= LogType::MessageDeleted as i64;
                         message = "Deleted messages will now be logged!".to_string();
-                    },
+                    }
                     "edit" => {
                         log_type |= LogType::MessageEdited as i64;
                         message = "Edited messages will now be logged!".to_string();
-                        },
+                    }
                     "join" => {
                         log_type |= LogType::UserJoined as i64;
                         message = "Join messages will now be logged!".to_string();
-                        },
+                    }
                     "leave" => {
                         log_type |= LogType::UserLeft as i64;
                         message = "Leave messages will now be logged!".to_string();
-                        },
-                    _ => return Ok(())
+                    }
+                    _ => return Ok(()),
                 };
-            },
+            }
             "disable" => {
                 match &log_kind[..] {
                     "all" => {
                         log_type |= LogType::All as i64;
                         message = "No messages will be logged anymore!".to_string();
-                    },
+                    }
                     "delete" => {
                         log_type &= !(LogType::MessageDeleted as i64);
                         message = "Deleted messages will no longer be logged!".to_string();
-                    },
+                    }
                     "edit" => {
                         log_type &= !(LogType::MessageEdited as i64);
                         message = "Edited messages will no longer be logged!".to_string();
-                        },
+                    }
                     "join" => {
                         log_type &= !(LogType::UserJoined as i64);
                         message = "Join messages will no longer be logged!".to_string();
-                        },
+                    }
                     "leave" => {
                         log_type &= !(LogType::UserLeft as i64);
                         message = "Leave messages will no longer be logged!".to_string();
-                        },
-                    _ => return Ok(())
+                    }
+                    _ => return Ok(()),
                 };
-            },
-            _ => return Ok(())
+            }
+            _ => return Ok(()),
         }
-        
-        let _ = conn.execute("REPLACE INTO log (guild_id, log_type) values (?1, ?2)",
-                            &[&gid.to_string(), &log_type.to_string()],);
+
+        let _ = conn.execute(
+            "REPLACE INTO log (guild_id, log_type) values (?1, ?2)",
+            &[&gid.to_string(), &log_type.to_string()],
+        );
         let _ = log_channel.say(&ctx.http, message);
-        return Ok(())
+        return Ok(());
     }
-    
-    return Ok(())
+
+    return Ok(());
 }

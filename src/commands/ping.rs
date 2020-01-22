@@ -1,5 +1,5 @@
-use log::error;
 use crate::data::*;
+use log::error;
 use serenity::{
     client::bridge::gateway::ShardId,
     framework::standard::{macros::command, CommandResult},
@@ -29,8 +29,16 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     match runner.latency {
-        Some(x) => { let _ = msg.channel_id.say(&ctx, &format!("The shard latency is {}ms.", x.as_millis())); },
-        None => { let _ = msg.channel_id.say(&ctx, "Please wait until the shard measures the latency."); }
+        Some(x) => {
+            let _ = msg
+                .channel_id
+                .say(&ctx, &format!("The shard latency is {}ms.", x.as_millis()));
+        }
+        None => {
+            let _ = msg
+                .channel_id
+                .say(&ctx, "Please wait until the shard measures the latency.");
+        }
     };
 
     Ok(())

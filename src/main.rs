@@ -19,11 +19,7 @@ use std::collections::HashSet;
 use std::env;
 use std::sync::Arc;
 
-use serenity::{
-    framework::StandardFramework,
-    model::prelude::*,
-    prelude::*,
-};
+use serenity::{framework::StandardFramework, model::prelude::*, prelude::*};
 
 fn main() {
     dotenv().ok();
