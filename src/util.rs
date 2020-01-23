@@ -59,3 +59,10 @@ pub fn get_prefix(guildid: &GuildId) -> Result<String, Box<dyn Error>> {
     let mut rows = statement.query(&[&guildid.as_u64().to_string()])?;
     Ok(rows.next()?.ok_or("Guild not found.")?.get(0)?)
 }
+
+pub fn get_user_score(guildid: &GuildId, userid: &UserId) -> Result<i64, Box<dyn Error>> {
+    let conn = get_db()?;
+    let mut statement = conn.prepare("SELECT points FROM leaderboard WHERE guild_id == ?1 AND user_id == ?2;")?;
+    let mut rows = statement.query(&[&guildid.as_u64().to_string(), &userid.as_u64().to_string()])?;
+    Ok(rows.next()?.ok_or("No record yet.")?.get(0)?)
+}

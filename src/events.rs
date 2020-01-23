@@ -1,5 +1,6 @@
 use crate::data::*;
 use crate::util::*;
+use crate::db::*;
 
 use std::sync::Arc;
 
@@ -13,6 +14,34 @@ pub struct Handler;
 impl EventHandler for Handler {
     fn ready(&self, _: Context, ready: Ready) {
         println!("Connected as {}", ready.user.name);
+    }
+
+    fn message(&self, _ctx: Context, new_message: Message) {
+        let guild_id = match new_message.guild_id {
+            Some(g) =>  g,
+            None => return
+        };
+
+        let conn = match get_db() {
+            Ok(c) => c,
+            Err(_) => return
+        };
+
+        let user_id = new_message.author.id;
+
+        match get_user_score(&guild_id, &user_id) {
+            Ok(_) => {
+                let _ = conn.execute("UPDATE leaderboard SET points = points + 1 WHERE guild_id == ?1 AND user_id == ?2;",
+                                    &[&guild_id.as_u64().to_string(), &user_id.as_u64().to_string()]);
+            }
+            Err(e) if e.to_string().as_str() == "No record yet." => {
+                let _ = conn.execute("INSERT INTO leaderboard (guild_id, user_id, points) values (?1, ?2, 1);",
+                                    &[&guild_id.as_u64().to_string(), &user_id.as_u64().to_string()]);
+            }
+            Err(_) => {
+                return;
+            }
+        }
     }
 
     fn message_delete(&self, ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
@@ -152,7 +181,7 @@ impl EventHandler for Handler {
             let mut req = reqwest::blocking::get(&avatar).unwrap();
             let _ = std::io::copy(&mut req, &mut picture);
             message.content(format!(
-                "User joined:\nTag: {}\nID: {}",
+                "User left:\nTag: {}\nID: {}",
                 user.tag(),
                 user.id
             ));

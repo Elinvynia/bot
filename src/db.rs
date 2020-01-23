@@ -29,6 +29,15 @@ pub fn create_db() {
                 error!("{}", e);
             }
         }
+        match connection.execute(
+            "CREATE TABLE IF NOT EXISTS leaderboard (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, points INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY (guild_id, user_id));",
+            NO_PARAMS,
+        ) {
+            Ok(_) => (),
+            Err(e) => {
+                error!("{}", e);
+            }
+        }
     } else {
         error!(
             "Could not open connection to database ({})",
