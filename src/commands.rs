@@ -6,8 +6,11 @@ use ping::*;
 pub mod prefix;
 use prefix::*;
 
+pub mod leaderboard;
+use leaderboard::*;
+
 #[group]
-#[commands(ping, prefix)]
+#[commands(ping, prefix, leaderboard)]
 struct General;
 
 pub mod log;

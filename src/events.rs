@@ -153,7 +153,7 @@ impl EventHandler for Handler {
             ));
             message.add_file((
                 picture.as_slice(),
-                format!("{}{}", user.tag(), ".webp").as_str(),
+                format!("{}{}", user.id, ".webp").as_str(),
             ));
             message
         });
@@ -187,7 +187,7 @@ impl EventHandler for Handler {
             ));
             message.add_file((
                 picture.as_slice(),
-                format!("{}{}", user.tag(), ".webp").as_str(),
+                format!("{}{}", user.id, ".webp").as_str(),
             ));
             message
         });
