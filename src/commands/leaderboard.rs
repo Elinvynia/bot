@@ -1,4 +1,5 @@
-use crate::util::*;
+use std::error::Error;
+use crate::db::*;
 use serenity::{
     framework::standard::{macros::command, CommandResult},
     model::prelude::*,
@@ -15,8 +16,8 @@ fn leaderboard(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let mut result = "".to_string();
-    for (id, points) in rows.iter() {
-        result.push_str(&format!("{} - {}\n", &ctx.http.get_member(*msg.guild_id.unwrap().as_u64(), id.parse::<u64>().unwrap()).unwrap().user.read().name, points)[..])
+    for x in rows.iter() {
+        result.push_str(&format!("{} - {}\n", &ctx.http.get_member(*msg.guild_id.unwrap().as_u64(), x.user_id.parse::<u64>().unwrap()).unwrap().user.read().name, x.points)[..])
     };
 
     let _ = msg.channel_id
@@ -32,4 +33,30 @@ fn leaderboard(ctx: &mut Context, msg: &Message) -> CommandResult {
 
     Ok(())
 
+}
+
+#[derive(Debug)]
+struct LeaderboardEntry {
+    user_id: String,
+    points: i64,
+}
+
+
+fn get_user_scores(guildid: &GuildId) -> Result<Vec<LeaderboardEntry>, Box<dyn Error>> {
+    let guild_id = guildid.as_u64().to_string();
+    let conn = get_db()?;
+    let mut statement = conn.prepare("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 ORDER BY points DESC LIMIT 10;")?;
+    let result_iter = statement.query_map(&[&guild_id], |row| {
+       Ok(LeaderboardEntry{
+        user_id: row.get(0)?,
+        points: row.get(1)?
+       })
+    })?;
+
+    let mut result = Vec::new();
+    for x in result_iter {
+        result.push(x?);
+    }
+
+    Ok(result)
 }
