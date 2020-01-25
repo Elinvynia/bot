@@ -17,7 +17,7 @@ fn leaderboard(ctx: &mut Context, msg: &Message) -> CommandResult {
 
     let mut result = "".to_string();
     for x in rows.iter() {
-        result.push_str(&format!("{} - {}\n", &ctx.http.get_member(*msg.guild_id.unwrap().as_u64(), x.user_id.parse::<u64>().unwrap()).unwrap().user.read().name, x.points)[..])
+        result.push_str(&format!("{} - {}\n", msg.guild_id.unwrap().member(&ctx, x.user_id.parse::<u64>().unwrap()).unwrap().user.read().name, x.points)[..])
     };
 
     let _ = msg.channel_id
