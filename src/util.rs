@@ -1,6 +1,6 @@
 use crate::data::*;
 use crate::db::*;
-use serenity::{model::prelude::*, prelude::*};
+use serenity::{model::prelude::*, prelude::*, utils::parse_username};
 use std::error::Error;
 
 pub fn log_dm(ctx: &mut Context, message: &Message) {
@@ -31,8 +31,11 @@ pub fn log_dm(ctx: &mut Context, message: &Message) {
     }
 }
 
-pub fn get_log_channel(guildid: &GuildId) -> Result<ChannelId, Box<dyn Error>> {
-    let conn = get_db()?;
+pub fn get_log_channel(guildid: &GuildId) -> Result<ChannelId, BotError> {
+    let conn = match get_db() {
+        Ok(c) => c,
+        Err(e) => return Err(e),
+    };
 
     let mut statement = conn.prepare("SELECT channel_id FROM log WHERE guild_id == ?1;")?;
     let mut rows = statement.query(&[&guildid.as_u64().to_string()])?;
@@ -42,7 +45,7 @@ pub fn get_log_channel(guildid: &GuildId) -> Result<ChannelId, Box<dyn Error>> {
     Ok(ChannelId(cid))
 }
 
-pub fn get_log_type(guildid: &GuildId) -> Result<i64, Box<dyn Error>> {
+pub fn get_log_type(guildid: &GuildId) -> Result<i64, BotError> {
     let conn = get_db()?;
 
     let mut statement = conn.prepare("SELECT log_type FROM log WHERE guild_id == ?1;")?;
@@ -53,16 +56,35 @@ pub fn get_log_type(guildid: &GuildId) -> Result<i64, Box<dyn Error>> {
     Ok(log_type)
 }
 
-pub fn get_prefix(guildid: &GuildId) -> Result<String, Box<dyn Error>> {
+pub fn get_prefix(guildid: &GuildId) -> Result<String, BotError> {
     let conn = get_db()?;
     let mut statement = conn.prepare("SELECT prefix FROM prefix WHERE guild_id == ?1;")?;
     let mut rows = statement.query(&[&guildid.as_u64().to_string()])?;
     Ok(rows.next()?.ok_or("Guild not found.")?.get(0)?)
 }
 
-pub fn get_user_score(guildid: &GuildId, userid: &UserId) -> Result<i64, Box<dyn Error>> {
+pub fn get_user_score(guildid: &GuildId, userid: &UserId) -> Result<i64, BotError> {
     let conn = get_db()?;
-    let mut statement = conn.prepare("SELECT points FROM leaderboard WHERE guild_id == ?1 AND user_id == ?2;")?;
-    let mut rows = statement.query(&[&guildid.as_u64().to_string(), &userid.as_u64().to_string()])?;
+    let mut statement =
+        conn.prepare("SELECT points FROM leaderboard WHERE guild_id == ?1 AND user_id == ?2;")?;
+    let mut rows =
+        statement.query(&[&guildid.as_u64().to_string(), &userid.as_u64().to_string()])?;
     Ok(rows.next()?.ok_or("No record yet.")?.get(0)?)
+}
+
+pub fn parse_user(
+    name: &String,
+    optional_msg: Option<&Message>,
+) -> Option<UserId> {
+    if let Some(x) = parse_username(&name) {
+        return Some(UserId(x));
+    }
+
+    if optional_msg.is_none() || optional_msg.unwrap().guild_id.is_none() {
+        return None;
+    }
+
+    let guildid = optional_msg.unwrap().guild_id.unwrap();
+
+    None
 }

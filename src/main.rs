@@ -1,3 +1,5 @@
+#![feature(int_error_matching)]
+
 mod commands;
 use commands::*;
 
@@ -19,7 +21,7 @@ use std::{collections::HashSet, env, sync::Arc};
 
 use serenity::{framework::StandardFramework, prelude::*};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     dotenv().ok();
 
     create_db();
@@ -65,6 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .normal_message(log_dm)
             .group(&CONFIG_GROUP)
             .group(&ADMIN_GROUP)
+            .group(&FUN_GROUP)
             .group(&GENERAL_GROUP),
     );
 
@@ -76,5 +79,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         data.insert::<BotOwners>(x);
     }
 
-    client.start_autosharded().map_err(|e| e.into())
+    client.start_autosharded().unwrap()
 }

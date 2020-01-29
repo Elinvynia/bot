@@ -22,7 +22,9 @@ fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
         &[&msg.guild_id.unwrap().as_u64().to_string(), pref],
     );
 
-    let _ = msg.channel_id.say(&ctx.http, format!("The prefix has been set to: `{}`", pref));
+    let _ = msg
+        .channel_id
+        .say(&ctx.http, format!("The prefix has been set to: `{}`", pref));
 
     Ok(())
 }

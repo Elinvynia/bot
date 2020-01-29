@@ -1,6 +1,7 @@
+use crate::data::*;
 use log::error;
 use rusqlite::{Connection, NO_PARAMS};
-use std::{error::Error, fs::File, path::Path};
+use std::{fs::File, path::Path};
 
 pub fn create_db() {
     let db = Path::new("db.sqlite3");
@@ -46,7 +47,10 @@ pub fn create_db() {
     }
 }
 
-pub fn get_db() -> Result<Connection, Box<dyn Error>> {
+pub fn get_db() -> Result<Connection, BotError> {
     let db = Path::new("db.sqlite3");
-    Ok(Connection::open(db)?)
+    match Connection::open(db) {
+        Ok(c) => return Ok(c),
+        Err(e) => return Err(BotError::DbError(e)),
+    }
 }

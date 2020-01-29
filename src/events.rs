@@ -1,6 +1,6 @@
 use crate::data::*;
-use crate::util::*;
 use crate::db::*;
+use crate::util::*;
 
 use std::sync::Arc;
 
@@ -18,13 +18,13 @@ impl EventHandler for Handler {
 
     fn message(&self, _ctx: Context, new_message: Message) {
         let guild_id = match new_message.guild_id {
-            Some(g) =>  g,
-            None => return
+            Some(g) => g,
+            None => return,
         };
 
         let conn = match get_db() {
             Ok(c) => c,
-            Err(_) => return
+            Err(_) => return,
         };
 
         let user_id = new_message.author.id;
@@ -34,9 +34,14 @@ impl EventHandler for Handler {
                 let _ = conn.execute("UPDATE leaderboard SET points = points + 1 WHERE guild_id == ?1 AND user_id == ?2;",
                                     &[&guild_id.as_u64().to_string(), &user_id.as_u64().to_string()]);
             }
-            Err(e) if e.to_string().as_str() == "No record yet." => {
-                let _ = conn.execute("INSERT INTO leaderboard (guild_id, user_id, points) values (?1, ?2, 1);",
-                                    &[&guild_id.as_u64().to_string(), &user_id.as_u64().to_string()]);
+            Err(BotError::CustomError(e)) if e == "No record yet." => {
+                let _ = conn.execute(
+                    "INSERT INTO leaderboard (guild_id, user_id, points) values (?1, ?2, 1);",
+                    &[
+                        &guild_id.as_u64().to_string(),
+                        &user_id.as_u64().to_string(),
+                    ],
+                );
             }
             Err(_) => {
                 return;
@@ -180,11 +185,7 @@ impl EventHandler for Handler {
             let avatar = user.face().replace("size=1024", "size=128");
             let mut req = reqwest::blocking::get(&avatar).unwrap();
             let _ = std::io::copy(&mut req, &mut picture);
-            message.content(format!(
-                "User left:\nTag: {}\nID: {}",
-                user.tag(),
-                user.id
-            ));
+            message.content(format!("User left:\nTag: {}\nID: {}", user.tag(), user.id));
             message.add_file((
                 picture.as_slice(),
                 format!("{}{}", user.id, ".webp").as_str(),

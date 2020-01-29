@@ -3,21 +3,18 @@ use serenity::framework::standard::macros::group;
 pub mod ping;
 use ping::*;
 
-pub mod prefix;
-use prefix::*;
-
-pub mod leaderboard;
-use leaderboard::*;
-
 #[group]
-#[commands(ping, prefix, leaderboard)]
+#[commands(ping)]
 struct General;
 
 pub mod log;
 use self::log::*;
 
+pub mod prefix;
+use prefix::*;
+
 #[group]
-#[commands(log)]
+#[commands(log, prefix)]
 struct Config;
 
 pub mod ban;
@@ -29,3 +26,16 @@ use kick::*;
 #[group]
 #[commands(ban, kick)]
 struct Admin;
+
+pub mod avatar;
+use avatar::*;
+
+pub mod user;
+use user::*;
+
+pub mod leaderboard;
+use leaderboard::*;
+
+#[group]
+#[commands(avatar, user, leaderboard)]
+struct Fun;

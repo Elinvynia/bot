@@ -1,8 +1,8 @@
-use serenity::prelude::*;
+use crate::util::parse_user;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
-    utils::parse_username,
+    prelude::*,
 };
 
 #[command]
@@ -11,9 +11,14 @@ use serenity::{
 #[min_args(1)]
 #[max_args(2)]
 fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let banned_id = parse_username(args.current().ok_or("no args passed")?)
-        .ok_or("arg passed isn't a valid user mention")?;
-    let banned = UserId(banned_id).to_user(&ctx)?;
+    let banned_id = match parse_user(
+        &args.current().unwrap().to_string(),
+        Some(&msg)
+    ) {
+        Some(x) => x,
+        None => return Ok(()),
+    };
+    let banned = banned_id.to_user(&ctx)?;
 
     args.advance();
     let arg_reason = args.current().unwrap_or("");
