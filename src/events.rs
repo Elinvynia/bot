@@ -1,19 +1,16 @@
-use crate::data::*;
-use crate::db::*;
-use crate::util::*;
-
-use std::sync::Arc;
-
+use crate::{data::*, db::*, util::*};
+use log::{error, info};
 use serenity::{
     model::{gateway::Ready, prelude::*},
     prelude::*,
 };
+use std::sync::Arc;
 
 pub struct Handler;
 
 impl EventHandler for Handler {
     fn ready(&self, _: Context, ready: Ready) {
-        println!("Connected as {}", ready.user.name);
+        info!("Connected as {}", ready.user.name);
     }
 
     fn message(&self, _ctx: Context, new_message: Message) {
@@ -24,8 +21,15 @@ impl EventHandler for Handler {
 
         let conn = match get_db() {
             Ok(c) => c,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
+
+        if new_message.author.bot {
+            return;
+        }
 
         let user_id = new_message.author.id;
 
@@ -43,7 +47,8 @@ impl EventHandler for Handler {
                     ],
                 );
             }
-            Err(_) => {
+            Err(e) => {
+                error!("{:?}", e);
                 return;
             }
         }
@@ -60,12 +65,21 @@ impl EventHandler for Handler {
 
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::MessageDeleted as i64
-            != LogType::MessageDeleted as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::MessageDeleted as i64 != LogType::MessageDeleted as i64 {
             return;
         }
 
@@ -103,7 +117,10 @@ impl EventHandler for Handler {
 
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
         let data = ctx.data.read();
@@ -115,13 +132,19 @@ impl EventHandler for Handler {
             return;
         }
 
-        if get_log_type(&guildid).unwrap() & LogType::MessageEdited as i64
-            != LogType::MessageEdited as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::MessageEdited as i64 != LogType::MessageEdited as i64 {
             return;
         }
 
-        let _ = log_channel.say(
+        if let Err(e) = log_channel.say(
             &ctx.http,
             format!(
                 "Message by {} updated in channel {} from:\n{}\nTo:\n{}",
@@ -130,18 +153,29 @@ impl EventHandler for Handler {
                 old_m.content,
                 new_m.content
             ),
-        );
+        ) {
+            error!("{:?}", e);
+        }
     }
 
     fn guild_member_addition(&self, ctx: Context, guildid: GuildId, new_member: Member) {
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::UserJoined as i64
-            != LogType::UserJoined as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::UserJoined as i64 != LogType::UserJoined as i64 {
             return;
         }
 
@@ -173,15 +207,26 @@ impl EventHandler for Handler {
     ) {
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::UserLeft as i64 != LogType::UserLeft as i64 {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::UserLeft as i64 != LogType::UserLeft as i64 {
             return;
         }
 
         let mut picture: Vec<u8> = vec![];
-        let _ = log_channel.send_message(&ctx.http, |message| {
+        if let Err(e) = log_channel.send_message(&ctx.http, |message| {
             let avatar = user.face().replace("size=1024", "size=128");
             let mut req = reqwest::blocking::get(&avatar).unwrap();
             let _ = std::io::copy(&mut req, &mut picture);
@@ -191,41 +236,50 @@ impl EventHandler for Handler {
                 format!("{}{}", user.id, ".webp").as_str(),
             ));
             message
-        });
+        }) {
+            error!("{:?}", e);
+        }
     }
 
     fn guild_ban_addition(&self, ctx: Context, guildid: GuildId, user: User) {
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::UserBanned as i64
-            != LogType::UserBanned as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::UserBanned as i64 != LogType::UserBanned as i64 {
             return;
         }
 
-        let _ = log_channel.send_message(&ctx.http, |m| {
-            if let Some(avatar) = user.avatar_url() {
-                m.content(format!(
-                    "User banned:\nTag: {}\nID: {}",
-                    user.tag(),
-                    user.id
-                ));
-                m.embed(|e| {
-                    let url = format!("{}{}", avatar, "?size=128");
-                    e.image(url)
-                });
-            } else {
-                m.content(format!(
-                    "User left:\nTag: {}\nID: {}\nDefault avatar.",
-                    user.tag(),
-                    user.id
-                ));
-            }
-            m
-        });
+        let mut picture: Vec<u8> = vec![];
+        if let Err(e) = log_channel.send_message(&ctx.http, |message| {
+            let avatar = user.face().replace("size=1024", "size=128");
+            let mut req = reqwest::blocking::get(&avatar).unwrap();
+            let _ = std::io::copy(&mut req, &mut picture);
+            message.content(format!(
+                "User banned:\nTag: {}\nID: {}",
+                user.tag(),
+                user.id
+            ));
+            message.add_file((
+                picture.as_slice(),
+                format!("{}{}", user.id, ".webp").as_str(),
+            ));
+            message
+        }) {
+            error!("{:?}", e);
+        }
     }
 
     fn channel_create(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
@@ -234,16 +288,27 @@ impl EventHandler for Handler {
 
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::ChannelCreated as i64
-            != LogType::ChannelCreated as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::ChannelCreated as i64 != LogType::ChannelCreated as i64 {
             return;
         }
 
-        let _ = log_channel.say(&ctx.http, format!("Channel created: {}", c.name));
+        if let Err(e) = log_channel.say(&ctx.http, format!("Channel created: {}", c.name)) {
+            error!("{:?}", e);
+        }
     }
 
     fn channel_delete(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
@@ -252,16 +317,27 @@ impl EventHandler for Handler {
 
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::ChannelDeleted as i64
-            != LogType::ChannelDeleted as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::ChannelDeleted as i64 != LogType::ChannelDeleted as i64 {
             return;
         }
 
-        let _ = log_channel.say(&ctx.http, format!("Channel deleted: {}", c.name));
+        if let Err(e) = log_channel.say(&ctx.http, format!("Channel deleted: {}", c.name)) {
+            error!("{:?}", e);
+        }
     }
 
     fn category_create(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
@@ -276,16 +352,27 @@ impl EventHandler for Handler {
 
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::CategoryCreated as i64
-            != LogType::CategoryDeleted as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::CategoryCreated as i64 != LogType::CategoryDeleted as i64 {
             return;
         }
 
-        let _ = log_channel.say(&ctx.http, format!("Category created: {}", c.name));
+        if let Err(e) = log_channel.say(&ctx.http, format!("Category created: {}", c.name)) {
+            error!("{:?}", e);
+        }
     }
 
     fn category_delete(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
@@ -300,15 +387,26 @@ impl EventHandler for Handler {
 
         let log_channel = match get_log_channel(&guildid) {
             Ok(l) => l,
-            Err(_) => return,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
         };
 
-        if get_log_type(&guildid).unwrap() & LogType::CategoryDeleted as i64
-            != LogType::CategoryDeleted as i64
-        {
+        let log_type = match get_log_type(&guildid) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return;
+            }
+        };
+
+        if log_type & LogType::CategoryDeleted as i64 != LogType::CategoryDeleted as i64 {
             return;
         }
 
-        let _ = log_channel.say(&ctx.http, format!("Category deleted: {}", c.name));
+        if let Err(e) = log_channel.say(&ctx.http, format!("Category deleted: {}", c.name)) {
+            error!("{:?}", e);
+        }
     }
 }

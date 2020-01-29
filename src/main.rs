@@ -1,5 +1,3 @@
-#![feature(int_error_matching)]
-
 mod commands;
 use commands::*;
 
@@ -16,10 +14,12 @@ mod events;
 use events::Handler;
 
 use dotenv::dotenv;
-
-use std::{collections::HashSet, env, sync::Arc};
-
 use serenity::{framework::StandardFramework, prelude::*};
+use std::{
+    collections::{HashMap, HashSet},
+    env,
+    sync::Arc,
+};
 
 fn main() {
     dotenv().ok();
@@ -51,17 +51,29 @@ fn main() {
             .configure(|c| {
                 c.owners(owners)
                     .on_mention(Some(botid))
-                    .dynamic_prefix(|_, msg| {
+                    .dynamic_prefix(|ctx, msg| {
                         if msg.is_private() {
                             return Some("!".to_string());
                         }
-                        if let Some(guild_id) = msg.guild_id {
-                            let prefix =
-                                get_prefix(&guild_id).map_or_else(|_| "!".to_string(), |pref| pref);
-                            return Some(prefix);
-                        } else {
+
+                        if msg.guild_id.is_none() {
                             return Some("!".to_string());
                         }
+
+                        let guildid = msg.guild_id.unwrap();
+
+                        {
+                            let data = ctx.data.read();
+                            let prefixes = data.get::<Prefix>().unwrap();
+                            if let Some(x) = prefixes.get(&guildid) {
+                                return Some(x.to_string());
+                            }
+                        }
+
+                        return Some(
+                            get_prefix(&guildid, &ctx)
+                                .map_or_else(|_| "!".to_string(), |pref| pref),
+                        );
                     })
             })
             .normal_message(log_dm)
@@ -77,6 +89,8 @@ fn main() {
         data.insert::<BotId>(botid);
         let x = vec![ownerid];
         data.insert::<BotOwners>(x);
+        let map = HashMap::new();
+        data.insert::<Prefix>(map);
     }
 
     client.start_autosharded().unwrap()

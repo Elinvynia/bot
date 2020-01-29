@@ -1,5 +1,6 @@
 use serenity::{client::bridge::gateway::ShardManager, model::prelude::*, prelude::*};
 use std::{
+    collections::HashMap,
     error::Error,
     fmt::{Display, Formatter, Result},
     num,
@@ -22,6 +23,12 @@ pub struct ShardManagerContainer;
 
 impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
+}
+
+pub struct Prefix;
+
+impl TypeMapKey for Prefix {
+    type Value = HashMap<GuildId, String>;
 }
 
 pub enum LogType {

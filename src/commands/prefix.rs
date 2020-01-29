@@ -1,4 +1,4 @@
-use crate::db::*;
+use crate::{data::*, db::*};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -15,12 +15,17 @@ fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
         Err(_) => return Ok(()),
     };
 
+    let mut data = ctx.data.write();
+    let guildid = msg.guild_id.unwrap();
     let pref = args.current().unwrap_or("!");
 
     let _ = conn.execute(
         "INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)",
-        &[&msg.guild_id.unwrap().as_u64().to_string(), pref],
+        &[&guildid.as_u64().to_string(), pref],
     );
+
+    let prefixes = data.get_mut::<Prefix>().unwrap();
+    prefixes.insert(guildid, pref.to_string());
 
     let _ = msg
         .channel_id
