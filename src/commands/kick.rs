@@ -1,8 +1,8 @@
+use crate::util::parse_user;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
     prelude::*,
-    utils::parse_username,
 };
 
 #[command]
@@ -11,9 +11,9 @@ use serenity::{
 #[min_args(1)]
 #[max_args(2)]
 fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let kicked_id = parse_username(args.current().ok_or("no args passed")?)
+    let kicked_id = parse_user(&args.current().unwrap().to_string(), msg.guild_id.as_ref(), Some(&ctx))
         .ok_or("arg passed isn't a valid user mention")?;
-    let kicked = UserId(kicked_id).to_user(&ctx)?;
+    let kicked = kicked_id.to_user(&ctx)?;
 
     args.advance();
     let arg_reason = args.current().unwrap_or("");

@@ -77,16 +77,42 @@ pub fn get_user_score(guildid: &GuildId, userid: &UserId) -> Result<i64, BotErro
     Ok(rows.next()?.ok_or("No record yet.")?.get(0)?)
 }
 
-pub fn parse_user(name: &String, optional_msg: Option<&Message>) -> Option<UserId> {
+pub fn parse_user(name: &String, optional_gid: Option<&GuildId>, optional_ctx: Option<&Context>) -> Option<UserId> {
     if let Some(x) = parse_username(&name) {
         return Some(UserId(x));
     }
 
-    if optional_msg.is_none() || optional_msg.unwrap().guild_id.is_none() {
+    if optional_gid.is_none() || optional_ctx.is_none() {
         return None;
     }
 
-    let guildid = optional_msg.unwrap().guild_id.unwrap();
+    let gid = optional_gid.unwrap();
+    let ctx = optional_ctx.unwrap();
+
+    let g = match gid.to_guild_cached(&ctx) {
+        Some(g) => g,
+        None => return None
+    };
+
+    let guild = g.read();
+
+    if let Ok(id) = name.parse::<u64>() {
+        if let Ok(m) = guild.member(ctx, id) {
+            return Some(m.user.read().id)
+        }
+    }
+
+    if let Some(m) = guild.member_named(&name[..]) {
+        return Some(m.user.read().id)
+    }
+
+    if let Some(m) = guild.members_starting_with(&name[..], false, true).get(0) {
+        return Some(m.user.read().id)
+    }
+
+    if let Some(m) = guild.members_containing(&name[..], false, true).get(0) {
+        return Some(m.user.read().id)
+    }
 
     None
 }
