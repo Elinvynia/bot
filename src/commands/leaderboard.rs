@@ -32,15 +32,7 @@ fn leaderboard(ctx: &mut Context, msg: &Message) -> CommandResult {
         )
     }
 
-    let _ = msg.channel_id.send_message(&ctx, |m| {
-        m.embed(|e| {
-            e.title("Leaderboard");
-
-            e.field("Top 10:", result, false);
-
-            e
-        })
-    });
+    let _ = msg.channel_id.say(&ctx, format!("**Leaderboard** - Top 10\n{}", result));
 
     Ok(())
 }
