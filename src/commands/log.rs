@@ -1,12 +1,10 @@
-use crate::data::*;
-use crate::db::*;
-use crate::util::*;
-
+use crate::{data::*, db::*, util::*};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
     prelude::*,
 };
+use log::error;
 
 #[command]
 #[only_in(guilds)]
@@ -45,7 +43,13 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     if args.len() == 2 {
         let log_channel = get_log_channel(&msg.guild_id.unwrap()).unwrap();
 
-        let mut log_type = LogType::All as i64;
+        let mut log_type = match get_log_type(&msg.guild_id.unwrap()) {
+            Ok(l) => l,
+            Err(e) => {
+                error!("{:?}", e);
+                return Ok(())
+            }
+        };
         let on_off = args.single::<String>().unwrap();
         let log_kind = args.single::<String>().unwrap();
         let message: String;
@@ -79,7 +83,7 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             "disable" => {
                 match &log_kind[..] {
                     "all" => {
-                        log_type |= LogType::All as i64;
+                        log_type &= !(LogType::All as i64);
                         message = "No messages will be logged anymore!".to_string();
                     }
                     "delete" => {
@@ -105,7 +109,7 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
         }
 
         let _ = conn.execute(
-            "REPLACE INTO log (guild_id, log_type) values (?1, ?2)",
+            "UPDATE log SET log_type = ?2 WHERE guild_id = ?1;",
             &[&gid.to_string(), &log_type.to_string()],
         );
         let _ = log_channel.say(&ctx.http, message);
