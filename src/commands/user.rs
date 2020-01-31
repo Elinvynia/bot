@@ -18,7 +18,6 @@ fn user(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
         ) {
             Some(i) => i,
             None => {
-            	println!("asdf");
             	return Err(CommandError("No user found".to_string()))
             }
         };
