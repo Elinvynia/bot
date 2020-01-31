@@ -1,4 +1,4 @@
-use crate::{data::*, db::*};
+use crate::{data::Prefix, db::get_db};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -10,12 +10,7 @@ use serenity::{
 #[owners_only]
 #[num_args(1)]
 fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
-    let conn = match get_db() {
-        Ok(c) => c,
-        Err(_) => return Ok(()),
-    };
-
-    let mut data = ctx.data.write();
+    let conn = get_db()?;
     let guildid = msg.guild_id.unwrap();
     let pref = args.current().unwrap_or("!");
 
@@ -24,8 +19,11 @@ fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
         &[&guildid.as_u64().to_string(), pref],
     );
 
-    let prefixes = data.get_mut::<Prefix>().unwrap();
-    prefixes.insert(guildid, pref.to_string());
+    {
+        let mut data = ctx.data.write();
+        let prefixes = data.get_mut::<Prefix>().unwrap();
+        prefixes.insert(guildid, pref.to_string());
+    }
 
     let _ = msg
         .channel_id

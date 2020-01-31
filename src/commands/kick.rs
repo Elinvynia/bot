@@ -11,8 +11,12 @@ use serenity::{
 #[min_args(1)]
 #[max_args(2)]
 fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let kicked_id = parse_user(&args.current().unwrap().to_string(), msg.guild_id.as_ref(), Some(&ctx))
-        .ok_or("arg passed isn't a valid user mention")?;
+    let kicked_id = parse_user(
+        &args.current().unwrap().to_string(),
+        msg.guild_id.as_ref(),
+        Some(&ctx),
+    )
+    .ok_or("arg passed isn't a valid user mention")?;
     let kicked = kicked_id.to_user(&ctx)?;
 
     args.advance();

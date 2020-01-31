@@ -1,4 +1,4 @@
-use crate::data::*;
+use crate::data::ShardManagerContainer;
 use log::error;
 use serenity::{
     client::bridge::gateway::ShardId,

@@ -1,10 +1,13 @@
-use crate::{data::*, db::*, util::*};
+use crate::{
+    data::LogType,
+    db::{get_db, get_log_channel, get_log_type},
+};
+use log::error;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
     prelude::*,
 };
-use log::error;
 
 #[command]
 #[only_in(guilds)]
@@ -12,19 +15,19 @@ use log::error;
 #[min_args(0)]
 #[max_args(2)]
 fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+    let guild_id = msg.guild_id.unwrap();
     let cid = msg.channel_id.0 as i64;
-    let gid = msg.guild_id.unwrap().0 as i64;
-
-    let conn = get_db().unwrap();
+    let gid = guild_id.0 as i64;
+    let conn = get_db()?;
 
     if args.len() == 0 {
-        if let Ok(_) = get_log_channel(&msg.guild_id.unwrap()) {
+        if let Ok(_) = get_log_channel(&guild_id) {
             let _ = conn.execute(
                 "UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;",
                 &[&cid.to_string(), &gid.to_string()],
-            );
-            let log_channel = get_log_channel(&msg.guild_id.unwrap()).unwrap();
-            let _ = log_channel.say(&ctx.http, "Log channel updated!");
+            )?;
+            let log_channel = get_log_channel(&guild_id)?;
+            let _ = log_channel.say(&ctx.http, "Log channel updated!")?;
             return Ok(());
         } else {
             let _ = conn.execute(
@@ -34,24 +37,24 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                     &cid.to_string(),
                     &(LogType::All as u64).to_string(),
                 ],
-            );
-            let _ = msg.channel_id.say(&ctx.http, "Log channel set!");
+            )?;
+            let _ = msg.channel_id.say(&ctx.http, "Log channel set!")?;
             return Ok(());
         };
     }
 
     if args.len() == 2 {
-        let log_channel = get_log_channel(&msg.guild_id.unwrap()).unwrap();
+        let log_channel = get_log_channel(&guild_id)?;
 
-        let mut log_type = match get_log_type(&msg.guild_id.unwrap()) {
+        let mut log_type = match get_log_type(&guild_id) {
             Ok(l) => l,
             Err(e) => {
                 error!("{:?}", e);
-                return Ok(())
+                return Ok(());
             }
         };
-        let on_off = args.single::<String>().unwrap();
-        let log_kind = args.single::<String>().unwrap();
+        let on_off = args.single::<String>()?;
+        let log_kind = args.single::<String>()?;
         let message: String;
 
         match &on_off[..] {
@@ -111,8 +114,8 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
         let _ = conn.execute(
             "UPDATE log SET log_type = ?2 WHERE guild_id = ?1;",
             &[&gid.to_string(), &log_type.to_string()],
-        );
-        let _ = log_channel.say(&ctx.http, message);
+        )?;
+        let _ = log_channel.say(&ctx.http, message)?;
         return Ok(());
     }
 

@@ -31,6 +31,13 @@ impl TypeMapKey for Prefix {
     type Value = HashMap<GuildId, String>;
 }
 
+#[derive(Debug)]
+pub struct LeaderboardEntry {
+    pub user_id: String,
+    pub channel_id: String,
+    pub points: i64,
+}
+
 pub enum LogType {
     MessageDeleted = 1 << 1,
     MessageEdited = 1 << 2,
@@ -48,20 +55,16 @@ pub enum LogType {
 pub enum BotError {
     DbError(rusqlite::Error),
     ParseError(String),
-    CustomError(&'static str),
+    CustomError(String),
 }
 
 impl Display for BotError {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{}", self)
+        write!(f, "{:#?}", self)
     }
 }
 
-impl Error for BotError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-}
+impl Error for BotError {}
 
 impl From<rusqlite::Error> for BotError {
     fn from(err: rusqlite::Error) -> BotError {
@@ -69,8 +72,8 @@ impl From<rusqlite::Error> for BotError {
     }
 }
 
-impl From<&'static str> for BotError {
-    fn from(err: &'static str) -> BotError {
+impl From<String> for BotError {
+    fn from(err: String) -> BotError {
         return BotError::CustomError(err);
     }
 }

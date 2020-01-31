@@ -13,7 +13,6 @@ use db::*;
 mod events;
 use events::Handler;
 
-use dotenv::dotenv;
 use serenity::{framework::StandardFramework, prelude::*};
 use std::{
     collections::{HashMap, HashSet},
@@ -21,9 +20,11 @@ use std::{
     sync::Arc,
 };
 
+use dotenv::dotenv;
+
 fn main() {
     dotenv().ok();
-
+    env_logger::init();
     create_db();
 
     let token = env::var("DISCORD_TOKEN").expect("DISCORD_TOKEN not found in environment");
@@ -76,6 +77,8 @@ fn main() {
                         );
                     })
             })
+            .on_dispatch_error(dispatch_error)
+            .after(after)
             .normal_message(log_dm)
             .group(&CONFIG_GROUP)
             .group(&ADMIN_GROUP)

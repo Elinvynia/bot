@@ -1,4 +1,4 @@
-use crate::{data::*, db::*, util::*};
+use crate::{data::*, db::*};
 use log::{error, info};
 use serenity::{
     model::{gateway::Ready, prelude::*},

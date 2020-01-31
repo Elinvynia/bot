@@ -11,7 +11,11 @@ use serenity::{
 #[min_args(1)]
 #[max_args(2)]
 fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let banned_id = match parse_user(&args.current().unwrap().to_string(), msg.guild_id.as_ref(), Some(&ctx)) {
+    let banned_id = match parse_user(
+        &args.current().unwrap().to_string(),
+        msg.guild_id.as_ref(),
+        Some(&ctx),
+    ) {
         Some(x) => x,
         None => return Ok(()),
     };
