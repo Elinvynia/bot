@@ -34,7 +34,6 @@ impl TypeMapKey for Prefix {
 #[derive(Debug)]
 pub struct LeaderboardEntry {
     pub user_id: String,
-    pub channel_id: String,
     pub points: i64,
 }
 
@@ -54,7 +53,7 @@ pub enum LogType {
 #[derive(Debug)]
 pub enum BotError {
     DbError(rusqlite::Error),
-    ParseError(String),
+    ParseError(num::ParseIntError),
     CustomError(String),
 }
 
@@ -80,6 +79,6 @@ impl From<String> for BotError {
 
 impl From<num::ParseIntError> for BotError {
     fn from(err: num::ParseIntError) -> BotError {
-        return BotError::ParseError(err.to_string());
+        return BotError::ParseError(err);
     }
 }

@@ -4,7 +4,7 @@ use serenity::{
     framework::standard::{CommandError, DispatchError},
     model::prelude::*,
     prelude::*,
-    utils::parse_username,
+    utils::{parse_channel, parse_username},
 };
 
 pub fn log_dm(ctx: &mut Context, message: &Message) {
@@ -74,6 +74,48 @@ pub fn parse_user(
 
     if let Some(m) = guild.members_containing(&name[..], false, true).get(0) {
         return Some(m.user.read().id);
+    }
+
+    None
+}
+
+pub fn parse_chan(
+    name: &String,
+    optional_gid: Option<&GuildId>,
+    optional_ctx: Option<&Context>,
+) -> Option<ChannelId> {
+    if let Some(x) = parse_channel(&name) {
+        return Some(ChannelId(x));
+    }
+
+    if optional_gid.is_none() || optional_ctx.is_none() {
+        return None;
+    }
+
+    let gid = optional_gid.unwrap();
+    let ctx = optional_ctx.unwrap();
+
+    if let Ok(id) = name.parse::<u64>() {
+        if let Some(x) = ChannelId(id).to_channel_cached(&ctx) {
+            return Some(x.id());
+        }
+    }
+
+    let g = match gid.to_guild_cached(&ctx) {
+        Some(g) => g,
+        None => return None,
+    };
+
+    let guild = g.read();
+
+    for (key, value) in guild.channels.iter() {
+        let cname = &value.read().name;
+        if cname == name {
+            return Some(*key);
+        }
+        if cname.contains(name) {
+            return Some(*key);
+        }
     }
 
     None
