@@ -12,7 +12,7 @@ use serenity::{
 #[max_args(2)]
 fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let kicked_id = parse_user(
-        &args.current().unwrap().to_string(),
+        &args.quoted().current().unwrap().to_string(),
         msg.guild_id.as_ref(),
         Some(&ctx),
     )
@@ -22,15 +22,15 @@ fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     args.advance();
     let arg_reason = args.current().unwrap_or("");
 
-    let _ = kicked.create_dm_channel(&ctx).unwrap().say(
+    kicked.create_dm_channel(&ctx).unwrap().say(
         &ctx.http,
         format!(
             "You have been kicked from {}\nReason: {}",
             msg.guild(&ctx.cache).unwrap().read().name,
             &arg_reason
         ),
-    );
-    let _ = msg.guild_id.unwrap().kick(&ctx.http, kicked);
+    )?;
+    msg.guild_id.unwrap().kick(&ctx.http, kicked)?;
 
     Ok(())
 }
