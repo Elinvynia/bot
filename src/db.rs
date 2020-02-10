@@ -122,7 +122,7 @@ pub fn get_user_channel_score(
 pub fn get_user_total_scores(guildid: &GuildId) -> Result<Vec<LeaderboardEntry>, BotError> {
     let guild_id = guildid.as_u64().to_string();
     let conn = get_db()?;
-    let mut statement = conn.prepare("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 ORDER BY points DESC LIMIT 10;")?;
+    let mut statement = conn.prepare("SELECT user_id, SUM(points) as points FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC LIMIT 10;")?;
     let result_iter = statement.query_map(&[&guild_id], |row| {
         Ok(LeaderboardEntry {
             user_id: row.get(0)?,
