@@ -1,5 +1,6 @@
 mod commands;
 use commands::*;
+use commands::help::*;
 
 mod data;
 use data::*;
@@ -80,6 +81,7 @@ fn main() {
             .on_dispatch_error(dispatch_error)
             .after(after)
             .normal_message(log_dm)
+            .help(&HELP)
             .group(&CONFIG_GROUP)
             .group(&ADMIN_GROUP)
             .group(&FUN_GROUP)
