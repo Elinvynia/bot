@@ -25,9 +25,9 @@ struct Admin;
 
 pub mod fun;
 use fun::avatar::*;
-use fun::user::*;
 use fun::guild::*;
 use fun::leaderboard::*;
+use fun::user::*;
 
 #[group]
 #[commands(avatar, user, leaderboard, guild)]

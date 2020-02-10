@@ -1,6 +1,6 @@
 mod commands;
-use commands::*;
 use commands::help::*;
+use commands::*;
 
 mod data;
 use data::*;

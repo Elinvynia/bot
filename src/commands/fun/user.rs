@@ -1,6 +1,6 @@
 use crate::util::parse_user;
 use serenity::{
-    framework::standard::{macros::command, Args, CommandResult, CommandError},
+    framework::standard::{macros::command, Args, CommandError, CommandResult},
     model::prelude::*,
     prelude::*,
 };
@@ -17,9 +17,7 @@ fn user(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             Some(&ctx),
         ) {
             Some(i) => i,
-            None => {
-            	return Err(CommandError("No user found".to_string()))
-            }
+            None => return Err(CommandError("No user found".to_string())),
         };
     } else {
         user_id = msg.author.id;
@@ -31,6 +29,6 @@ fn user(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
         &ctx,
         format!("User found!\nTag: {}\nID: {}", user.tag(), user.id),
     );
-    
+
     Ok(())
 }

@@ -1,6 +1,11 @@
-use serenity::{model::prelude::*, prelude::*, utils::parse_username, framework::standard::{DispatchError, CommandError}};
 use crate::data::{BotId, BotOwners};
 use log::error;
+use serenity::{
+    framework::standard::{CommandError, DispatchError},
+    model::prelude::*,
+    prelude::*,
+    utils::parse_username,
+};
 
 pub fn log_dm(ctx: &mut Context, message: &Message) {
     if message.guild_id.is_some() {
@@ -77,11 +82,17 @@ pub fn parse_user(
 pub fn dispatch_error(context: &mut Context, msg: &Message, error: DispatchError) {
     match error {
         DispatchError::NotEnoughArguments { min, given } => {
-            let _ = msg.channel_id.say(&context.http, format!("Need {} arguments, but only got {}.", min, given));
-        },
+            let _ = msg.channel_id.say(
+                &context.http,
+                format!("Need {} arguments, but only got {}.", min, given),
+            );
+        }
         DispatchError::TooManyArguments { max, given } => {
-            let _ = msg.channel_id.say(&context.http, format!("Max arguments allowed is {}, but got {}.", max, given));
-        },
+            let _ = msg.channel_id.say(
+                &context.http,
+                format!("Max arguments allowed is {}, but got {}.", max, given),
+            );
+        }
         _ => error!("Unhandled dispatch error."),
     }
 }

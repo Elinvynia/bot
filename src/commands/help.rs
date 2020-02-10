@@ -16,6 +16,13 @@ use std::collections::HashSet;
     searching for a different command instead."
 )]
 #[strikethrough_commands_tip_in_guild("Test")]
-fn help(ctx: &mut Context, msg: &Message, args: Args, opts: &'static HelpOptions, groups: &[&'static CommandGroup], owners: HashSet<UserId>) -> CommandResult {
+fn help(
+    ctx: &mut Context,
+    msg: &Message,
+    args: Args,
+    opts: &'static HelpOptions,
+    groups: &[&'static CommandGroup],
+    owners: HashSet<UserId>,
+) -> CommandResult {
     help_commands::plain(ctx, msg, args, &opts, groups, owners)
 }
