@@ -7,13 +7,13 @@ use general::ping::*;
 #[commands(ping)]
 struct General;
 
-pub mod config;
-use config::log::*;
-use config::prefix::*;
+pub mod settings;
+use settings::log::*;
+use settings::prefix::*;
 
 #[group]
 #[commands(log, prefix)]
-struct Config;
+struct Settings;
 
 pub mod admin;
 use admin::ban::*;

@@ -17,19 +17,30 @@ use listeners::Handler;
 use serenity::{framework::StandardFramework, prelude::*};
 use std::{
     collections::{HashMap, HashSet},
-    env,
     sync::Arc,
+    env
 };
 
-use dotenv::dotenv;
-
 fn main() {
-    dotenv().ok();
+    let mut settings = config::Config::default();
+    settings
+        .merge(config::File::with_name("config")).unwrap()
+        // Add in settings from the environment (with a prefix of APP)
+        // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
+        .merge(config::Environment::with_prefix("APP")).unwrap();
+    
+    dotenv::dotenv().ok();
     env_logger::init();
     create_db();
 
-    let token = env::var("DISCORD_TOKEN").expect("DISCORD_TOKEN not found in environment");
-    let mut client = Client::new(&token, Handler).expect("Error creating client");
+    let token;
+    if let Ok(x) = env::var("DISCORD_TOKEN") {
+        token = x;
+    }
+    else {
+        token = settings.get_str("discord_token").expect("discord_token not found in settings.");
+    }
+    let mut client = Client::new(&token, Handler).expect("Error creating client.");
 
     let (owners, botid, ownerid) = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
@@ -53,36 +64,13 @@ fn main() {
             .configure(|c| {
                 c.owners(owners)
                     .on_mention(Some(botid))
-                    .dynamic_prefix(|ctx, msg| {
-                        if msg.is_private() {
-                            return Some("!".to_string());
-                        }
-
-                        if msg.guild_id.is_none() {
-                            return Some("!".to_string());
-                        }
-
-                        let guildid = msg.guild_id.unwrap();
-
-                        {
-                            let data = ctx.data.read();
-                            let prefixes = data.get::<Prefix>().unwrap();
-                            if let Some(x) = prefixes.get(&guildid) {
-                                return Some(x.to_string());
-                            }
-                        }
-
-                        return Some(
-                            get_prefix(&guildid, &ctx)
-                                .map_or_else(|_| "!".to_string(), |pref| pref),
-                        );
-                    })
+                    .dynamic_prefix(dynamic_prefix)
             })
             .on_dispatch_error(dispatch_error)
             .after(after)
             .normal_message(log_dm)
             .help(&HELP)
-            .group(&CONFIG_GROUP)
+            .group(&SETTINGS_GROUP)
             .group(&ADMIN_GROUP)
             .group(&FUN_GROUP)
             .group(&GENERAL_GROUP),
@@ -94,8 +82,9 @@ fn main() {
         data.insert::<BotId>(botid);
         let x = vec![ownerid];
         data.insert::<BotOwners>(x);
+        data.insert::<DefaultPrefix>(settings.get_str("default_prefix").expect("default_prefix not found in settings."));
         let map = HashMap::new();
-        data.insert::<Prefix>(map);
+        data.insert::<GuildPrefixes>(map);
     }
 
     client.start_autosharded().unwrap()

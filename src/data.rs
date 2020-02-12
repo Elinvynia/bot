@@ -25,9 +25,15 @@ impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 
-pub struct Prefix;
+pub struct DefaultPrefix;
 
-impl TypeMapKey for Prefix {
+impl TypeMapKey for DefaultPrefix {
+    type Value = String;
+}
+
+pub struct GuildPrefixes;
+
+impl TypeMapKey for GuildPrefixes {
     type Value = HashMap<GuildId, String>;
 }
 

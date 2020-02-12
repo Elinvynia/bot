@@ -1,4 +1,4 @@
-use crate::{data::Prefix, db::get_db};
+use crate::{data::GuildPrefixes, db::get_db};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -21,7 +21,7 @@ fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 
     {
         let mut data = ctx.data.write();
-        let prefixes = data.get_mut::<Prefix>().unwrap();
+        let prefixes = data.get_mut::<GuildPrefixes>().unwrap();
         prefixes.insert(guildid, pref.to_string());
     }
 

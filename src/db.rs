@@ -1,4 +1,4 @@
-use crate::data::{BotError, LeaderboardEntry, Prefix};
+use crate::data::{BotError, LeaderboardEntry, GuildPrefixes};
 use log::error;
 use rusqlite::{Connection, NO_PARAMS};
 use serenity::{model::prelude::*, prelude::*};
@@ -88,7 +88,7 @@ pub fn get_prefix(guildid: &GuildId, ctx: &Context) -> Result<String, BotError> 
     let prefix: String = rows.next()?.ok_or("Guild not found.".to_string())?.get(0)?;
     {
         let mut data = ctx.data.write();
-        let prefixes = data.get_mut::<Prefix>().unwrap();
+        let prefixes = data.get_mut::<GuildPrefixes>().unwrap();
         prefixes.insert(guildid.clone(), prefix.clone());
     }
     Ok(prefix)
