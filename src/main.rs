@@ -11,8 +11,8 @@ use util::*;
 mod db;
 use db::*;
 
-mod events;
-use events::Handler;
+mod listeners;
+use listeners::Handler;
 
 use serenity::{framework::StandardFramework, prelude::*};
 use std::{
