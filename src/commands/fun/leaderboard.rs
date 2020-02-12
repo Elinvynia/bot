@@ -26,17 +26,16 @@ fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResul
         let rows = get_user_channel_scores(&guild_id, &channel_id)?;
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
+            let id = x.user_id.parse::<u64>().unwrap();
+            let user = match guild_id.member(&ctx, id) {
+                Ok(m) => m.user.read().clone(),
+                Err(_) => ctx.http.get_user(id).unwrap()
+            };
             result.push_str(
                 &format!(
                     "{}. {} - {}\n",
                     i + 1,
-                    msg.guild_id
-                        .unwrap()
-                        .member(&ctx, x.user_id.parse::<u64>().unwrap())
-                        .unwrap()
-                        .user
-                        .read()
-                        .name,
+                    user.name,
                     x.points
                 )[..],
             )
@@ -50,17 +49,16 @@ fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResul
         let rows = get_user_total_scores(&guild_id)?;
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
+            let id = x.user_id.parse::<u64>().unwrap();
+            let user = match guild_id.member(&ctx, id) {
+                Ok(m) => m.user.read().clone(),
+                Err(_) => ctx.http.get_user(id).unwrap()
+            };
             result.push_str(
                 &format!(
                     "{}. {} - {}\n",
                     i + 1,
-                    msg.guild_id
-                        .unwrap()
-                        .member(&ctx, x.user_id.parse::<u64>().unwrap())
-                        .unwrap()
-                        .user
-                        .read()
-                        .name,
+                    user.name,
                     x.points
                 )[..],
             )
