@@ -19,7 +19,7 @@ pub fn create_db() {
         ) {
             Ok(_) => (),
             Err(e) => {
-                error!("{}", e);
+                error!("Failed to crate table `log`: {}", e);
             }
         }
         match connection.execute(
@@ -28,7 +28,7 @@ pub fn create_db() {
         ) {
             Ok(_) => (),
             Err(e) => {
-                error!("{}", e);
+                error!("Failed to create table `prefix`: {}", e);
             }
         }
         match connection.execute(
@@ -37,7 +37,7 @@ pub fn create_db() {
         ) {
             Ok(_) => (),
             Err(e) => {
-                error!("{}", e);
+                error!("Failed to create table `leaderboard`: {}", e);
             }
         }
     } else {
@@ -92,15 +92,6 @@ pub fn get_prefix(guildid: &GuildId, ctx: &Context) -> Result<String, BotError> 
         prefixes.insert(guildid.clone(), prefix.clone());
     }
     Ok(prefix)
-}
-
-pub fn get_user_total_score(guildid: &GuildId, userid: &UserId) -> Result<i64, BotError> {
-    let conn = get_db()?;
-    let mut statement =
-        conn.prepare("SELECT points FROM leaderboard WHERE guild_id == ?1 AND user_id == ?2;")?;
-    let mut rows =
-        statement.query(&[&guildid.as_u64().to_string(), &userid.as_u64().to_string()])?;
-    Ok(rows.next()?.ok_or("No record yet.".to_string())?.get(0)?)
 }
 
 pub fn get_user_channel_score(
