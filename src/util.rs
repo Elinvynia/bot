@@ -1,13 +1,14 @@
+use crate::data::{BotId, BotOwners, DefaultPrefix, GuildPrefixes};
+use crate::db::get_prefix;
+use log::error;
 use serenity::{
     framework::standard::{CommandError, DispatchError},
     model::prelude::*,
     prelude::*,
     utils::{parse_channel, parse_username},
 };
-use crate::data::{BotId, BotOwners, DefaultPrefix, GuildPrefixes};
-use crate::db::get_prefix;
-use log::error;
 
+//Sends non-command DMs from regular users to the bot owners.
 pub fn log_dm(ctx: &mut Context, message: &Message) {
     if message.guild_id.is_some() {
         return;
@@ -36,6 +37,7 @@ pub fn log_dm(ctx: &mut Context, message: &Message) {
     }
 }
 
+//A more detailed user parsing function, in order of priority: Mention, ID, whole name, name starting with, name containing
 pub fn parse_user(
     name: &String,
     optional_gid: Option<&GuildId>,
@@ -80,6 +82,7 @@ pub fn parse_user(
     None
 }
 
+// A more detailed channel parsing function, in order of priority: mention, channel id, channel name, channel name containing
 pub fn parse_chan(
     name: &String,
     optional_gid: Option<&GuildId>,
@@ -114,6 +117,10 @@ pub fn parse_chan(
         if cname == name {
             return Some(*key);
         }
+    }
+
+    for (key, value) in guild.channels.iter() {
+        let cname = &value.read().name;
         if cname.contains(name) {
             return Some(*key);
         }
@@ -122,6 +129,7 @@ pub fn parse_chan(
     None
 }
 
+//Generic handling of common user errors.
 pub fn dispatch_error(context: &mut Context, msg: &Message, error: DispatchError) {
     match error {
         DispatchError::NotEnoughArguments { min, given } => {
@@ -140,12 +148,14 @@ pub fn dispatch_error(context: &mut Context, msg: &Message, error: DispatchError
     }
 }
 
+//Logs every command that errored, should only be used for bot failures and not user failures.
 pub fn after(_ctx: &mut Context, _msg: &Message, _cmd_name: &str, error: Result<(), CommandError>) {
     if let Err(why) = error {
         error!("{:?}", why);
     }
 }
 
+//Allows the use of a per-guild prefix with a default one set using the config file.
 pub fn dynamic_prefix(ctx: &mut Context, msg: &Message) -> Option<String> {
     let default_prefix;
     {
@@ -173,6 +183,7 @@ pub fn dynamic_prefix(ctx: &mut Context, msg: &Message) -> Option<String> {
 
     return Some(
         get_prefix(&guildid, &ctx)
-            .map_or_else(|_| default_prefix, |pref| pref).to_string(),
+            .map_or_else(|_| default_prefix, |pref| pref)
+            .to_string(),
     );
 }
