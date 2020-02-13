@@ -1,4 +1,4 @@
-use crate::{data::GuildPrefixes, db::get_db};
+use crate::{data::cache::GuildPrefixes, db::get_db};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,

@@ -1,8 +1,7 @@
-use serenity::{model::prelude::*, prelude::*};
-
-use crate::data::LogType;
+use crate::data::db::LogType;
 use crate::db::{get_log_channel, get_log_type};
 use log::error;
+use serenity::{model::prelude::*, prelude::*};
 use std::sync::Arc;
 
 pub fn category_delete(ctx: Context, category: Arc<RwLock<ChannelCategory>>) {

@@ -1,5 +1,5 @@
 use crate::{
-    data::LogType,
+    data::db::LogType,
     db::{get_db, get_log_channel, get_log_type},
 };
 use log::error;

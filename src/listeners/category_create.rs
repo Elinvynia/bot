@@ -1,4 +1,4 @@
-use crate::data::LogType;
+use crate::data::db::LogType;
 use crate::db::*;
 use log::error;
 use serenity::{model::prelude::*, prelude::*};

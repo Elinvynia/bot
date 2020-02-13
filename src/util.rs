@@ -1,4 +1,4 @@
-use crate::data::{BotId, BotOwners, DefaultPrefix, GuildPrefixes};
+use crate::data::cache::{BotId, BotOwners, DefaultPrefix, GuildPrefixes};
 use crate::db::get_prefix;
 use log::error;
 use serenity::{

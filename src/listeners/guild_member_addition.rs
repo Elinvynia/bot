@@ -1,4 +1,4 @@
-use crate::data::LogType;
+use crate::data::db::LogType;
 use crate::db::{get_log_channel, get_log_type};
 use serenity::{model::prelude::*, prelude::*};
 

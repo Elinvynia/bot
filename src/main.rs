@@ -3,7 +3,7 @@ use commands::help::*;
 use commands::*;
 
 mod data;
-use data::*;
+use data::cache::{BotId, BotOwners, DefaultPrefix, GuildPrefixes, ShardManagerContainer};
 
 mod util;
 use util::*;

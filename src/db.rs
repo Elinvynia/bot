@@ -1,4 +1,4 @@
-use crate::data::{BotError, LeaderboardEntry, GuildPrefixes};
+use crate::data::{cache::GuildPrefixes, db::LeaderboardEntry, error::BotError};
 use log::error;
 use rusqlite::{Connection, NO_PARAMS};
 use serenity::{model::prelude::*, prelude::*};

@@ -1,4 +1,4 @@
-use crate::data::BotError;
+use crate::data::error::BotError;
 use crate::db::{get_db, get_user_channel_score};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};

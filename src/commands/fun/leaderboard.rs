@@ -29,16 +29,9 @@ fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResul
             let id = x.user_id.parse::<u64>().unwrap();
             let user = match guild_id.member(&ctx, id) {
                 Ok(m) => m.user.read().clone(),
-                Err(_) => ctx.http.get_user(id).unwrap()
+                Err(_) => ctx.http.get_user(id).unwrap(),
             };
-            result.push_str(
-                &format!(
-                    "{}. {} - {}\n",
-                    i + 1,
-                    user.name,
-                    x.points
-                )[..],
-            )
+            result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
         }
 
         let _ = msg.channel_id.say(
@@ -52,16 +45,9 @@ fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResul
             let id = x.user_id.parse::<u64>().unwrap();
             let user = match guild_id.member(&ctx, id) {
                 Ok(m) => m.user.read().clone(),
-                Err(_) => ctx.http.get_user(id).unwrap()
+                Err(_) => ctx.http.get_user(id).unwrap(),
             };
-            result.push_str(
-                &format!(
-                    "{}. {} - {}\n",
-                    i + 1,
-                    user.name,
-                    x.points
-                )[..],
-            )
+            result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
         }
 
         let _ = msg
