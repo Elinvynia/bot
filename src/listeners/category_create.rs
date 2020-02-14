@@ -1,5 +1,5 @@
 use crate::data::db::LogType;
-use crate::db::*;
+use crate::db::log::{get_log_channel, get_log_type};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 use std::sync::Arc;

@@ -1,5 +1,5 @@
 use crate::data::db::LogType;
-use crate::db::{get_log_channel, get_log_type};
+use crate::db::log::{get_log_channel, get_log_type};
 use serenity::{model::prelude::*, prelude::*};
 
 pub fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member) {

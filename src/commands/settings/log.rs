@@ -1,6 +1,9 @@
 use crate::{
     data::db::LogType,
-    db::{get_db, get_log_channel, get_log_type},
+    db::{
+        get_db,
+        log::{get_log_channel, get_log_type},
+    },
 };
 use log::error;
 use serenity::{

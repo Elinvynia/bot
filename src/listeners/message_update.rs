@@ -1,5 +1,5 @@
 use crate::data::{cache::BotId, db::LogType};
-use crate::db::{get_log_channel, get_log_type};
+use crate::db::log::{get_log_channel, get_log_type};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
