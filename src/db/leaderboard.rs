@@ -1,6 +1,6 @@
-use serenity::{model::prelude::*};
-use crate::data::{db::LeaderboardEntry, error::BotError};
 use super::get_db;
+use crate::data::{db::LeaderboardEntry, error::BotError};
+use serenity::model::prelude::*;
 
 pub fn get_user_channel_score(
     guildid: &GuildId,

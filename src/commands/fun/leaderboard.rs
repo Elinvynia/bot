@@ -1,5 +1,5 @@
 use crate::db::leaderboard::{get_user_channel_scores, get_user_total_scores};
-use crate::util::parse_chan;
+use crate::utils::parse::parse_chan;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,

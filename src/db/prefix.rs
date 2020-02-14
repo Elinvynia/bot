@@ -1,6 +1,6 @@
-use serenity::{prelude::*, model::prelude::*};
-use crate::data::{error::BotError, cache::GuildPrefixes};
 use super::get_db;
+use crate::data::{cache::GuildPrefixes, error::BotError};
+use serenity::{model::prelude::*, prelude::*};
 
 pub fn get_prefix(guildid: &GuildId, ctx: &Context) -> Result<String, BotError> {
     let conn = get_db()?;

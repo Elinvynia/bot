@@ -5,8 +5,8 @@ use commands::*;
 mod data;
 use data::cache::{BotId, BotOwners, DefaultPrefix, GuildPrefixes, ShardManagerContainer};
 
-mod util;
-use util::*;
+mod utils;
+use utils::framework::{after, dispatch_error, dynamic_prefix, log_dm};
 
 mod db;
 use db::*;

@@ -1,6 +1,6 @@
-use serenity::{model::prelude::*};
-use crate::data::{error::BotError};
 use super::get_db;
+use crate::data::error::BotError;
+use serenity::model::prelude::*;
 
 pub fn get_log_channel(guildid: &GuildId) -> Result<ChannelId, BotError> {
     let conn = match get_db() {

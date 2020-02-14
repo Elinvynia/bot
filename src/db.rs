@@ -1,4 +1,4 @@
-use crate::data::{error::BotError};
+use crate::data::error::BotError;
 use ::log::error;
 use rusqlite::{Connection, NO_PARAMS};
 use std::{fs::File, path::Path};
