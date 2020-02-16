@@ -22,20 +22,15 @@ pub fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member)
     }
 
     let user = new_member.user.read();
-    let mut picture: Vec<u8> = vec![];
+    let avatar = user.face().replace("size=1024", "size=128");
+
     let _ = log_channel.send_message(&ctx.http, |message| {
-        let avatar = user.face().replace("size=1024", "size=128");
-        let mut req = reqwest::blocking::get(&avatar).unwrap();
-        let _ = std::io::copy(&mut req, &mut picture);
         message.content(format!(
             "User joined:\nTag: {}\nID: {}",
             user.tag(),
             user.id
         ));
-        message.add_file((
-            picture.as_slice(),
-            format!("{}{}", user.id, ".webp").as_str(),
-        ));
+        message.add_file(&avatar[..]);
         message
     });
 }

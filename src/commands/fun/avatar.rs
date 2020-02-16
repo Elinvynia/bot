@@ -24,18 +24,11 @@ fn avatar(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     }
 
     let user = user_id.to_user(&ctx)?;
-
-    let mut picture: Vec<u8> = vec![];
     let avatar = user.face();
-    let mut req = reqwest::blocking::get(&avatar).unwrap();
-    let _ = std::io::copy(&mut req, &mut picture);
 
     let _ = msg.channel_id.send_message(&ctx.http, |message| {
         message.content(format!("{} avatar", user.tag()));
-        message.add_file((
-            picture.as_slice(),
-            format!("{}{}", user.id, ".webp").as_str(),
-        ));
+        message.add_file(&avatar[..]);
         message
     });
 

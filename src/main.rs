@@ -22,10 +22,7 @@ use std::{
 };
 
 fn main() {
-    //Start logging as soon as possible.
     env_logger::init();
-
-    //Load the dotenv for ease of development.
     dotenv::dotenv().ok();
 
     let mut settings = config::Config::default();
@@ -45,7 +42,6 @@ fn main() {
             .expect("discord_token not found in settings.");
     }
 
-    //Create the Discord client.
     let mut client = Client::new(&token, Handler).expect("Error creating the client.");
 
     //Get the application info to use for later.
@@ -85,7 +81,7 @@ fn main() {
             .group(&GENERAL_GROUP),
     );
 
-    //Fill the data with some previously gathered and default values.
+    //Fill the data with previously gathered and default values.
     {
         let mut data = client.data.write();
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
@@ -101,7 +97,6 @@ fn main() {
         data.insert::<GuildPrefixes>(map);
     }
 
-    //Start the client, autosharded.
     client
         .start_autosharded()
         .expect("Failed to start the client.")

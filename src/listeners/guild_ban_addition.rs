@@ -22,20 +22,15 @@ pub fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
         return;
     }
 
-    let mut picture: Vec<u8> = vec![];
+    let avatar = user.face().replace("size=1024", "size=128");
+
     if let Err(e) = log_channel.send_message(&ctx.http, |message| {
-        let avatar = user.face().replace("size=1024", "size=128");
-        let mut req = reqwest::blocking::get(&avatar).unwrap();
-        let _ = std::io::copy(&mut req, &mut picture);
         message.content(format!(
             "User banned:\nTag: {}\nID: {}",
             user.tag(),
             user.id
         ));
-        message.add_file((
-            picture.as_slice(),
-            format!("{}{}", user.id, ".webp").as_str(),
-        ));
+        message.add_file(&avatar[..]);
         message
     }) {
         error!("{:?}", e);
