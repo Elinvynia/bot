@@ -1,28 +1,31 @@
-use serenity::client::Context;
-use serenity::framework::standard::help_commands;
-use serenity::framework::standard::macros::help;
-use serenity::framework::standard::Args;
-use serenity::framework::standard::HelpOptions;
-use serenity::framework::standard::{CommandGroup, CommandResult};
-use serenity::model::prelude::{Message, UserId};
-
+use serenity::{
+    client::Context,
+    framework::standard::{macros::help, Args, CommandGroup, CommandResult, HelpOptions},
+    model::prelude::*,
+};
 use std::collections::HashSet;
 
 #[help]
-#[no_help_available_text(
-    "**Error**: I was unable to find any information on this command, \
-    usually indicating that this command does not exist or does not have \
-    any help available for said command. Please try again later, or try \
-    searching for a different command instead."
-)]
-#[strikethrough_commands_tip_in_guild("Test")]
 fn help(
     ctx: &mut Context,
     msg: &Message,
-    args: Args,
-    opts: &'static HelpOptions,
+    _args: Args,
+    _help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    _owners: HashSet<UserId>,
 ) -> CommandResult {
-    help_commands::plain(ctx, msg, args, &opts, groups, owners)
+    let mut s = "Eli Bot made by @Elinvynia".to_string();
+    s.push_str("\n\n");
+    for x in groups {
+        let mut n = format!("**{}:** ", x.name);
+        for y in x.options.commands {
+            let name = y.options.names.first().unwrap();
+            n.push_str(&format!("{}, ", &name)[..]);
+        }
+        n.push_str("\n");
+        s.push_str(&n[..])
+    }
+    msg.channel_id.say(&ctx, &s)?;
+
+    Ok(())
 }
