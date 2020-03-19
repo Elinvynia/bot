@@ -8,8 +8,8 @@ use serenity::{
 };
 
 #[command]
-fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let data = ctx.data.read();
+async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let data = ctx.data.read().await;
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
         None => {
@@ -18,8 +18,8 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
         }
     };
 
-    let manager = shard_manager.lock();
-    let runners = manager.runners.lock();
+    let manager = shard_manager.lock().await;
+    let runners = manager.runners.lock().await;
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {

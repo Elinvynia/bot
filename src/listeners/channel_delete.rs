@@ -4,8 +4,8 @@ use log::error;
 use serenity::{model::prelude::*, prelude::*};
 use std::sync::Arc;
 
-pub fn channel_delete(ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
-    let c = channel.read();
+pub async fn channel_delete(ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
+    let c = channel.read().await;
     let guildid = c.guild_id;
 
     let log_channel = match get_log_channel(&guildid) {
@@ -26,7 +26,10 @@ pub fn channel_delete(ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
         return;
     }
 
-    if let Err(e) = log_channel.say(&ctx.http, format!("Channel deleted: {}", c.name)) {
+    if let Err(e) = log_channel
+        .say(&ctx.http, format!("Channel deleted: {}", c.name))
+        .await
+    {
         error!("{:?}", e);
     }
 }

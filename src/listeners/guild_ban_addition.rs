@@ -3,7 +3,7 @@ use crate::db::log::{get_log_channel, get_log_type};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
-pub fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
+pub async fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
     let log_channel = match get_log_channel(&guildid) {
         Ok(l) => l,
         Err(_) => {
@@ -24,15 +24,18 @@ pub fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
 
     let avatar = user.face().replace("size=1024", "size=128");
 
-    if let Err(e) = log_channel.send_message(&ctx.http, |message| {
-        message.content(format!(
-            "User banned:\nTag: {}\nID: {}",
-            user.tag(),
-            user.id
-        ));
-        message.add_file(&avatar[..]);
-        message
-    }) {
+    if let Err(e) = log_channel
+        .send_message(&ctx.http, |message| {
+            message.content(format!(
+                "User banned:\nTag: {}\nID: {}",
+                user.tag(),
+                user.id
+            ));
+            message.add_file(&avatar[..]);
+            message
+        })
+        .await
+    {
         error!("{:?}", e);
     }
 }

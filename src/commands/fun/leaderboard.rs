@@ -10,26 +10,28 @@ use serenity::{
 #[only_in(guilds)]
 #[min_args(0)]
 #[max_args(1)]
-fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
 
     if args.len() == 1 {
         let channel_id = parse_chan(
-            &args.quoted().current().unwrap().to_string(),
+            &args.quoted().await.current().await.unwrap().to_string(),
             Some(&guild_id),
             Some(&ctx),
         )
+        .await
         .ok_or("Failed to parse channel.")?;
         let channel = channel_id
             .to_channel_cached(&ctx)
+            .await
             .ok_or("Channel not found.")?;
         let rows = get_user_channel_scores(&guild_id, &channel_id)?;
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
-            let user = match guild_id.member(&ctx, id) {
-                Ok(m) => m.user.read().clone(),
-                Err(_) => ctx.http.get_user(id).unwrap(),
+            let user = match guild_id.member(&ctx, id).await {
+                Ok(m) => m.user.read().await.clone(),
+                Err(_) => ctx.http.get_user(id).await.unwrap(),
             };
             result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
         }
@@ -43,9 +45,9 @@ fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResul
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
-            let user = match guild_id.member(&ctx, id) {
-                Ok(m) => m.user.read().clone(),
-                Err(_) => ctx.http.get_user(id).unwrap(),
+            let user = match guild_id.member(&ctx, id).await {
+                Ok(m) => m.user.read().await.clone(),
+                Err(_) => ctx.http.get_user(id).await.unwrap(),
             };
             result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
         }

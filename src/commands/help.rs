@@ -6,7 +6,7 @@ use serenity::{
 use std::collections::HashSet;
 
 #[help]
-fn help(
+async fn help(
     ctx: &mut Context,
     msg: &Message,
     _args: Args,
@@ -25,7 +25,7 @@ fn help(
         n.push_str("\n");
         s.push_str(&n[..])
     }
-    msg.channel_id.say(&ctx, &s)?;
+    msg.channel_id.say(&ctx, &s).await?;
 
     Ok(())
 }

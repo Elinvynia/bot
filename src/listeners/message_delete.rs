@@ -2,13 +2,15 @@ use crate::data::{cache::BotId, db::LogType};
 use crate::db::log::{get_log_channel, get_log_type};
 use serenity::{model::prelude::*, prelude::*};
 
-pub fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
+pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
     let guildid = channel
         .to_channel(&ctx)
+        .await
         .unwrap()
         .guild()
         .unwrap()
         .read()
+        .await
         .guild_id;
 
     let log_channel = match get_log_channel(&guildid) {
@@ -29,19 +31,26 @@ pub fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id: Mess
         return;
     }
 
-    if let Some(x) = ctx.cache.read().message(&channel, &deleted_message_id) {
+    if let Some(x) = ctx
+        .cache
+        .read()
+        .await
+        .message(&channel, &deleted_message_id)
+    {
         let data = ctx.data.read();
-        if x.author.id == *data.get::<BotId>().unwrap() {
+        if x.author.id == *data.await.get::<BotId>().unwrap() {
             return;
         }
-        let _ = log_channel.say(
-            &ctx.http,
-            format!(
-                "Message by {} deleted in channel {}:\n{}",
-                x.author,
-                x.channel(&ctx.cache).unwrap(),
-                x.content
-            ),
-        );
+        let _ = log_channel
+            .say(
+                &ctx.http,
+                format!(
+                    "Message by {} deleted in channel {}:\n{}",
+                    x.author,
+                    x.channel(&ctx.cache).await.unwrap(),
+                    x.content
+                ),
+            )
+            .await;
     }
 }

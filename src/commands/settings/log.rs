@@ -17,7 +17,7 @@ use serenity::{
 #[owners_only]
 #[min_args(0)]
 #[max_args(2)]
-fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
     let cid = msg.channel_id.0 as i64;
     let gid = guild_id.0 as i64;
@@ -30,7 +30,7 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                 &[&cid.to_string(), &gid.to_string()],
             )?;
             let log_channel = get_log_channel(&guild_id)?;
-            let _ = log_channel.say(&ctx.http, "Log channel updated!")?;
+            let _ = log_channel.say(&ctx.http, "Log channel updated!").await;
             return Ok(());
         } else {
             let _ = conn.execute(
@@ -41,7 +41,7 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                     &(LogType::All as u64).to_string(),
                 ],
             )?;
-            let _ = msg.channel_id.say(&ctx.http, "Log channel set!")?;
+            let _ = msg.channel_id.say(&ctx.http, "Log channel set!").await;
             return Ok(());
         };
     }
@@ -56,8 +56,8 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
                 return Ok(());
             }
         };
-        let on_off = args.single::<String>()?;
-        let log_kind = args.single::<String>()?;
+        let on_off = args.single::<String>().await?;
+        let log_kind = args.single::<String>().await?;
         let message: String;
 
         match &on_off[..] {
@@ -118,7 +118,7 @@ fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             "UPDATE log SET log_type = ?2 WHERE guild_id = ?1;",
             &[&gid.to_string(), &log_type.to_string()],
         )?;
-        let _ = log_channel.say(&ctx.http, message)?;
+        let _ = log_channel.say(&ctx.http, message).await;
         return Ok(());
     }
 

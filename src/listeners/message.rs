@@ -3,7 +3,7 @@ use crate::db::{get_db, leaderboard::get_user_channel_score};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
-pub fn message(_: Context, new_message: Message) {
+pub async fn message(_: Context, new_message: Message) {
     let guild_id = match new_message.guild_id {
         Some(g) => g,
         None => return,

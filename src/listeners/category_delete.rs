@@ -4,14 +4,16 @@ use log::error;
 use serenity::{model::prelude::*, prelude::*};
 use std::sync::Arc;
 
-pub fn category_delete(ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
-    let c = category.read();
+pub async fn category_delete(ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
+    let c = category.read().await;
     let guildid =
         c.id.to_channel(&ctx)
+            .await
             .unwrap()
             .guild()
             .unwrap()
             .read()
+            .await
             .guild_id;
 
     let log_channel = match get_log_channel(&guildid) {
@@ -32,7 +34,10 @@ pub fn category_delete(ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
         return;
     }
 
-    if let Err(e) = log_channel.say(&ctx.http, format!("Category deleted: {}", c.name)) {
+    if let Err(e) = log_channel
+        .say(&ctx.http, format!("Category deleted: {}", c.name))
+        .await
+    {
         error!("{:?}", e);
     }
 }

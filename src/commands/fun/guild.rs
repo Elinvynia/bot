@@ -6,19 +6,22 @@ use serenity::{
 
 #[command]
 #[only_in(guilds)]
-fn guild(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let g = match msg.guild_id.unwrap().to_guild_cached(&ctx) {
+async fn guild(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let g = match msg.guild_id.unwrap().to_guild_cached(&ctx).await {
         Some(g) => g,
         None => {
-            msg.channel_id.say(&ctx.http, "Guild not found in cache.")?;
+            msg.channel_id
+                .say(&ctx.http, "Guild not found in cache.")
+                .await?;
             return Ok(());
         }
     };
 
-    let guild = g.read();
+    let guild = g.read().await;
     let owner = guild
         .owner_id
         .to_user(&ctx)
+        .await
         .map_or("Owner information not found.".to_string(), |user| {
             user.tag()
         });

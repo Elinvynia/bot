@@ -2,7 +2,7 @@ use crate::data::db::LogType;
 use crate::db::log::{get_log_channel, get_log_type};
 use serenity::{model::prelude::*, prelude::*};
 
-pub fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member) {
+pub async fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member) {
     let log_channel = match get_log_channel(&guildid) {
         Ok(l) => l,
         Err(_) => {
@@ -21,7 +21,7 @@ pub fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member)
         return;
     }
 
-    let user = new_member.user.read();
+    let user = new_member.user.read().await;
     let avatar = user.face().replace("size=1024", "size=128");
 
     let _ = log_channel.send_message(&ctx.http, |message| {

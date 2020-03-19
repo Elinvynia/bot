@@ -1,4 +1,4 @@
-use serenity::{model::prelude::*, prelude::*};
+use serenity::{async_trait, model::prelude::*, prelude::*};
 use std::sync::Arc;
 
 pub mod category_create;
@@ -15,54 +15,66 @@ pub mod ready;
 
 pub struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn category_create(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
-        category_create::category_create(ctx, category)
+    async fn category_create(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
+        category_create::category_create(ctx, category).await
     }
 
-    fn category_delete(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
-        category_delete::category_delete(ctx, category)
+    async fn category_delete(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
+        category_delete::category_delete(ctx, category).await
     }
 
-    fn channel_create(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
-        channel_create::channel_create(ctx, channel)
+    async fn channel_create(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
+        channel_create::channel_create(ctx, channel).await
     }
 
-    fn channel_delete(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
-        channel_delete::channel_delete(ctx, channel)
+    async fn channel_delete(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
+        channel_delete::channel_delete(ctx, channel).await
     }
 
-    fn guild_ban_addition(&self, ctx: Context, guildid: GuildId, user: User) {
-        guild_ban_addition::guild_ban_addition(ctx, guildid, user)
+    async fn guild_ban_addition(&self, ctx: Context, guildid: GuildId, user: User) {
+        guild_ban_addition::guild_ban_addition(ctx, guildid, user).await
     }
 
-    fn guild_member_addition(&self, ctx: Context, guildid: GuildId, new_member: Member) {
-        guild_member_addition::guild_member_addition(ctx, guildid, new_member)
+    async fn guild_member_addition(&self, ctx: Context, guildid: GuildId, new_member: Member) {
+        guild_member_addition::guild_member_addition(ctx, guildid, new_member).await
     }
 
-    fn guild_member_removal(&self, ctx: Context, gid: GuildId, user: User, member: Option<Member>) {
-        guild_member_removal::guild_member_removal(ctx, gid, user, member)
+    async fn guild_member_removal(
+        &self,
+        ctx: Context,
+        gid: GuildId,
+        user: User,
+        member: Option<Member>,
+    ) {
+        guild_member_removal::guild_member_removal(ctx, gid, user, member).await
     }
 
-    fn message(&self, ctx: Context, new_message: Message) {
-        message::message(ctx, new_message)
+    async fn message(&self, ctx: Context, new_message: Message) {
+        message::message(ctx, new_message).await
     }
 
-    fn message_delete(&self, ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
-        message_delete::message_delete(ctx, channel, deleted_message_id)
+    async fn message_delete(
+        &self,
+        ctx: Context,
+        channel: ChannelId,
+        deleted_message_id: MessageId,
+    ) {
+        message_delete::message_delete(ctx, channel, deleted_message_id).await
     }
 
-    fn message_update(
+    async fn message_update(
         &self,
         ctx: Context,
         old: Option<Message>,
         new: Option<Message>,
         event: MessageUpdateEvent,
     ) {
-        message_update::message_update(ctx, old, new, event)
+        message_update::message_update(ctx, old, new, event).await
     }
 
-    fn ready(&self, ctx: Context, ready: Ready) {
-        ready::ready(ctx, ready)
+    async fn ready(&self, ctx: Context, ready: Ready) {
+        ready::ready(ctx, ready).await
     }
 }

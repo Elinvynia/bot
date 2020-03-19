@@ -3,7 +3,7 @@ use crate::db::log::{get_log_channel, get_log_type};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
-pub fn message_update(
+pub async fn message_update(
     ctx: Context,
     old: Option<Message>,
     new: Option<Message>,
@@ -25,7 +25,7 @@ pub fn message_update(
     };
 
     let data = ctx.data.read();
-    if new_m.author.id == *data.get::<BotId>().unwrap() {
+    if new_m.author.id == *data.await.get::<BotId>().unwrap() {
         return;
     }
 
@@ -44,16 +44,19 @@ pub fn message_update(
         return;
     }
 
-    if let Err(e) = log_channel.say(
-        &ctx.http,
-        format!(
-            "Message by {} updated in channel {} from:\n{}\nTo:\n{}",
-            new_m.author,
-            new_m.channel(&ctx.cache).unwrap(),
-            old_m.content,
-            new_m.content
-        ),
-    ) {
+    if let Err(e) = log_channel
+        .say(
+            &ctx.http,
+            format!(
+                "Message by {} updated in channel {} from:\n{}\nTo:\n{}",
+                new_m.author,
+                new_m.channel(&ctx.cache).await.unwrap(),
+                old_m.content,
+                new_m.content
+            ),
+        )
+        .await
+    {
         error!("{:?}", e);
     }
 }
