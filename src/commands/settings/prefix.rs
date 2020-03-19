@@ -25,9 +25,9 @@ async fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
         prefixes.insert(guildid, pref.to_string());
     }
 
-    let _ = msg
+    msg
         .channel_id
-        .say(&ctx.http, format!("The prefix has been set to: `{}`", pref));
+        .say(&ctx.http, format!("The prefix has been set to: `{}`", pref)).await?;
 
     Ok(())
 }

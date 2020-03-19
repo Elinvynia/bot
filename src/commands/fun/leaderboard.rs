@@ -36,10 +36,10 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
             result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
         }
 
-        let _ = msg.channel_id.say(
+       msg.channel_id.say(
             &ctx,
             format!("**Leaderboard** - {} - Top 10\n{}", channel, result),
-        );
+        ).await?;
     } else {
         let rows = get_user_total_scores(&guild_id)?;
         let mut result = "".to_string();
@@ -52,9 +52,9 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
             result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
         }
 
-        let _ = msg
+        msg
             .channel_id
-            .say(&ctx, format!("**Leaderboard** - Top 10\n{}", result));
+            .say(&ctx, format!("**Leaderboard** - Top 10\n{}", result)).await?;
     }
 
     Ok(())

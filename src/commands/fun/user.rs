@@ -27,10 +27,10 @@ async fn user(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
 
     let user = user_id.to_user(&ctx).await?;
 
-    let _ = msg.channel_id.say(
+    msg.channel_id.say(
         &ctx,
         format!("User found!\nTag: {}\nID: {}", user.tag(), user.id),
-    );
+    ).await?;
 
     Ok(())
 }
