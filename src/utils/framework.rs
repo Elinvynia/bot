@@ -106,9 +106,10 @@ pub async fn dynamic_prefix(ctx: &mut Context, msg: &Message) -> Option<String> 
         }
     }
 
-    return Some(get_prefix(&guildid, &ctx)
+    return Some(
+        get_prefix(&guildid, &ctx)
             .await
             .map_or_else(|_| default_prefix, |pref| pref)
-            .to_string()
+            .to_string(),
     );
 }

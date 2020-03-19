@@ -26,13 +26,15 @@ async fn guild(ctx: &mut Context, msg: &Message) -> CommandResult {
             user.tag()
         });
 
-    msg.channel_id.say(
-        &ctx.http,
-        format!(
-            "**{}**\n**ID:** {}\n**Owner:** {}\n**Region:** {}\n",
-            guild.name, guild.id, owner, guild.region
-        ),
-    ).await?;
+    msg.channel_id
+        .say(
+            &ctx.http,
+            format!(
+                "**{}**\n**ID:** {}\n**Owner:** {}\n**Region:** {}\n",
+                guild.name, guild.id, owner, guild.region
+            ),
+        )
+        .await?;
 
     Ok(())
 }

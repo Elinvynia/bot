@@ -1,6 +1,6 @@
 use super::get_db;
 use crate::data::{cache::GuildPrefixes, error::BotError};
-use serenity::{model::prelude::*, prelude::*, framework::standard::macros::hook};
+use serenity::{framework::standard::macros::hook, model::prelude::*, prelude::*};
 
 #[hook]
 pub async fn get_prefix(guildid: &GuildId, ctx: &Context) -> Result<String, BotError> {

@@ -30,14 +30,14 @@ async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
 
     match runner.latency {
         Some(x) => {
-            msg
-                .channel_id
-                .say(&ctx, &format!("The shard latency is {}ms.", x.as_millis())).await?;
+            msg.channel_id
+                .say(&ctx, &format!("The shard latency is {}ms.", x.as_millis()))
+                .await?;
         }
         None => {
-            msg
-                .channel_id
-                .say(&ctx, "Please wait until the shard measures the latency.").await?;
+            msg.channel_id
+                .say(&ctx, "Please wait until the shard measures the latency.")
+                .await?;
         }
     };
 
