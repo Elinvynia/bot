@@ -12,7 +12,7 @@ use serenity::{
 async fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let conn = get_db()?;
     let guildid = msg.guild_id.unwrap();
-    let pref = args.current().await.unwrap_or("!");
+    let pref = args.current().unwrap_or("!");
 
     let _ = conn.execute(
         "INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)",

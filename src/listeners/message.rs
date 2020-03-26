@@ -46,8 +46,6 @@ pub async fn message(_: Context, new_message: Message) {
                 ],
             );
         }
-        Err(_) => {
-            return;
-        }
+        Err(_) => {}
     }
 }

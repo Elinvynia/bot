@@ -12,7 +12,7 @@ use serenity::{
 #[max_args(2)]
 async fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let banned_id = parse_user(
-        &args.quoted().await.current().await.unwrap().to_string(),
+        &args.quoted().current().unwrap().to_string(),
         msg.guild_id.as_ref(),
         Some(&ctx),
     )
@@ -21,7 +21,7 @@ async fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
     let banned = banned_id.to_user(&ctx).await?;
 
     args.advance();
-    let arg_reason = args.current().await.unwrap_or("");
+    let arg_reason = args.current().unwrap_or("");
     let reason = format!("Eli Bot | {}", arg_reason);
 
     banned

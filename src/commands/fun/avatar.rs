@@ -12,7 +12,7 @@ async fn avatar(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResu
     let user_id;
     if args.len() == 1 {
         user_id = match parse_user(
-            &args.quoted().await.current().await.unwrap().to_string(),
+            &args.quoted().current().unwrap().to_string(),
             msg.guild_id.as_ref(),
             Some(&ctx),
         )

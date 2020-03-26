@@ -15,7 +15,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
 
     if args.len() == 1 {
         let channel_id = parse_chan(
-            &args.quoted().await.current().await.unwrap().to_string(),
+            &args.quoted().current().unwrap().to_string(),
             Some(&guild_id),
             Some(&ctx),
         )

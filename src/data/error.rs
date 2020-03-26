@@ -21,18 +21,18 @@ impl Error for BotError {}
 
 impl From<rusqlite::Error> for BotError {
     fn from(err: rusqlite::Error) -> BotError {
-        return BotError::DbError(err);
+        BotError::DbError(err)
     }
 }
 
 impl From<String> for BotError {
     fn from(err: String) -> BotError {
-        return BotError::CustomError(err);
+        BotError::CustomError(err)
     }
 }
 
 impl From<ParseIntError> for BotError {
     fn from(err: ParseIntError) -> BotError {
-        return BotError::ParseError(err);
+        BotError::ParseError(err)
     }
 }

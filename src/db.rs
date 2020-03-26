@@ -63,7 +63,7 @@ pub fn create_db() {
 pub fn get_db() -> Result<Connection, BotError> {
     let db = Path::new("db.sqlite3");
     match Connection::open(db) {
-        Ok(c) => return Ok(c),
-        Err(e) => return Err(BotError::DbError(e)),
+        Ok(c) => Ok(c),
+        Err(e) => Err(BotError::DbError(e)),
     }
 }

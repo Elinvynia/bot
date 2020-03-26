@@ -56,8 +56,8 @@ async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
                 return Ok(());
             }
         };
-        let on_off = args.single::<String>().await?;
-        let log_kind = args.single::<String>().await?;
+        let on_off = args.single::<String>()?;
+        let log_kind = args.single::<String>()?;
         let message: String;
 
         match &on_off[..] {

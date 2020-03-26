@@ -12,7 +12,7 @@ use serenity::{
 #[max_args(2)]
 async fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let kicked_id = parse_user(
-        &args.quoted().await.current().await.unwrap().to_string(),
+        &args.quoted().current().unwrap().to_string(),
         msg.guild_id.as_ref(),
         Some(&ctx),
     )
@@ -21,7 +21,7 @@ async fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
     let kicked = kicked_id.to_user(&ctx).await?;
 
     args.advance();
-    let arg_reason = args.current().await.unwrap_or("");
+    let arg_reason = args.current().unwrap_or("");
 
     kicked
         .create_dm_channel(&ctx)
