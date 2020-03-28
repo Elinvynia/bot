@@ -17,7 +17,7 @@ pub async fn message_update(
     let new_m = new.unwrap();
     let guildid = new_m.guild_id.unwrap();
 
-    let log_channel = match get_log_channel(&guildid) {
+    let log_channel = match get_log_channel(guildid) {
         Ok(l) => l,
         Err(_) => {
             return;
@@ -33,7 +33,7 @@ pub async fn message_update(
         return;
     }
 
-    let log_type = match get_log_type(&guildid) {
+    let log_type = match get_log_type(guildid) {
         Ok(l) => l,
         Err(_) => {
             return;

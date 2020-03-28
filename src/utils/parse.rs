@@ -12,7 +12,7 @@ use serenity::{
 // 4. User name starting with
 // 5. User name containing
 pub async fn parse_user(
-    name: &String,
+    name: &str,
     optional_gid: Option<&GuildId>,
     optional_ctx: Option<&Context>,
 ) -> Option<UserId> {
@@ -72,7 +72,7 @@ pub async fn parse_user(
 // 3. Channel name
 // 4. Part of a channel name
 pub async fn parse_chan(
-    name: &String,
+    name: &str,
     optional_gid: Option<&GuildId>,
     optional_ctx: Option<&Context>,
 ) -> Option<ChannelId> {

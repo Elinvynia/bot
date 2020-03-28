@@ -25,7 +25,7 @@ pub async fn message(_: Context, new_message: Message) {
 
     let user_id = new_message.author.id;
 
-    match get_user_channel_score(&guild_id, &channel_id, &user_id) {
+    match get_user_channel_score(guild_id, channel_id, user_id) {
         Ok(_) => {
             let _ = conn.execute(
                 "UPDATE leaderboard SET points = points + 1 WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;",

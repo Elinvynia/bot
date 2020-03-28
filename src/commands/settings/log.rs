@@ -23,13 +23,13 @@ async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
     let gid = guild_id.0 as i64;
     let conn = get_db()?;
 
-    if args.len() == 0 {
-        if let Ok(_) = get_log_channel(&guild_id) {
+    if args.is_empty() {
+        if get_log_channel(guild_id).is_ok() {
             let _ = conn.execute(
                 "UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;",
                 &[&cid.to_string(), &gid.to_string()],
             )?;
-            let log_channel = get_log_channel(&guild_id)?;
+            let log_channel = get_log_channel(guild_id)?;
             log_channel.say(&ctx.http, "Log channel updated!").await?;
             return Ok(());
         } else {
@@ -47,9 +47,9 @@ async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
     }
 
     if args.len() == 2 {
-        let log_channel = get_log_channel(&guild_id)?;
+        let log_channel = get_log_channel(guild_id)?;
 
-        let mut log_type = match get_log_type(&guild_id) {
+        let mut log_type = match get_log_type(guild_id) {
             Ok(l) => l,
             Err(e) => {
                 error!("{:?}", e);

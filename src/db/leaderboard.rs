@@ -3,9 +3,9 @@ use crate::data::{db::LeaderboardEntry, error::BotError};
 use serenity::model::prelude::*;
 
 pub fn get_user_channel_score(
-    guildid: &GuildId,
-    channelid: &ChannelId,
-    userid: &UserId,
+    guildid: GuildId,
+    channelid: ChannelId,
+    userid: UserId,
 ) -> Result<i64, BotError> {
     let conn = get_db()?;
     let mut statement = conn.prepare(
@@ -16,10 +16,13 @@ pub fn get_user_channel_score(
         &channelid.as_u64().to_string(),
         &userid.as_u64().to_string(),
     ])?;
-    Ok(rows.next()?.ok_or("No record yet.".to_string())?.get(0)?)
+    Ok(rows
+        .next()?
+        .ok_or_else(|| "No record yet.".to_string())?
+        .get(0)?)
 }
 
-pub fn get_user_total_scores(guildid: &GuildId) -> Result<Vec<LeaderboardEntry>, BotError> {
+pub fn get_user_total_scores(guildid: GuildId) -> Result<Vec<LeaderboardEntry>, BotError> {
     let guild_id = guildid.as_u64().to_string();
     let conn = get_db()?;
     let mut statement =
@@ -40,8 +43,8 @@ pub fn get_user_total_scores(guildid: &GuildId) -> Result<Vec<LeaderboardEntry>,
 }
 
 pub fn get_user_channel_scores(
-    guildid: &GuildId,
-    channelid: &ChannelId,
+    guildid: GuildId,
+    channelid: ChannelId,
 ) -> Result<Vec<LeaderboardEntry>, BotError> {
     let guild_id = guildid.as_u64().to_string();
     let channel_id = channelid.as_u64().to_string();

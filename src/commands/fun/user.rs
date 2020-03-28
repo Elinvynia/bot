@@ -1,6 +1,6 @@
 use crate::utils::parse::parse_user;
 use serenity::{
-    framework::standard::{macros::command, Args, CommandError, CommandResult},
+    framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
     prelude::*,
 };
@@ -9,9 +9,8 @@ use serenity::{
 #[min_args(0)]
 #[max_args(1)]
 async fn user(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let user_id;
-    if args.len() == 1 {
-        user_id = match parse_user(
+    let user_id = if args.len() == 1 {
+        match parse_user(
             &args.quoted().current().unwrap().to_string(),
             msg.guild_id.as_ref(),
             Some(&ctx),
@@ -19,11 +18,11 @@ async fn user(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
         .await
         {
             Some(i) => i,
-            None => return Err(CommandError("No user found".to_string())),
-        };
+            None => msg.author.id,
+        }
     } else {
-        user_id = msg.author.id;
-    }
+        msg.author.id
+    };
 
     let user = user_id.to_user(&ctx).await?;
 

@@ -13,14 +13,14 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
         .await
         .guild_id;
 
-    let log_channel = match get_log_channel(&guildid) {
+    let log_channel = match get_log_channel(guildid) {
         Ok(l) => l,
         Err(_) => {
             return;
         }
     };
 
-    let log_type = match get_log_type(&guildid) {
+    let log_type = match get_log_type(guildid) {
         Ok(l) => l,
         Err(_) => {
             return;

@@ -106,10 +106,13 @@ pub async fn dynamic_prefix(ctx: &mut Context, msg: &Message) -> Option<String> 
         }
     }
 
-    return Some(
-        get_prefix(&guildid, &ctx)
-            .await
-            .map_or_else(|_| default_prefix, |pref| pref)
-            .to_string(),
-    );
+    if let Ok(prefix) = get_prefix(guildid, &ctx) {
+        {
+            let mut data = ctx.data.write().await;
+            let prefixes = data.get_mut::<GuildPrefixes>().unwrap();
+            prefixes.insert(guildid.clone(), prefix.clone());
+        }
+        return Some(prefix);
+    }
+    return Some(default_prefix);
 }
