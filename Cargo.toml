@@ -10,8 +10,6 @@ serenity = { git = "https://github.com/Lakelezz/serenity/", branch = "await" }
 tokio  = { version = "0.2", features = ["macros", "rt-threaded", "blocking"] }
 dotenv = "0.15.0"
 config = "0.10.1"
-reqwest = "0.10.1"
 env_logger = "0.7.1"
 log = "0.4.8"
-rusqlite = { version = "0.21.0", features = ["bundled"] }
-sqlx = { git = "https://github.com/launchbadge/sqlx", default-features = false, features = ["runtime-tokio", "macros", "sqlite"] }
+sqlx = { version = "0.3", default-features = false, features = ["runtime-tokio", "macros", "sqlite"] }

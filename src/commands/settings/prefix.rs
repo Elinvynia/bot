@@ -10,14 +10,14 @@ use serenity::{
 #[owners_only]
 #[num_args(1)]
 async fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
-    let conn = get_db()?;
+    let mut conn = get_db(&ctx).await?;
     let guildid = msg.guild_id.unwrap();
     let pref = args.current().unwrap_or("!");
 
-    let _ = conn.execute(
-        "INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)",
-        &[&guildid.as_u64().to_string(), pref],
-    );
+    let _ = sqlx::query("INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)")
+        .bind(&guildid.to_string())
+        .bind(pref)
+        .execute(&mut conn);
 
     {
         let mut data = ctx.data.write().await;

@@ -3,14 +3,14 @@ use crate::db::log::{get_log_channel, get_log_type};
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member) {
-    let log_channel = match get_log_channel(guildid) {
+    let log_channel = match get_log_channel(&ctx, guildid).await {
         Ok(l) => l,
         Err(_) => {
             return;
         }
     };
 
-    let log_type = match get_log_type(guildid) {
+    let log_type = match get_log_type(&ctx, guildid).await {
         Ok(l) => l,
         Err(_) => {
             return;

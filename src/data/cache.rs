@@ -1,4 +1,5 @@
 use serenity::{client::bridge::gateway::ShardManager, model::prelude::*, prelude::*};
+use sqlx::SqlitePool;
 use std::{collections::HashMap, sync::Arc};
 
 pub struct BotOwners;
@@ -29,4 +30,10 @@ pub struct GuildPrefixes;
 
 impl TypeMapKey for GuildPrefixes {
     type Value = HashMap<GuildId, String>;
+}
+
+pub struct Pool;
+
+impl TypeMapKey for Pool {
+    type Value = SqlitePool;
 }

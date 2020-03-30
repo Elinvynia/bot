@@ -3,7 +3,7 @@ use crate::db::{get_db, leaderboard::get_user_channel_score};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
-pub async fn message(_: Context, new_message: Message) {
+pub async fn message(ctx: Context, new_message: Message) {
     let guild_id = match new_message.guild_id {
         Some(g) => g,
         None => return,
@@ -11,7 +11,7 @@ pub async fn message(_: Context, new_message: Message) {
 
     let channel_id = new_message.channel_id;
 
-    let conn = match get_db() {
+    let mut conn = match get_db(&ctx).await {
         Ok(c) => c,
         Err(e) => {
             error!("{:?}", e);
@@ -25,26 +25,20 @@ pub async fn message(_: Context, new_message: Message) {
 
     let user_id = new_message.author.id;
 
-    match get_user_channel_score(guild_id, channel_id, user_id) {
+    match get_user_channel_score(&ctx, guild_id, channel_id, user_id).await {
         Ok(_) => {
-            let _ = conn.execute(
-                "UPDATE leaderboard SET points = points + 1 WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;",
-                &[
-                    &guild_id.as_u64().to_string(),
-                    &channel_id.as_u64().to_string(),
-                    &user_id.as_u64().to_string(),
-                ],
-            );
+            let _ = sqlx::query("UPDATE leaderboard SET points = points + 1 WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;")
+                .bind(&guild_id.as_u64().to_string())
+                .bind(&channel_id.as_u64().to_string())
+                .bind(&user_id.as_u64().to_string())
+                .execute(&mut conn);
         }
         Err(BotError::CustomError(e)) if e == "No record yet." => {
-            let _ = conn.execute(
-                "INSERT INTO leaderboard (guild_id, channel_id, user_id, points) values (?1, ?2, ?3, 1);",
-                &[
-                    &guild_id.as_u64().to_string(),
-                    &channel_id.as_u64().to_string(),
-                    &user_id.as_u64().to_string(),
-                ],
-            );
+            let _ = sqlx::query("INSERT INTO leaderboard (guild_id, channel_id, user_id, points) values (?1, ?2, ?3, 1);")
+                .bind(&guild_id.as_u64().to_string())
+                .bind(&channel_id.as_u64().to_string())
+                .bind(&user_id.as_u64().to_string())
+                .execute(&mut conn);
         }
         Err(_) => {}
     }

@@ -25,7 +25,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
             .to_channel_cached(&ctx)
             .await
             .ok_or("Channel not found.")?;
-        let rows = get_user_channel_scores(guild_id, channel_id)?;
+        let rows = get_user_channel_scores(&ctx, guild_id, channel_id).await?;
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
@@ -43,7 +43,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
             )
             .await?;
     } else {
-        let rows = get_user_total_scores(guild_id)?;
+        let rows = get_user_total_scores(&ctx, guild_id).await?;
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();

@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, sqlx::FromRow)]
 pub struct LeaderboardEntry {
     pub user_id: String,
     pub points: i64,

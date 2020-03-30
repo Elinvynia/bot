@@ -1,67 +1,52 @@
 use super::get_db;
 use crate::data::{db::LeaderboardEntry, error::BotError};
-use serenity::model::prelude::*;
+use serenity::{model::prelude::*, prelude::*};
+use sqlx::prelude::*;
 
-pub fn get_user_channel_score(
+pub async fn get_user_channel_score(
+    ctx: &Context,
     guildid: GuildId,
     channelid: ChannelId,
     userid: UserId,
 ) -> Result<i64, BotError> {
-    let conn = get_db()?;
-    let mut statement = conn.prepare(
-        "SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;",
-    )?;
-    let mut rows = statement.query(&[
-        &guildid.as_u64().to_string(),
-        &channelid.as_u64().to_string(),
-        &userid.as_u64().to_string(),
-    ])?;
-    Ok(rows
-        .next()?
+    let mut conn = get_db(ctx).await?;
+    let result = sqlx::query("SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;")
+        .bind(&guildid.to_string())
+        .bind(&channelid.to_string())
+        .bind(&userid.to_string())
+        .fetch(&mut conn)
+        .next()
+        .await?
         .ok_or_else(|| "No record yet.".to_string())?
-        .get(0)?)
-}
-
-pub fn get_user_total_scores(guildid: GuildId) -> Result<Vec<LeaderboardEntry>, BotError> {
-    let guild_id = guildid.as_u64().to_string();
-    let conn = get_db()?;
-    let mut statement =
-        conn.prepare("SELECT user_id, SUM(points) as points FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC LIMIT 10;")?;
-    let result_iter = statement.query_map(&[&guild_id], |row| {
-        Ok(LeaderboardEntry {
-            user_id: row.get(0)?,
-            points: row.get(1)?,
-        })
-    })?;
-
-    let mut result = Vec::new();
-    for x in result_iter {
-        result.push(x?);
-    }
+        .try_get(0)?;
 
     Ok(result)
 }
 
-pub fn get_user_channel_scores(
+pub async fn get_user_total_scores(
+    ctx: &Context,
+    guildid: GuildId,
+) -> Result<Vec<LeaderboardEntry>, BotError> {
+    let mut conn = get_db(ctx).await?;
+    let result = sqlx::query_as("SELECT user_id, SUM(points) as points FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC LIMIT 10;")
+        .bind(&guildid.to_string())
+        .fetch_all(&mut conn)
+        .await?;
+
+    Ok(result)
+}
+
+pub async fn get_user_channel_scores(
+    ctx: &Context,
     guildid: GuildId,
     channelid: ChannelId,
 ) -> Result<Vec<LeaderboardEntry>, BotError> {
-    let guild_id = guildid.as_u64().to_string();
-    let channel_id = channelid.as_u64().to_string();
-    let conn = get_db()?;
-    let mut statement =
-        conn.prepare("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC LIMIT 10;")?;
-    let result_iter = statement.query_map(&[&guild_id, &channel_id], |row| {
-        Ok(LeaderboardEntry {
-            user_id: row.get(0)?,
-            points: row.get(1)?,
-        })
-    })?;
-
-    let mut result = Vec::new();
-    for x in result_iter {
-        result.push(x?);
-    }
+    let mut conn = get_db(ctx).await?;
+    let result = sqlx::query_as("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC LIMIT 10;")
+        .bind(&guildid.to_string())
+        .bind(&channelid.to_string())
+        .fetch_all(&mut conn)
+        .await?;
 
     Ok(result)
 }

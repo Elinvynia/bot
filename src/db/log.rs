@@ -1,34 +1,28 @@
 use super::get_db;
 use crate::data::error::BotError;
-use serenity::model::prelude::*;
+use serenity::{model::prelude::*, prelude::*};
+use sqlx::prelude::*;
 
-pub fn get_log_channel(guildid: GuildId) -> Result<ChannelId, BotError> {
-    let conn = match get_db() {
-        Ok(c) => c,
-        Err(e) => return Err(e),
-    };
-
-    let mut statement = conn.prepare("SELECT channel_id FROM log WHERE guild_id == ?1;")?;
-    let mut rows = statement.query(&[&guildid.as_u64().to_string()])?;
-    let result: String = rows
-        .next()?
+pub async fn get_log_channel(ctx: &Context, guildid: GuildId) -> Result<ChannelId, BotError> {
+    let mut conn = get_db(ctx).await?;
+    let cid: i64 = sqlx::query("SELECT channel_id FROM log WHERE guild_id == ?1;")
+        .bind(&guildid.to_string())
+        .fetch(&mut conn)
+        .next()
+        .await?
         .ok_or_else(|| "Guild not found.".to_string())?
-        .get(0)?;
-    let cid: u64 = result.parse()?;
-
-    Ok(ChannelId(cid))
+        .try_get(0)?;
+    Ok(ChannelId(cid as u64))
 }
 
-pub fn get_log_type(guildid: GuildId) -> Result<i64, BotError> {
-    let conn = get_db()?;
-
-    let mut statement = conn.prepare("SELECT log_type FROM log WHERE guild_id == ?1;")?;
-    let mut rows = statement.query(&[&guildid.as_u64().to_string()])?;
-    let result: String = rows
-        .next()?
+pub async fn get_log_type(ctx: &Context, guildid: GuildId) -> Result<i64, BotError> {
+    let mut conn = get_db(ctx).await?;
+    let log_type = sqlx::query("SELECT log_type FROM log WHERE guild_id == ?1;")
+        .bind(&guildid.to_string())
+        .fetch(&mut conn)
+        .next()
+        .await?
         .ok_or_else(|| "Guild not found.".to_string())?
-        .get(0)?;
-    let log_type: i64 = result.parse()?;
-
+        .try_get(0)?;
     Ok(log_type)
 }

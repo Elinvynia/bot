@@ -8,14 +8,14 @@ pub async fn channel_delete(ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
     let c = channel.read().await;
     let guildid = c.guild_id;
 
-    let log_channel = match get_log_channel(guildid) {
+    let log_channel = match get_log_channel(&ctx, guildid).await {
         Ok(l) => l,
         Err(_) => {
             return;
         }
     };
 
-    let log_type = match get_log_type(guildid) {
+    let log_type = match get_log_type(&ctx, guildid).await {
         Ok(l) => l,
         Err(_) => {
             return;

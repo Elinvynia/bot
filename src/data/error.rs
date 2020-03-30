@@ -6,7 +6,7 @@ use std::{
 
 #[derive(Debug)]
 pub enum BotError {
-    DbError(rusqlite::Error),
+    DbError(sqlx::Error),
     ParseError(ParseIntError),
     CustomError(String),
 }
@@ -19,8 +19,8 @@ impl Display for BotError {
 
 impl Error for BotError {}
 
-impl From<rusqlite::Error> for BotError {
-    fn from(err: rusqlite::Error) -> BotError {
+impl From<sqlx::Error> for BotError {
+    fn from(err: sqlx::Error) -> BotError {
         BotError::DbError(err)
     }
 }
