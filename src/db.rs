@@ -20,7 +20,7 @@ pub async fn create_db() {
             Err(e) => error!("Failed to create database file: {}", e),
         }
     }
-    if let Ok(mut conn) = SqliteConnection::connect("db.sqlite3").await {
+    if let Ok(mut conn) = SqliteConnection::connect("sqlite://db.sqlite3").await {
         match sqlx::query("CREATE TABLE IF NOT EXISTS log (guild_id TEXT PRIMARY KEY, channel_id TEXT NOT NULL, log_type TEXT NOT NULL);")
         .execute(&mut conn).await
         {

@@ -98,7 +98,7 @@ async fn main() {
         );
         let map = HashMap::new();
         data.insert::<GuildPrefixes>(map);
-        let pool = sqlx::SqlitePool::new("db.sqlite3")
+        let pool = sqlx::SqlitePool::new("sqlite://db.sqlite3")
             .await
             .expect("Failed to create DB pool");
         data.insert::<Pool>(pool);
