@@ -28,7 +28,8 @@ async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
             let _ = sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")
                 .bind(&cid.to_string())
                 .bind(&gid.to_string())
-                .execute(&mut conn).await;
+                .execute(&mut conn)
+                .await;
             let log_channel = get_log_channel(&ctx, guild_id).await?;
             log_channel.say(&ctx.http, "Log channel updated!").await?;
             return Ok(());
@@ -38,7 +39,8 @@ async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
                     .bind(&gid.to_string())
                     .bind(&cid.to_string())
                     .bind(&(LogType::All as u64).to_string())
-                    .execute(&mut conn).await;
+                    .execute(&mut conn)
+                    .await;
             msg.channel_id.say(&ctx.http, "Log channel set!").await?;
             return Ok(());
         };
