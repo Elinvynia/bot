@@ -36,12 +36,12 @@ pub async fn parse_user(
 
     if let Ok(id) = name.parse::<u64>() {
         if let Ok(m) = guild.member(ctx, id).await {
-            return Some(m.user.read().await.id);
+            return Some(m.user.id);
         }
     }
 
     if let Some(m) = guild.member_named(&name[..]).await {
-        return Some(m.user.read().await.id);
+        return Some(m.user.id);
     }
 
     if let Some(m) = guild
@@ -50,7 +50,7 @@ pub async fn parse_user(
         .get(0)
     {
         let (mem, _) = m;
-        return Some(mem.user.read().await.id);
+        return Some(mem.user.id);
     }
 
     if let Some(m) = guild
@@ -59,7 +59,7 @@ pub async fn parse_user(
         .get(0)
     {
         let (mem, _) = m;
-        return Some(mem.user.read().await.id);
+        return Some(mem.user.id);
     }
 
     None
@@ -89,7 +89,7 @@ pub async fn parse_chan(
 
     if let Ok(id) = name.parse::<u64>() {
         if let Some(x) = ChannelId(id).to_channel_cached(&ctx).await {
-            return Some(x.id().await);
+            return Some(x.id());
         }
     }
 
@@ -101,14 +101,14 @@ pub async fn parse_chan(
     let guild = g.read().await;
 
     for (key, value) in guild.channels.iter() {
-        let cname = &value.read().await.name;
+        let cname = &value.name;
         if cname == name {
             return Some(*key);
         }
     }
 
     for (key, value) in guild.channels.iter() {
-        let cname = &value.read().await.name;
+        let cname = &value.name;
         if cname.contains(name) {
             return Some(*key);
         }

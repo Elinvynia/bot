@@ -2,18 +2,15 @@ use crate::data::db::LogType;
 use crate::db::log::{get_log_channel, get_log_type};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
-use std::sync::Arc;
 
-pub async fn category_create(ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
-    let c = category.read().await;
+
+pub async fn category_create(ctx: Context, category: &ChannelCategory) {
     let guildid =
-        c.id.to_channel(&ctx)
+        category.id.to_channel(&ctx)
             .await
             .unwrap()
             .guild()
             .unwrap()
-            .read()
-            .await
             .guild_id;
 
     let log_channel = match get_log_channel(&ctx, guildid).await {
@@ -35,7 +32,7 @@ pub async fn category_create(ctx: Context, category: Arc<RwLock<ChannelCategory>
     }
 
     if let Err(e) = log_channel
-        .say(&ctx.http, format!("Category created: {}", c.name))
+        .say(&ctx.http, format!("Category created: {}", category.name))
         .await
     {
         error!("{:?}", e);

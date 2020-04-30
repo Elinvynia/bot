@@ -30,7 +30,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
             let user = match guild_id.member(&ctx, id).await {
-                Ok(m) => m.user.read().await.clone(),
+                Ok(m) => m.user.clone(),
                 Err(_) => ctx.http.get_user(id).await.unwrap(),
             };
             result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
@@ -48,7 +48,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
             let user = match guild_id.member(&ctx, id).await {
-                Ok(m) => m.user.read().await.clone(),
+                Ok(m) => m.user.clone(),
                 Err(_) => ctx.http.get_user(id).await.unwrap(),
             };
             result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])

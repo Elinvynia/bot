@@ -1,5 +1,4 @@
 use serenity::{async_trait, model::prelude::*, prelude::*};
-use std::sync::Arc;
 
 pub mod category_create;
 pub mod category_delete;
@@ -17,19 +16,19 @@ pub struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn category_create(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
+    async fn category_create(&self, ctx: Context, category: &ChannelCategory) {
         category_create::category_create(ctx, category).await
     }
 
-    async fn category_delete(&self, ctx: Context, category: Arc<RwLock<ChannelCategory>>) {
+    async fn category_delete(&self, ctx: Context, category: &ChannelCategory) {
         category_delete::category_delete(ctx, category).await
     }
 
-    async fn channel_create(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
+    async fn channel_create(&self, ctx: Context, channel: &GuildChannel) {
         channel_create::channel_create(ctx, channel).await
     }
 
-    async fn channel_delete(&self, ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
+    async fn channel_delete(&self, ctx: Context, channel: &GuildChannel) {
         channel_delete::channel_delete(ctx, channel).await
     }
 

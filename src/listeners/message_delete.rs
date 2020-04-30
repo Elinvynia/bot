@@ -9,8 +9,6 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
         .unwrap()
         .guild()
         .unwrap()
-        .read()
-        .await
         .guild_id;
 
     let log_channel = match get_log_channel(&ctx, guildid).await {

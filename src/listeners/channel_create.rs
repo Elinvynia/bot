@@ -2,11 +2,9 @@ use crate::data::db::LogType;
 use crate::db::log::{get_log_channel, get_log_type};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
-use std::sync::Arc;
 
-pub async fn channel_create(ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
-    let c = channel.read().await;
-    let guildid = c.guild_id;
+pub async fn channel_create(ctx: Context, channel: &GuildChannel) {
+    let guildid = channel.guild_id;
 
     let log_channel = match get_log_channel(&ctx, guildid).await {
         Ok(l) => l,
@@ -27,7 +25,7 @@ pub async fn channel_create(ctx: Context, channel: Arc<RwLock<GuildChannel>>) {
     }
 
     if let Err(e) = log_channel
-        .say(&ctx.http, format!("Channel created: {}", c.name))
+        .say(&ctx.http, format!("Channel created: {}", channel.name))
         .await
     {
         error!("{:?}", e);

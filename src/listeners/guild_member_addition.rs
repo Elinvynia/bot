@@ -21,7 +21,7 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: M
         return;
     }
 
-    let user = new_member.user.read().await;
+    let user = new_member.user;
     let avatar = user.face().replace("size=1024", "size=128");
 
     let _ = log_channel.send_message(&ctx.http, |message| {
