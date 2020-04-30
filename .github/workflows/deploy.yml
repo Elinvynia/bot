@@ -2,9 +2,9 @@ name: Deploy
 on:
   push:
     branches:
-      - master
+    - master
     tags:
-      - v0.*
+    - 'v*'
 
 jobs:
   build:

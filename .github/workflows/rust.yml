@@ -2,12 +2,12 @@ name: Rust
 on:
   push:
     branches:
-      - master
+    - master
     tags-ignore:
-      - v0.*
+    - 'v*'
   pull_request:
     branches:
-      - master
+    - master
 
 jobs:
   build:
