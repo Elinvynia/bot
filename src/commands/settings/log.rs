@@ -35,8 +35,8 @@ async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
         } else {
             let _ =
                 sqlx::query("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")
-                    .bind(&cid.to_string())
                     .bind(&gid.to_string())
+                    .bind(&cid.to_string())
                     .bind(&(LogType::All as u64).to_string())
                     .execute(&mut conn).await;
             msg.channel_id.say(&ctx.http, "Log channel set!").await?;
