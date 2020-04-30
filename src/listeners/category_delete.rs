@@ -4,13 +4,14 @@ use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn category_delete(ctx: Context, category: &ChannelCategory) {
-    let guildid =
-        category.id.to_channel(&ctx)
-            .await
-            .unwrap()
-            .guild()
-            .unwrap()
-            .guild_id;
+    let guildid = category
+        .id
+        .to_channel(&ctx)
+        .await
+        .unwrap()
+        .guild()
+        .unwrap()
+        .guild_id;
 
     let log_channel = match get_log_channel(&ctx, guildid).await {
         Ok(l) => l,

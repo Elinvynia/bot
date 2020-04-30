@@ -6,12 +6,16 @@ use sqlx::prelude::*;
 pub async fn get_prefix(guildid: GuildId, ctx: &Context) -> Result<String, BotError> {
     let mut conn = get_db(ctx).await?;
     let gid: i64 = guildid.into();
-    let prefix = sqlx::query("SELECT prefix FROM prefix WHERE guild_id == ?1;")
+
+    if let Some(x) = sqlx::query("SELECT prefix FROM prefix WHERE guild_id == ?1;")
         .bind(gid)
         .fetch(&mut conn)
         .next()
         .await?
-        .unwrap()
-        .try_get(0)?;
-    Ok(prefix)
+    {
+        let y = x.try_get(0)?;
+        return Ok(y);
+    } else {
+        Err(BotError::CustomError("".to_string()))
+    }
 }

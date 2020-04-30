@@ -17,7 +17,8 @@ async fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let _ = sqlx::query("INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)")
         .bind(&guildid.to_string())
         .bind(pref)
-        .execute(&mut conn);
+        .execute(&mut conn)
+        .await;
 
     {
         let mut data = ctx.data.write().await;

@@ -1,7 +1,12 @@
 use super::get_db;
 use crate::data::{db::LeaderboardEntry, error::BotError};
 use serenity::{model::prelude::*, prelude::*};
-use sqlx::prelude::*;
+use sqlx::prelude::{Cursor, Row};
+
+#[cfg(feature = "postgres")]
+use sqlx::prelude::PgQueryAs;
+#[cfg(feature = "sqlite")]
+use sqlx::prelude::SqliteQueryAs;
 
 pub async fn get_user_channel_score(
     ctx: &Context,

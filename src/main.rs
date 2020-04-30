@@ -14,7 +14,9 @@ use db::*;
 mod listeners;
 use listeners::Handler;
 
-use serenity::{framework::StandardFramework, http::Http, prelude::*};
+use serenity::{
+    client::bridge::gateway::GatewayIntents, framework::StandardFramework, http::Http, prelude::*,
+};
 use std::{
     collections::{HashMap, HashSet},
     env,
@@ -31,9 +33,15 @@ async fn main() {
         .merge(config::File::with_name("config"))
         .expect("Failed to open the config file.");
 
-    create_db().await;
+    if cfg!(feature = "postgres") {
+        settings
+            .merge(config::File::with_name("db"))
+            .expect("Failed to open database file");
+    };
 
-    //If a token exists in the environment, prefer to use that.
+    create_db(&settings).await;
+
+    //If a token exists in the dotenv, prefer to use that.
     let token;
     if let Ok(x) = env::var("DISCORD_TOKEN") {
         token = x;
@@ -71,9 +79,30 @@ async fn main() {
         .group(&FUN_GROUP)
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::new_with_framework(&token, Handler, framework)
-        .await
-        .expect("Error creating the client.");
+    let mut client = Client::new_with_extras(&token, |extras| {
+        extras
+            .intents(
+                GatewayIntents::GUILDS
+                    | GatewayIntents::GUILD_MEMBERS
+                    | GatewayIntents::GUILD_BANS
+                    | GatewayIntents::GUILD_EMOJIS
+                    | GatewayIntents::GUILD_INTEGRATIONS
+                    | GatewayIntents::GUILD_WEBHOOKS
+                    | GatewayIntents::GUILD_INVITES
+                    | GatewayIntents::GUILD_VOICE_STATES
+                    | GatewayIntents::GUILD_PRESENCES
+                    | GatewayIntents::GUILD_MESSAGES
+                    | GatewayIntents::GUILD_MESSAGE_REACTIONS
+                    | GatewayIntents::GUILD_MESSAGE_TYPING
+                    | GatewayIntents::DIRECT_MESSAGES
+                    | GatewayIntents::DIRECT_MESSAGE_REACTIONS
+                    | GatewayIntents::DIRECT_MESSAGE_TYPING,
+            )
+            .event_handler(Handler)
+            .framework(framework)
+    })
+    .await
+    .expect("Error creating the client.");
 
     //Set the cache for each channel to 100 messages.
     client
@@ -98,14 +127,12 @@ async fn main() {
         );
         let map = HashMap::new();
         data.insert::<GuildPrefixes>(map);
-        let pool = sqlx::SqlitePool::new("sqlite://db.sqlite3")
-            .await
-            .expect("Failed to create DB pool");
+        let pool = create_pool(&settings).await;
         data.insert::<Pool>(pool);
     }
 
     client
         .start_autosharded()
         .await
-        .expect("Failed to start the client.")
+        .expect("Failed to start the client.");
 }
