@@ -14,7 +14,7 @@ pub async fn get_prefix(guildid: GuildId, ctx: &Context) -> Result<String, BotEr
         .await?
     {
         let y = x.try_get(0)?;
-        return Ok(y);
+        Ok(y)
     } else {
         Err(BotError::CustomError("".to_string()))
     }

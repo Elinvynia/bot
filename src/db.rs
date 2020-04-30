@@ -75,9 +75,7 @@ pub async fn connect(_: &Config) -> Result<SqliteConnection, BotError> {
             Err(e) => error!("Failed to create database file: {}", e),
         }
     };
-    SqliteConnection::connect("sqlite://db.sqlite3")
-        .await
-        .map_err(|e| BotError::DbError(e))
+    Ok(SqliteConnection::connect("sqlite://db.sqlite3").await?)
 }
 
 #[cfg(feature = "postgres")]

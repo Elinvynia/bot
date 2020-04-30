@@ -110,7 +110,7 @@ pub async fn dynamic_prefix(ctx: &mut Context, msg: &Message) -> Option<String> 
         {
             let mut data = ctx.data.write().await;
             let prefixes = data.get_mut::<GuildPrefixes>().unwrap();
-            prefixes.insert(guildid.clone(), prefix.clone());
+            prefixes.insert(guildid, prefix.clone());
         }
         return Some(prefix);
     }

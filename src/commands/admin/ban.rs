@@ -24,10 +24,9 @@ async fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
     let arg_reason = args.current().unwrap_or("");
     let reason = format!("Eli Bot | {}", arg_reason);
 
-    banned
-        .create_dm_channel(&ctx)
-        .await
-        .unwrap()
+    let channel = banned.create_dm_channel(&ctx).await.unwrap();
+
+    channel
         .say(
             &ctx.http,
             format!(

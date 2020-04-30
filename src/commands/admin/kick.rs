@@ -23,16 +23,17 @@ async fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
     args.advance();
     let arg_reason = args.current().unwrap_or("");
 
-    kicked
-        .create_dm_channel(&ctx)
-        .await
-        .unwrap()
+    let channel = kicked.create_dm_channel(&ctx).await.unwrap();
+
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_name = &guild.read().await.name;
+
+    channel
         .say(
             &ctx.http,
             format!(
                 "You have been kicked from {}\nReason: {}",
-                msg.guild(&ctx.cache).await.unwrap().read().await.name,
-                &arg_reason
+                &guild_name, &arg_reason
             ),
         )
         .await?;
