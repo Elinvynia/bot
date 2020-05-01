@@ -30,7 +30,7 @@ async fn avatar(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResu
     msg.channel_id
         .send_message(&ctx.http, |message| {
             message.content(format!("{} avatar", user.tag()));
-            message.add_file(&avatar[..]);
+            message.add_file(avatar.as_str());
             message
         })
         .await?;
