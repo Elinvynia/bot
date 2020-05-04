@@ -9,7 +9,7 @@ use serenity::{
 #[only_in(guilds)]
 #[owners_only]
 #[num_args(1)]
-async fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let mut conn = get_db(&ctx).await?;
     let guildid = msg.guild_id.unwrap();
     let pref = args.current().unwrap_or("!");

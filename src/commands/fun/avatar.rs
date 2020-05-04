@@ -8,7 +8,7 @@ use serenity::{
 #[command]
 #[min_args(0)]
 #[max_args(1)]
-async fn avatar(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn avatar(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id = if args.len() == 1 {
         match parse_user(
             &args.quoted().current().unwrap().to_string(),
@@ -24,7 +24,7 @@ async fn avatar(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResu
         msg.author.id
     };
 
-    let user = user_id.to_user(&ctx).await?;
+    let user = user_id.to_user(ctx).await?;
     let avatar = user.face();
 
     msg.channel_id

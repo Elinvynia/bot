@@ -79,8 +79,7 @@ async fn main() {
         .group(&FUN_GROUP)
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::new_with_extras(&token, |extras| {
-        extras
+    let mut client = Client::new(&token)
             .intents(
                 GatewayIntents::GUILDS
                     | GatewayIntents::GUILD_MEMBERS
@@ -100,7 +99,6 @@ async fn main() {
             )
             .event_handler(Handler)
             .framework(framework)
-    })
     .await
     .expect("Error creating the client.");
 

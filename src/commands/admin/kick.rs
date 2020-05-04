@@ -10,7 +10,7 @@ use serenity::{
 #[required_permissions(KICK_MEMBERS)]
 #[min_args(1)]
 #[max_args(2)]
-async fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let kicked_id = parse_user(
         &args.quoted().current().unwrap().to_string(),
         msg.guild_id.as_ref(),
@@ -18,7 +18,7 @@ async fn kick(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
     )
     .await
     .ok_or("arg passed isn't a valid user mention")?;
-    let kicked = kicked_id.to_user(&ctx).await?;
+    let kicked = kicked_id.to_user(ctx).await?;
 
     args.advance();
     let arg_reason = args.current().unwrap_or("");

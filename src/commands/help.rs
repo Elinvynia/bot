@@ -7,7 +7,7 @@ use std::collections::HashSet;
 
 #[help]
 async fn help(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     _args: Args,
     _help_options: &'static HelpOptions,

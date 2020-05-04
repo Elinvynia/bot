@@ -10,7 +10,7 @@ use serenity::{
 #[required_permissions(BAN_MEMBERS)]
 #[min_args(1)]
 #[max_args(2)]
-async fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let banned_id = parse_user(
         &args.quoted().current().unwrap().to_string(),
         msg.guild_id.as_ref(),
@@ -18,7 +18,7 @@ async fn ban(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
     )
     .await
     .ok_or("Arg passed isn't a valid user mention.")?;
-    let banned = banned_id.to_user(&ctx).await?;
+    let banned = banned_id.to_user(ctx).await?;
 
     args.advance();
     let arg_reason = args.current().unwrap_or("");

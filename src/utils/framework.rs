@@ -9,7 +9,7 @@ use serenity::{
 
 //Sends non-command DMs from regular users to the bot owners.
 #[hook]
-pub async fn log_dm(ctx: &mut Context, message: &Message) {
+pub async fn log_dm(ctx: &Context, message: &Message) {
     if message.guild_id.is_some() {
         return;
     }
@@ -26,7 +26,7 @@ pub async fn log_dm(ctx: &mut Context, message: &Message) {
             continue;
         }
         let _ = x
-            .to_user(&ctx)
+            .to_user(ctx)
             .await
             .unwrap()
             .create_dm_channel(&ctx)
@@ -42,7 +42,7 @@ pub async fn log_dm(ctx: &mut Context, message: &Message) {
 
 //Generic handling of common user errors.
 #[hook]
-pub async fn dispatch_error(context: &mut Context, msg: &Message, error: DispatchError) {
+pub async fn dispatch_error(context: &Context, msg: &Message, error: DispatchError) {
     match error {
         DispatchError::NotEnoughArguments { min, given } => {
             let _ = msg
@@ -69,7 +69,7 @@ pub async fn dispatch_error(context: &mut Context, msg: &Message, error: Dispatc
 //Logs every command that errored, should only be used for bot failures and not user failures.
 #[hook]
 pub async fn after(
-    _ctx: &mut Context,
+    _ctx: &Context,
     _msg: &Message,
     _cmd_name: &str,
     error: Result<(), CommandError>,
@@ -81,7 +81,7 @@ pub async fn after(
 
 //Allows the use of a per-guild prefix with a default one set using the config file.
 #[hook]
-pub async fn dynamic_prefix(ctx: &mut Context, msg: &Message) -> Option<String> {
+pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
     let default_prefix;
     {
         let data = ctx.data.read();

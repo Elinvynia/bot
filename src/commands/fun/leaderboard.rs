@@ -10,7 +10,7 @@ use serenity::{
 #[only_in(guilds)]
 #[min_args(0)]
 #[max_args(1)]
-async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
 
     if args.len() == 1 {
@@ -29,7 +29,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
-            let user = match guild_id.member(&ctx, id).await {
+            let user = match guild_id.member(ctx, id).await {
                 Ok(m) => m.user.clone(),
                 Err(_) => ctx.http.get_user(id).await.unwrap(),
             };
@@ -47,7 +47,7 @@ async fn leaderboard(ctx: &mut Context, msg: &Message, mut args: Args) -> Comman
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>().unwrap();
-            let user = match guild_id.member(&ctx, id).await {
+            let user = match guild_id.member(ctx, id).await {
                 Ok(m) => m.user.clone(),
                 Err(_) => ctx.http.get_user(id).await.unwrap(),
             };

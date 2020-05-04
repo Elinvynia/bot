@@ -17,7 +17,7 @@ use serenity::{
 #[owners_only]
 #[min_args(0)]
 #[max_args(2)]
-async fn log(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
     let cid = msg.channel_id.0 as i64;
     let gid = guild_id.0 as i64;

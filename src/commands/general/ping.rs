@@ -8,7 +8,7 @@ use serenity::{
 };
 
 #[command]
-async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read().await;
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
