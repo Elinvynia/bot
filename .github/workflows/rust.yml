@@ -1,10 +1,10 @@
 name: Rust
 on:
   push:
-    branches:
-    - master
     tags-ignore:
     - 'v**'
+    branches:
+    - master
   pull_request:
     branches:
     - master

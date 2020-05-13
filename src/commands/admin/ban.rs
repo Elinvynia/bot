@@ -22,7 +22,7 @@ async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
     args.advance();
     let arg_reason = args.current().unwrap_or("");
-    let reason = format!("Eli Bot | {}", arg_reason);
+    let _reason = format!("Eli Bot | {}", arg_reason);
 
     let channel = banned.create_dm_channel(&ctx).await.unwrap();
 
@@ -36,10 +36,7 @@ async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             ),
         )
         .await?;
-    msg.guild_id
-        .unwrap()
-        .ban(&ctx.http, banned, &(0, reason))
-        .await?;
+    msg.guild_id.unwrap().ban(&ctx.http, banned, 0).await?;
 
     Ok(())
 }
