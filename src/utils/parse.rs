@@ -27,12 +27,10 @@ pub async fn parse_user(
     let gid = optional_gid.unwrap();
     let ctx = optional_ctx.unwrap();
 
-    let g = match gid.to_guild_cached(&ctx).await {
+    let guild = match gid.to_guild_cached(&ctx).await {
         Some(g) => g,
         None => return None,
     };
-
-    let guild = g.read().await;
 
     if let Ok(id) = name.parse::<u64>() {
         if let Ok(m) = guild.member(ctx, id).await {
@@ -93,12 +91,10 @@ pub async fn parse_chan(
         }
     }
 
-    let g = match gid.to_guild_cached(&ctx).await {
+    let guild = match gid.to_guild_cached(&ctx).await {
         Some(g) => g,
         None => return None,
     };
-
-    let guild = g.read().await;
 
     for (key, value) in guild.channels.iter() {
         let cname = &value.name;

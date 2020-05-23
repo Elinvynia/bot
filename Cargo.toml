@@ -6,7 +6,7 @@ edition = "2018"
 
 
 [dependencies]
-serenity = { git = "https://github.com/Lakelezz/serenity/", branch = "await" }
+serenity = { git = "https://github.com/Lakelezz/serenity.git", branch = "await" }
 tokio  = { version = "0.2", features = ["macros", "rt-threaded", "blocking"] }
 dotenv = "0.15.0"
 config = "0.10.1"

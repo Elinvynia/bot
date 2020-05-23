@@ -31,7 +31,7 @@ async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             &ctx.http,
             format!(
                 "You have been banned from {}\nReason: {}",
-                msg.guild(&ctx.cache).await.unwrap().read().await.name,
+                msg.guild(&ctx.cache).await.unwrap().name,
                 &arg_reason
             ),
         )

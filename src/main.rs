@@ -106,9 +106,8 @@ async fn main() {
     client
         .cache_and_http
         .cache
-        .write()
+        .settings()
         .await
-        .settings_mut()
         .max_messages(100);
 
     //Fill the data with previously gathered and default values.

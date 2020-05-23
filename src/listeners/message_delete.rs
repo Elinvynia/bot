@@ -31,9 +31,8 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
 
     if let Some(x) = ctx
         .cache
-        .read()
-        .await
         .message(&channel, &deleted_message_id)
+        .await
     {
         let data = ctx.data.read();
         if x.author.id == *data.await.get::<BotId>().unwrap() {

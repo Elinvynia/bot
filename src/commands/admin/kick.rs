@@ -26,7 +26,7 @@ async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let channel = kicked.create_dm_channel(&ctx).await.unwrap();
 
     let guild = msg.guild(&ctx.cache).await.unwrap();
-    let guild_name = &guild.read().await.name;
+    let guild_name = &guild.name;
 
     channel
         .say(
