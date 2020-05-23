@@ -23,5 +23,5 @@ RUN cargo build --release
 FROM scratch
 COPY --from=build /app/bot/target/x86_64-unknown-linux-musl/release/bot .
 COPY --from=build /app/bot/config.toml .
-USER 1000
+USER 0
 CMD ["./bot"]

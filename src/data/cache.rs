@@ -1,6 +1,6 @@
 use serenity::{client::bridge::gateway::ShardManager, model::prelude::*, prelude::*};
-use std::{collections::HashMap, sync::Arc};
 use sqlx::SqlitePool;
+use std::{collections::HashMap, sync::Arc};
 
 pub struct BotOwners;
 
