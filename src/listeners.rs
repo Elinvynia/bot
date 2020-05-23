@@ -1,5 +1,6 @@
 use serenity::{async_trait, model::prelude::*, prelude::*};
 
+pub mod cache_ready;
 pub mod category_create;
 pub mod category_delete;
 pub mod channel_create;
@@ -16,6 +17,10 @@ pub struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
+    async fn cache_ready(&self, ctx: Context, guilds: Vec<GuildId>) {
+        cache_ready::cache_ready(ctx, guilds).await
+    }
+
     async fn category_create(&self, ctx: Context, category: &ChannelCategory) {
         category_create::category_create(ctx, category).await
     }
@@ -50,8 +55,8 @@ impl EventHandler for Handler {
         guild_member_removal::guild_member_removal(ctx, gid, user, member).await
     }
 
-    async fn message(&self, ctx: Context, new_message: Message) {
-        message::message(ctx, new_message).await
+    async fn message(&self, _ctx: Context, new_message: Message) {
+        message::message(new_message).await
     }
 
     async fn message_delete(

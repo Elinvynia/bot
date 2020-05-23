@@ -1,40 +1,21 @@
 use crate::data::db::LogType;
-use crate::db::log::{get_log_channel, get_log_type};
-use log::error;
+use crate::db::log::{check_log_type, log_channel_say};
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn category_delete(ctx: Context, category: &ChannelCategory) {
-    let guildid = category
-        .id
-        .to_channel(&ctx)
+    let guildid = category.guild_id;
+
+    if check_log_type(LogType::CategoryDeleted, guildid)
         .await
-        .unwrap()
-        .guild()
-        .unwrap()
-        .guild_id;
-
-    let log_channel = match get_log_channel(&ctx, guildid).await {
-        Ok(l) => l,
-        Err(_) => {
-            return;
-        }
-    };
-
-    let log_type = match get_log_type(&ctx, guildid).await {
-        Ok(l) => l,
-        Err(_) => {
-            return;
-        }
-    };
-
-    if log_type & LogType::CategoryDeleted as i64 != LogType::CategoryDeleted as i64 {
+        .is_err()
+    {
         return;
     }
 
-    if let Err(e) = log_channel
-        .say(&ctx.http, format!("Category deleted: {}", category.name))
-        .await
-    {
-        error!("{:?}", e);
-    }
+    let _ = log_channel_say(
+        &ctx,
+        guildid,
+        &format!("Category deleted: {}", category.name),
+    )
+    .await;
 }

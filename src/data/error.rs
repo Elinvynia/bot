@@ -8,6 +8,7 @@ use std::{
 pub enum BotError {
     DbError(sqlx::Error),
     ParseError(ParseIntError),
+    SerenityError(serenity::Error),
     CustomError(String),
 }
 
@@ -34,5 +35,11 @@ impl From<String> for BotError {
 impl From<ParseIntError> for BotError {
     fn from(err: ParseIntError) -> BotError {
         BotError::ParseError(err)
+    }
+}
+
+impl From<serenity::Error> for BotError {
+    fn from(err: serenity::Error) -> BotError {
+        BotError::SerenityError(err)
     }
 }

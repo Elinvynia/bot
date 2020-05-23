@@ -1,36 +1,25 @@
 use crate::data::db::LogType;
-use crate::db::log::{get_log_channel, get_log_type};
+use crate::db::log::{check_log_type, get_log_channel};
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: Member) {
-    let log_channel = match get_log_channel(&ctx, guildid).await {
-        Ok(l) => l,
-        Err(_) => {
-            return;
-        }
-    };
-
-    let log_type = match get_log_type(&ctx, guildid).await {
-        Ok(l) => l,
-        Err(_) => {
-            return;
-        }
-    };
-
-    if log_type & LogType::UserJoined as i64 != LogType::UserJoined as i64 {
+    if check_log_type(LogType::UserJoined, guildid).await.is_err() {
         return;
     }
 
+    let log_channel = get_log_channel(guildid).await.unwrap();
     let user = new_member.user;
     let avatar = user.face().replace("size=1024", "size=128");
 
-    let _ = log_channel.send_message(&ctx.http, |message| {
-        message.content(format!(
-            "User joined:\nTag: {}\nID: {}",
-            user.tag(),
-            user.id
-        ));
-        message.add_file(&avatar[..]);
-        message
-    });
+    let _ = log_channel
+        .send_message(&ctx.http, |message| {
+            message.content(format!(
+                "User joined:\nTag: {}\nID: {}",
+                user.tag(),
+                user.id
+            ));
+            message.add_file(&avatar[..]);
+            message
+        })
+        .await;
 }

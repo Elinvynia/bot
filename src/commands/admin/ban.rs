@@ -37,7 +37,10 @@ async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         )
         .await?;
 
-    msg.guild_id.unwrap().ban_with_reason(&ctx.http, banned, 0, reason).await?;
+    msg.guild_id
+        .unwrap()
+        .ban_with_reason(&ctx.http, banned, 0, reason)
+        .await?;
 
     Ok(())
 }

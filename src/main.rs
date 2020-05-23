@@ -74,35 +74,28 @@ async fn main() {
         .group(&GENERAL_GROUP);
 
     let mut client = Client::new(&token)
-        .intents(
-            GatewayIntents::GUILDS
-                | GatewayIntents::GUILD_MEMBERS
-                | GatewayIntents::GUILD_BANS
-                | GatewayIntents::GUILD_EMOJIS
-                | GatewayIntents::GUILD_INTEGRATIONS
-                | GatewayIntents::GUILD_WEBHOOKS
-                | GatewayIntents::GUILD_INVITES
-                | GatewayIntents::GUILD_VOICE_STATES
-                | GatewayIntents::GUILD_PRESENCES
-                | GatewayIntents::GUILD_MESSAGES
-                | GatewayIntents::GUILD_MESSAGE_REACTIONS
-                | GatewayIntents::GUILD_MESSAGE_TYPING
-                | GatewayIntents::DIRECT_MESSAGES
-                | GatewayIntents::DIRECT_MESSAGE_REACTIONS
-                | GatewayIntents::DIRECT_MESSAGE_TYPING,
-        )
+        .add_intent(GatewayIntents::GUILDS)
+        .add_intent(GatewayIntents::GUILD_MEMBERS)
+        .add_intent(GatewayIntents::GUILD_BANS)
+        .add_intent(GatewayIntents::GUILD_EMOJIS)
+        .add_intent(GatewayIntents::GUILD_INTEGRATIONS)
+        .add_intent(GatewayIntents::GUILD_WEBHOOKS)
+        .add_intent(GatewayIntents::GUILD_INVITES)
+        .add_intent(GatewayIntents::GUILD_VOICE_STATES)
+        .add_intent(GatewayIntents::GUILD_PRESENCES)
+        .add_intent(GatewayIntents::GUILD_MESSAGES)
+        .add_intent(GatewayIntents::GUILD_MESSAGE_REACTIONS)
+        .add_intent(GatewayIntents::GUILD_MESSAGE_TYPING)
+        .add_intent(GatewayIntents::DIRECT_MESSAGES)
+        .add_intent(GatewayIntents::DIRECT_MESSAGE_REACTIONS)
+        .add_intent(GatewayIntents::DIRECT_MESSAGE_TYPING)
         .event_handler(Handler)
         .framework(framework)
         .await
         .expect("Error creating the client.");
 
     //Set the cache for each channel to 100 messages.
-    client
-        .cache_and_http
-        .cache
-        .settings()
-        .await
-        .max_messages(100);
+    client.cache_and_http.cache.set_max_messages(100).await;
 
     //Fill the data with previously gathered and default values.
     {

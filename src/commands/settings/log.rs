@@ -24,31 +24,31 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut conn = connect().await?;
 
     if args.is_empty() {
-        if get_log_channel(&ctx, guild_id).await.is_ok() {
+        if get_log_channel(guild_id).await.is_ok() {
             sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")
                 .bind(&cid.to_string())
                 .bind(&gid.to_string())
                 .execute(&mut conn)
                 .await?;
-            let log_channel = get_log_channel(&ctx, guild_id).await?;
+            let log_channel = get_log_channel(guild_id).await?;
             log_channel.say(&ctx.http, "Log channel updated!").await?;
             return Ok(());
         } else {
             sqlx::query("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")
-                    .bind(&gid.to_string())
-                    .bind(&cid.to_string())
-                    .bind(&(LogType::All as u64).to_string())
-                    .execute(&mut conn)
-                    .await?;
+                .bind(&gid.to_string())
+                .bind(&cid.to_string())
+                .bind(&(LogType::All as u64).to_string())
+                .execute(&mut conn)
+                .await?;
             msg.channel_id.say(&ctx.http, "Log channel set!").await?;
             return Ok(());
         };
     }
 
     if args.len() == 2 {
-        let log_channel = get_log_channel(&ctx, guild_id).await?;
+        let log_channel = get_log_channel(guild_id).await?;
 
-        let mut log_type = match get_log_type(&ctx, guild_id).await {
+        let mut log_type = match get_log_type(guild_id).await {
             Ok(l) => l,
             Err(e) => {
                 error!("{:?}", e);

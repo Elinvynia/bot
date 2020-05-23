@@ -4,6 +4,7 @@ pub struct LeaderboardEntry {
     pub points: i64,
 }
 
+#[derive(Debug)]
 pub enum LogType {
     MessageDeleted = 1 << 1,
     MessageEdited = 1 << 2,
@@ -14,5 +15,5 @@ pub enum LogType {
     ChannelDeleted = 1 << 7,
     CategoryCreated = 1 << 8,
     CategoryDeleted = 1 << 9,
-    All = (1 << 9) - 1,
+    All = (1 << 9) + 1,
 }

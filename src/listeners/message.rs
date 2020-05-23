@@ -1,9 +1,9 @@
 use crate::data::error::BotError;
 use crate::db::{connect, leaderboard::get_user_channel_score};
 use log::error;
-use serenity::{model::prelude::*, prelude::*};
+use serenity::model::prelude::*;
 
-pub async fn message(ctx: Context, new_message: Message) {
+pub async fn message(new_message: Message) {
     let guild_id = match new_message.guild_id {
         Some(g) => g,
         None => return,
@@ -25,7 +25,7 @@ pub async fn message(ctx: Context, new_message: Message) {
 
     let user_id = new_message.author.id;
 
-    match get_user_channel_score(&ctx, guild_id, channel_id, user_id).await {
+    match get_user_channel_score(guild_id, channel_id, user_id).await {
         Ok(_) => {
             let _ = sqlx::query("UPDATE leaderboard SET points = points + 1 WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;")
                 .bind(&guild_id.as_u64().to_string())

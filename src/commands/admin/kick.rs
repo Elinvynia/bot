@@ -38,8 +38,11 @@ async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             ),
         )
         .await?;
-    
-    msg.guild_id.unwrap().kick_with_reason(&ctx.http, kicked, &reason).await?;
+
+    msg.guild_id
+        .unwrap()
+        .kick_with_reason(&ctx.http, kicked, &reason)
+        .await?;
 
     Ok(())
 }

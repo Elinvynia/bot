@@ -8,9 +8,9 @@ edition = "2018"
 [dependencies]
 serenity = { git = "https://github.com/Lakelezz/serenity.git", branch = "await" }
 tokio  = { version = "0.2", features = ["macros", "rt-threaded", "blocking"] }
-dotenv = "0.15.0"
-config = "0.10.1"
+dotenv = "0.15"
+config = "0.10"
 env_logger = "0.7.1"
-log = "0.4.8"
+log = "0.4"
 sqlx = { version = "0.3", default-features = false, features = ["runtime-tokio", "macros", "sqlite"] }
 libsqlite3-sys = { version = "*", features = ["bundled"] }

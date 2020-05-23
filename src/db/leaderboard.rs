@@ -1,11 +1,10 @@
 use super::connect;
 use crate::data::{db::LeaderboardEntry, error::BotError};
-use serenity::{model::prelude::*, prelude::*};
+use serenity::model::prelude::*;
 use sqlx::prelude::SqliteQueryAs;
 use sqlx::prelude::{Cursor, Row};
 
 pub async fn get_user_channel_score(
-    _ctx: &Context,
     guildid: GuildId,
     channelid: ChannelId,
     userid: UserId,
@@ -24,10 +23,7 @@ pub async fn get_user_channel_score(
     Ok(result)
 }
 
-pub async fn get_user_total_scores(
-    _ctx: &Context,
-    guildid: GuildId,
-) -> Result<Vec<LeaderboardEntry>, BotError> {
+pub async fn get_user_total_scores(guildid: GuildId) -> Result<Vec<LeaderboardEntry>, BotError> {
     let mut conn = connect().await?;
     let result = sqlx::query_as("SELECT user_id, SUM(points) as points FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC LIMIT 10;")
         .bind(&guildid.to_string())
@@ -38,7 +34,6 @@ pub async fn get_user_total_scores(
 }
 
 pub async fn get_user_channel_scores(
-    _ctx: &Context,
     guildid: GuildId,
     channelid: ChannelId,
 ) -> Result<Vec<LeaderboardEntry>, BotError> {
