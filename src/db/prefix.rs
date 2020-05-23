@@ -1,10 +1,10 @@
-use super::get_db;
+use super::connect;
 use crate::data::error::BotError;
 use serenity::{model::prelude::*, prelude::*};
 use sqlx::prelude::*;
 
-pub async fn get_prefix(guildid: GuildId, ctx: &Context) -> Result<String, BotError> {
-    let mut conn = get_db(ctx).await?;
+pub async fn get_prefix(guildid: GuildId, _ctxx: &Context) -> Result<String, BotError> {
+    let mut conn = connect().await?;
     let gid: i64 = guildid.into();
 
     if let Some(x) = sqlx::query("SELECT prefix FROM prefix WHERE guild_id == ?1;")

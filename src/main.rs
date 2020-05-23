@@ -3,7 +3,7 @@ use commands::help::*;
 use commands::*;
 
 mod data;
-use data::cache::{BotId, BotOwners, DefaultPrefix, GuildPrefixes, Pool, ShardManagerContainer};
+use data::cache::{BotId, BotOwners, DefaultPrefix, GuildPrefixes, ShardManagerContainer};
 
 mod utils;
 use utils::framework::{after, dispatch_error, dynamic_prefix, log_dm};
@@ -33,7 +33,7 @@ async fn main() {
         .merge(config::File::with_name("config"))
         .expect("Failed to open the config file.");
 
-    create_db(&settings).await;
+    create_db().await;
 
     //If a token exists in the dotenv, prefer to use that.
     let token;
@@ -118,8 +118,6 @@ async fn main() {
         );
         let map = HashMap::new();
         data.insert::<GuildPrefixes>(map);
-        let pool = create_pool(&settings).await;
-        data.insert::<Pool>(pool);
     }
 
     client

@@ -1,7 +1,7 @@
 use crate::{
     data::db::LogType,
     db::{
-        get_db,
+        connect,
         log::{get_log_channel, get_log_type},
     },
 };
@@ -21,26 +21,25 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
     let cid = msg.channel_id.0 as i64;
     let gid = guild_id.0 as i64;
-    let mut conn = get_db(&ctx).await?;
+    let mut conn = connect().await?;
 
     if args.is_empty() {
         if get_log_channel(&ctx, guild_id).await.is_ok() {
-            let _ = sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")
+            sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")
                 .bind(&cid.to_string())
                 .bind(&gid.to_string())
                 .execute(&mut conn)
-                .await;
+                .await?;
             let log_channel = get_log_channel(&ctx, guild_id).await?;
             log_channel.say(&ctx.http, "Log channel updated!").await?;
             return Ok(());
         } else {
-            let _ =
-                sqlx::query("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")
+            sqlx::query("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")
                     .bind(&gid.to_string())
                     .bind(&cid.to_string())
                     .bind(&(LogType::All as u64).to_string())
                     .execute(&mut conn)
-                    .await;
+                    .await?;
             msg.channel_id.say(&ctx.http, "Log channel set!").await?;
             return Ok(());
         };
@@ -113,11 +112,11 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             }
             _ => return Ok(()),
         }
-        let _ = sqlx::query("UPDATE log SET log_type = ?2 WHERE guild_id = ?1;")
-            .bind(&gid.to_string())
+        sqlx::query("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")
             .bind(&log_type.to_string())
+            .bind(&gid.to_string())
             .execute(&mut conn)
-            .await;
+            .await?;
         log_channel.say(&ctx.http, message).await?;
         return Ok(());
     }

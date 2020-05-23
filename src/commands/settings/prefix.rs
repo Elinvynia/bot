@@ -1,4 +1,4 @@
-use crate::{data::cache::GuildPrefixes, db::get_db};
+use crate::{data::cache::GuildPrefixes, db::connect};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -10,7 +10,7 @@ use serenity::{
 #[owners_only]
 #[num_args(1)]
 async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let mut conn = get_db(&ctx).await?;
+    let mut conn = connect().await?;
     let guildid = msg.guild_id.unwrap();
     let pref = args.current().unwrap_or("!");
 

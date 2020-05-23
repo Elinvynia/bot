@@ -22,6 +22,7 @@ async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
     args.advance();
     let arg_reason = args.current().unwrap_or("");
+    let reason = format!("Eli Bot | {}", &arg_reason);
 
     let channel = kicked.create_dm_channel(&ctx).await.unwrap();
 
@@ -37,7 +38,8 @@ async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             ),
         )
         .await?;
-    msg.guild_id.unwrap().kick(&ctx.http, kicked).await?;
+    
+    msg.guild_id.unwrap().kick_with_reason(&ctx.http, kicked, &reason).await?;
 
     Ok(())
 }

@@ -1,5 +1,5 @@
 use crate::data::error::BotError;
-use crate::db::{get_db, leaderboard::get_user_channel_score};
+use crate::db::{connect, leaderboard::get_user_channel_score};
 use log::error;
 use serenity::{model::prelude::*, prelude::*};
 
@@ -11,7 +11,7 @@ pub async fn message(ctx: Context, new_message: Message) {
 
     let channel_id = new_message.channel_id;
 
-    let mut conn = match get_db(&ctx).await {
+    let mut conn = match connect().await {
         Ok(c) => c,
         Err(e) => {
             error!("{:?}", e);

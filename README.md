@@ -3,10 +3,10 @@
 A Discord bot written using the Serenity framework in Rust. With a focus on proper logging and zero embeds, this general purpose bot was made to fill in the gap in the market. Everyone is encouraged to run their own.
 
 ## Manual setup
-1. Open `config.toml`
-2. Insert your Discord bot token
-3. `cargo build` to get the executable
-4. `cargo run` to run the bot
+1. Clone the repository.
+2. `cargo build` to get the executable.
+3. Open `config.toml` and insert your Discord bot token.
+4. `cargo run` to run the bot.
 
 ## Docker-compose setup
 ```

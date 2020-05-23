@@ -1,21 +1,15 @@
-use crate::data::cache::Pool;
 use crate::data::error::BotError;
 use ::log::error;
-use config::Config;
-use serenity::prelude::*;
-
-use sqlx::pool::PoolConnection;
 use sqlx::prelude::*;
-
-use sqlx::sqlite::{SqliteConnection, SqlitePool};
+use sqlx::sqlite::SqliteConnection;
 use std::{fs::File, path::Path};
 
 pub mod leaderboard;
 pub mod log;
 pub mod prefix;
 
-pub async fn create_db(settings: &Config) {
-    match connect(settings).await {
+pub async fn create_db() {
+    match connect().await {
         Ok(mut conn) => {
             match sqlx::query("CREATE TABLE IF NOT EXISTS log (guild_id TEXT PRIMARY KEY, channel_id TEXT NOT NULL, log_type TEXT NOT NULL);")
             .execute(&mut conn).await
@@ -59,7 +53,7 @@ pub async fn create_db(settings: &Config) {
     }
 }
 
-pub async fn connect(_: &Config) -> Result<SqliteConnection, BotError> {
+pub async fn connect() -> Result<SqliteConnection, BotError> {
     let db = Path::new("db.sqlite3");
     if !db.exists() {
         match File::create(&db) {
@@ -68,19 +62,4 @@ pub async fn connect(_: &Config) -> Result<SqliteConnection, BotError> {
         }
     };
     Ok(SqliteConnection::connect("sqlite://db.sqlite3").await?)
-}
-
-pub async fn get_db(ctx: &Context) -> Result<PoolConnection<SqliteConnection>, BotError> {
-    let data = ctx.data.read().await;
-    let pool = data.get::<Pool>().unwrap();
-    match pool.acquire().await {
-        Ok(c) => Ok(c),
-        Err(e) => Err(BotError::DbError(e)),
-    }
-}
-
-pub async fn create_pool(_: &Config) -> SqlitePool {
-    sqlx::SqlitePool::new("sqlite://db.sqlite3")
-        .await
-        .expect("Failed to create DB pool")
 }
