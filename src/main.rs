@@ -33,12 +33,6 @@ async fn main() {
         .merge(config::File::with_name("config"))
         .expect("Failed to open the config file.");
 
-    if cfg!(feature = "postgres") {
-        settings
-            .merge(config::File::with_name("db"))
-            .expect("Failed to open database file");
-    };
-
     create_db(&settings).await;
 
     //If a token exists in the dotenv, prefer to use that.

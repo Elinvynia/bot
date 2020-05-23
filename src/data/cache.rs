@@ -1,11 +1,6 @@
 use serenity::{client::bridge::gateway::ShardManager, model::prelude::*, prelude::*};
 use std::{collections::HashMap, sync::Arc};
-
-#[cfg(feature = "sqlite")]
 use sqlx::SqlitePool;
-
-#[cfg(feature = "postgres")]
-use sqlx::PgPool;
 
 pub struct BotOwners;
 
@@ -39,12 +34,6 @@ impl TypeMapKey for GuildPrefixes {
 
 pub struct Pool;
 
-#[cfg(feature = "sqlite")]
 impl TypeMapKey for Pool {
     type Value = SqlitePool;
-}
-
-#[cfg(feature = "postgres")]
-impl TypeMapKey for Pool {
-    type Value = PgPool;
 }
