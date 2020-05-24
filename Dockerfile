@@ -19,8 +19,8 @@ COPY config.toml ./
 # This is the actual build.
 RUN cargo build --release
 
-#FROM scratch
-#COPY --from=build /app/bot/target/x86_64-unknown-linux-musl/release/bot .
-#COPY --from=build /app/bot/config.toml .
-#USER 0
-#CMD ["./bot"]
+FROM scratch
+COPY --from=build /app/bot/target/x86_64-unknown-linux-musl/release/bot .
+COPY --from=build /app/bot/config.toml .
+USER 0
+CMD ["./bot"]
