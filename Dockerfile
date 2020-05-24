@@ -13,7 +13,7 @@ WORKDIR /app/bot/
 RUN cargo build --release
 
 # Now copy in the rest of the sources.
-COPY src /app/bot/src/
+COPY src/ /app/bot/
 COPY config.toml /app/bot/
 
 # This is the actual build.
