@@ -25,7 +25,7 @@ use std::{
 
 #[tokio::main]
 async fn main() {
-    dotenv::dotenv().expect("Failed to load dotenv.");
+    dotenv::dotenv().ok();
     pretty_env_logger::init();
 
     let mut settings = config::Config::default();
