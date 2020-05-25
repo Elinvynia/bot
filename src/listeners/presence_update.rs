@@ -5,13 +5,12 @@ use serenity::{model::prelude::*, prelude::*};
 pub async fn presence_update(ctx: Context, new_data: PresenceUpdateEvent) {
     let guildid = match new_data.guild_id {
         Some(g) => g,
-        None => { return; }
+        None => {
+            return;
+        }
     };
 
-    if check_log_type(LogType::Presence, guildid)
-        .await
-        .is_err()
-    {
+    if check_log_type(LogType::Presence, guildid).await.is_err() {
         return;
     }
 

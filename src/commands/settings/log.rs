@@ -28,13 +28,17 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut conn = connect().await?;
 
     if args.is_empty() {
-        return log_channel(ctx, msg, &mut conn, guild_id, cid).await
+        return log_channel(ctx, msg, &mut conn, guild_id, cid).await;
     }
 
     if args.len() == 1 {
-        return msg.channel_id.say(ctx, "You need to provide two arguments.").await.map_err(|e| e.into()).and(Ok(()))
+        return msg
+            .channel_id
+            .say(ctx, "You need to provide two arguments.")
+            .await
+            .map_err(|e| e.into())
+            .and(Ok(()));
     }
-
 
     let log_channel = get_log_channel(guild_id).await?;
     let mut log_type = get_log_type(guild_id).await?;
@@ -65,11 +69,15 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     log_channel.say(&ctx, message).await?;
 
     Ok(())
-
 }
 
-
-async fn log_channel(ctx: &Context, msg: &Message, mut conn: &mut SqliteConnection, guild_id: GuildId, cid: String) -> CommandResult {
+async fn log_channel(
+    ctx: &Context,
+    msg: &Message,
+    mut conn: &mut SqliteConnection,
+    guild_id: GuildId,
+    cid: String,
+) -> CommandResult {
     let gid = guild_id.to_string();
     if get_log_channel(guild_id).await.is_ok() {
         sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")

@@ -1,5 +1,5 @@
-use std::convert::TryFrom;
 use crate::data::error::BotError;
+use std::convert::TryFrom;
 
 #[derive(Debug, sqlx::FromRow)]
 pub struct LeaderboardEntry {
@@ -41,7 +41,6 @@ impl std::fmt::Display for LogType {
     }
 }
 
-
 impl TryFrom<String> for LogType {
     type Error = BotError;
     fn try_from(s: String) -> Result<Self, Self::Error> {
@@ -56,7 +55,7 @@ impl TryFrom<String> for LogType {
             "catdelete" => Ok(LogType::CategoryDeleted),
             "presence" => Ok(LogType::Presence),
             "all" => Ok(LogType::All),
-            _ => Err(BotError::CustomError("".into()))
+            _ => Err(BotError::CustomError("".into())),
         }
     }
 }
