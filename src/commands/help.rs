@@ -87,7 +87,7 @@ fn command_help(groups: &[&'static CommandGroup], arg: String) -> String {
     }
 
     s.push_str("\n");
-    if command.options.examples.len() > 0 {
+    if !command.options.examples.is_empty() {
         s.push_str("Examples: ");
         for x in command.options.examples {
             s.push_str(x);
