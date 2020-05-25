@@ -8,6 +8,9 @@ use serenity::{
 };
 
 #[command]
+#[description = "Retrieves the current shard latency."]
+#[usage = "ping"]
+#[example = "ping"]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read().await;
     let shard_manager = match data.get::<ShardManagerContainer>() {

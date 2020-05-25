@@ -10,6 +10,9 @@ use serenity::{
 #[required_permissions(BAN_MEMBERS)]
 #[min_args(1)]
 #[max_args(2)]
+#[description("Bans a user from the server.")]
+#[usage("ban <person> <optional: reason>")]
+#[example("ban @Elinvynia \"Abusive language\"")]
 async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let banned_id = parse_user(
         &args.quoted().current().unwrap().to_string(),

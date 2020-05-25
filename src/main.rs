@@ -9,7 +9,7 @@ mod utils;
 use utils::framework::{after, dispatch_error, dynamic_prefix, log_dm};
 
 mod db;
-use db::*;
+use db::setup_db;
 
 mod listeners;
 use listeners::Handler;
@@ -25,15 +25,15 @@ use std::{
 
 #[tokio::main]
 async fn main() {
-    env_logger::init();
-    dotenv::dotenv().ok();
+    dotenv::dotenv().expect("Failed to load dotenv.");
+    pretty_env_logger::init();
 
     let mut settings = config::Config::default();
     settings
         .merge(config::File::with_name("config"))
         .expect("Failed to open the config file.");
 
-    create_db().await;
+    setup_db().await.expect("Failed to set up database.");
 
     //If a token exists in the dotenv, prefer to use that.
     let token;

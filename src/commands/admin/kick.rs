@@ -10,6 +10,9 @@ use serenity::{
 #[required_permissions(KICK_MEMBERS)]
 #[min_args(1)]
 #[max_args(2)]
+#[description("Kicks a user from the server.")]
+#[usage("kick <person> <optional: reason>")]
+#[example("kick @Elinvynia \"Abusive language\"")]
 async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let kicked_id = parse_user(
         &args.quoted().current().unwrap().to_string(),

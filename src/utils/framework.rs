@@ -83,6 +83,7 @@ pub async fn after(
 #[hook]
 pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
     let default_prefix;
+
     {
         let data = ctx.data.read();
         default_prefix = data.await.get::<DefaultPrefix>().unwrap().clone();
@@ -98,6 +99,7 @@ pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
 
     let guildid = msg.guild_id.unwrap();
 
+    // If the guild prefix is already retrieved, use it.
     {
         let data = ctx.data.read().await;
         let prefixes = data.get::<GuildPrefixes>().unwrap();
@@ -106,6 +108,7 @@ pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
         }
     }
 
+    // Otherwise, fetch it from the db.
     if let Ok(prefix) = get_prefix(guildid, &ctx).await {
         {
             let mut data = ctx.data.write().await;

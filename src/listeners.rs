@@ -11,6 +11,7 @@ pub mod guild_member_removal;
 pub mod message;
 pub mod message_delete;
 pub mod message_update;
+pub mod presence_update;
 pub mod ready;
 
 pub struct Handler;
@@ -76,6 +77,10 @@ impl EventHandler for Handler {
         event: MessageUpdateEvent,
     ) {
         message_update::message_update(ctx, old, new, event).await
+    }
+
+    async fn presence_update(&self, ctx: Context, new_data: PresenceUpdateEvent) {
+        presence_update::presence_update(ctx, new_data).await
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {

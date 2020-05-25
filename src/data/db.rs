@@ -1,10 +1,13 @@
+use std::convert::TryFrom;
+use crate::data::error::BotError;
+
 #[derive(Debug, sqlx::FromRow)]
 pub struct LeaderboardEntry {
     pub user_id: String,
     pub points: i64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum LogType {
     MessageDeleted = 1 << 1,
     MessageEdited = 1 << 2,
@@ -15,5 +18,45 @@ pub enum LogType {
     ChannelDeleted = 1 << 7,
     CategoryCreated = 1 << 8,
     CategoryDeleted = 1 << 9,
-    All = (1 << 9) + 1,
+    Presence = 1 << 10,
+    All = (1 << 10) + 1,
+}
+
+impl std::fmt::Display for LogType {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        let msg = match self {
+            LogType::MessageDeleted => "Deleted",
+            LogType::MessageEdited => "Edited",
+            LogType::UserJoined => "User join",
+            LogType::UserLeft => "User leave",
+            LogType::UserBanned => "User ban",
+            LogType::ChannelCreated => "Channel creations",
+            LogType::ChannelDeleted => "Channel deletion",
+            LogType::CategoryCreated => "Category creation",
+            LogType::CategoryDeleted => "Category deletion",
+            LogType::Presence => "Presence",
+            LogType::All => "All",
+        };
+        write!(fmt, "{}", msg)
+    }
+}
+
+
+impl TryFrom<String> for LogType {
+    type Error = BotError;
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        match s.as_str() {
+            "delete" => Ok(LogType::MessageDeleted),
+            "edit" => Ok(LogType::MessageEdited),
+            "join" => Ok(LogType::UserJoined),
+            "ban" => Ok(LogType::UserBanned),
+            "chancreate" => Ok(LogType::ChannelCreated),
+            "chandelete" => Ok(LogType::ChannelDeleted),
+            "catcreate" => Ok(LogType::CategoryCreated),
+            "catdelete" => Ok(LogType::CategoryDeleted),
+            "presence" => Ok(LogType::Presence),
+            "all" => Ok(LogType::All),
+            _ => Err(BotError::CustomError("".into()))
+        }
+    }
 }

@@ -8,6 +8,9 @@ use serenity::{
 #[command]
 #[min_args(0)]
 #[max_args(1)]
+#[description("Retrieves information about a user.")]
+#[usage("user <optional: person>")]
+#[example("user Elinvynia")]
 async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id = if args.len() == 1 {
         match parse_user(

@@ -8,6 +8,9 @@ use serenity::{
 #[command]
 #[min_args(0)]
 #[max_args(1)]
+#[description("Retrieves the avatar of a person.")]
+#[usage("avatar <optional: person>")]
+#[example("avatar Elinvynia")]
 async fn avatar(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id = if args.len() == 1 {
         match parse_user(

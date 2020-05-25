@@ -10,6 +10,9 @@ use serenity::{
 #[only_in(guilds)]
 #[min_args(0)]
 #[max_args(1)]
+#[description("Retrieves the leaderboard of a channel.")]
+#[usage("leaderboard <optional: channel>")]
+#[example("leaderboard #general")]
 async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
 

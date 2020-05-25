@@ -9,6 +9,9 @@ use serenity::{
 #[only_in(guilds)]
 #[owners_only]
 #[num_args(1)]
+#[description = "Sets the prefix for the current server."]
+#[usage = "prefix <value>"]
+#[example = "prefix !"]
 async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let mut conn = connect().await?;
     let guildid = msg.guild_id.unwrap();
