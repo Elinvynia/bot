@@ -14,9 +14,7 @@ use db::setup_db;
 mod listeners;
 use listeners::Handler;
 
-use serenity::{
-    client::bridge::gateway::GatewayIntents, framework::StandardFramework, http::Http, prelude::*,
-};
+use serenity::{client::bridge::gateway::GatewayIntents, framework::StandardFramework, http::Http, prelude::*};
 use std::{
     collections::{HashMap, HashSet},
     env,
@@ -59,11 +57,7 @@ async fn main() {
     };
 
     let framework = StandardFramework::new()
-        .configure(|c| {
-            c.owners(owners)
-                .on_mention(Some(botid))
-                .dynamic_prefix(dynamic_prefix)
-        })
+        .configure(|c| c.owners(owners).on_mention(Some(botid)).dynamic_prefix(dynamic_prefix))
         .on_dispatch_error(dispatch_error)
         .after(after)
         .normal_message(log_dm)
@@ -113,8 +107,5 @@ async fn main() {
         data.insert::<GuildPrefixes>(map);
     }
 
-    client
-        .start_autosharded()
-        .await
-        .expect("Failed to start the client.");
+    client.start_autosharded().await.expect("Failed to start the client.");
 }

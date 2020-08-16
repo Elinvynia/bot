@@ -35,10 +35,7 @@ async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     channel
         .say(
             &ctx.http,
-            format!(
-                "You have been kicked from {}\nReason: {}",
-                &guild_name, &arg_reason
-            ),
+            format!("You have been kicked from {}\nReason: {}", &guild_name, &arg_reason),
         )
         .await?;
 

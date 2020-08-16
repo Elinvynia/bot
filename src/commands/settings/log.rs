@@ -18,8 +18,8 @@ use std::convert::TryInto;
 #[owners_only]
 #[min_args(0)]
 #[max_args(2)]
-#[description = "Sets the log channel.  |  Toggles which type of event is logged in the log channel."]
-#[usage = "log  |  log <enable|disable> <category>"]
+#[description = "Sets the log channel. |  Resets the enabled flags.  |  Toggles which type of event is logged in the log channel."]
+#[usage = "log  |  log reset  |  log <enable|disable> <category>"]
 #[example = "log enable join"]
 async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.unwrap();
@@ -32,12 +32,14 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     }
 
     if args.len() == 1 {
-        return msg
-            .channel_id
-            .say(ctx, "You need to provide two arguments.")
-            .await
-            .map_err(|e| e.into())
-            .and(Ok(()));
+        let arg = args.single::<String>().unwrap();
+        if &arg == "reset" {
+            sqlx::query("UPDATE log SET log_type = 0 WHERE guild_id = ?1;")
+                .bind(&gid.to_string())
+                .execute(&mut conn)
+                .await?;
+        }
+        return Ok(())
     }
 
     let log_channel = get_log_channel(guild_id).await?;
@@ -66,6 +68,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         .bind(&gid.to_string())
         .execute(&mut conn)
         .await?;
+
     log_channel.say(&ctx, message).await?;
 
     Ok(())

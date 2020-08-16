@@ -12,11 +12,7 @@ pub async fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
 
     let _ = log_channel
         .send_message(&ctx, |message| {
-            message.content(format!(
-                "User banned:\nTag: {}\nID: {}",
-                user.tag(),
-                user.id
-            ));
+            message.content(format!("User banned:\nTag: {}\nID: {}", user.tag(), user.id));
             message.add_file(&avatar[..]);
             message
         })

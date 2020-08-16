@@ -24,10 +24,7 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
         )
         .await
         .ok_or("Failed to parse channel.")?;
-        let channel = channel_id
-            .to_channel_cached(&ctx)
-            .await
-            .ok_or("Channel not found.")?;
+        let channel = channel_id.to_channel_cached(&ctx).await.ok_or("Channel not found.")?;
         let rows = get_user_channel_scores(guild_id, channel_id).await?;
         let mut result = "".to_string();
         for (i, x) in rows.iter().enumerate() {
@@ -40,10 +37,7 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
         }
 
         msg.channel_id
-            .say(
-                &ctx,
-                format!("**Leaderboard** - {} - Top 10\n{}", channel, result),
-            )
+            .say(&ctx, format!("**Leaderboard** - {} - Top 10\n{}", channel, result))
             .await?;
     } else {
         let rows = get_user_total_scores(guild_id).await?;

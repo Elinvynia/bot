@@ -11,11 +11,7 @@ use serenity::{
 // 3. User name
 // 4. User name starting with
 // 5. User name containing
-pub async fn parse_user(
-    name: &str,
-    optional_gid: Option<&GuildId>,
-    optional_ctx: Option<&Context>,
-) -> Option<UserId> {
+pub async fn parse_user(name: &str, optional_gid: Option<&GuildId>, optional_ctx: Option<&Context>) -> Option<UserId> {
     if let Some(x) = parse_username(&name) {
         return Some(UserId(x));
     }
@@ -38,24 +34,16 @@ pub async fn parse_user(
         }
     }
 
-    if let Some(m) = guild.member_named(&name[..]).await {
+    if let Some(m) = guild.member_named(&name[..]) {
         return Some(m.user.id);
     }
 
-    if let Some(m) = guild
-        .members_starting_with(&name[..], false, true)
-        .await
-        .get(0)
-    {
+    if let Some(m) = guild.members_starting_with(&name[..], false, true).await.get(0) {
         let (mem, _) = m;
         return Some(mem.user.id);
     }
 
-    if let Some(m) = guild
-        .members_containing(&name[..], false, true)
-        .await
-        .get(0)
-    {
+    if let Some(m) = guild.members_containing(&name[..], false, true).await.get(0) {
         let (mem, _) = m;
         return Some(mem.user.id);
     }

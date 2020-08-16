@@ -46,13 +46,7 @@ impl EventHandler for Handler {
         guild_member_addition::guild_member_addition(ctx, guildid, new_member).await
     }
 
-    async fn guild_member_removal(
-        &self,
-        ctx: Context,
-        gid: GuildId,
-        user: User,
-        member: Option<Member>,
-    ) {
+    async fn guild_member_removal(&self, ctx: Context, gid: GuildId, user: User, member: Option<Member>) {
         guild_member_removal::guild_member_removal(ctx, gid, user, member).await
     }
 
@@ -60,12 +54,7 @@ impl EventHandler for Handler {
         message::message(new_message).await
     }
 
-    async fn message_delete(
-        &self,
-        ctx: Context,
-        channel: ChannelId,
-        deleted_message_id: MessageId,
-    ) {
+    async fn message_delete(&self, ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
         message_delete::message_delete(ctx, channel, deleted_message_id).await
     }
 

@@ -65,10 +65,7 @@ fn command_help(groups: &[&'static CommandGroup], arg: String) -> String {
 
     let command = matched_command.unwrap();
 
-    s.push_str(&format!(
-        "Command **{}**",
-        command.options.names.first().unwrap()
-    ));
+    s.push_str(&format!("Command: **{}**", command.options.names.first().unwrap()));
 
     s.push_str("\n");
     if let Some(description) = command.options.desc {

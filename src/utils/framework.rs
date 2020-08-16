@@ -32,10 +32,7 @@ pub async fn log_dm(ctx: &Context, message: &Message) {
             .create_dm_channel(&ctx)
             .await
             .unwrap()
-            .say(
-                &ctx.http,
-                format!("DM from {}:\n{}", &message.author, &message.content),
-            )
+            .say(&ctx.http, format!("DM from {}:\n{}", &message.author, &message.content))
             .await;
     }
 }
@@ -68,12 +65,7 @@ pub async fn dispatch_error(context: &Context, msg: &Message, error: DispatchErr
 
 //Logs every command that errored, should only be used for bot failures and not user failures.
 #[hook]
-pub async fn after(
-    _ctx: &Context,
-    _msg: &Message,
-    _cmd_name: &str,
-    error: Result<(), CommandError>,
-) {
+pub async fn after(_ctx: &Context, _msg: &Message, _cmd_name: &str, error: Result<(), CommandError>) {
     if let Err(why) = error {
         error!("{:?}", why);
     }
@@ -89,11 +81,8 @@ pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
         default_prefix = data.await.get::<DefaultPrefix>().unwrap().clone();
     }
 
-    if msg.is_private() {
-        return Some(default_prefix.to_string());
-    }
-
-    if msg.guild_id.is_none() {
+    // Private messages use the default prefix.
+    if msg.is_private() || msg.guild_id.is_none() {
         return Some(default_prefix.to_string());
     }
 
@@ -117,5 +106,7 @@ pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
         }
         return Some(prefix);
     }
+
+    // If there is no prefix set, use the default one.
     return Some(default_prefix);
 }

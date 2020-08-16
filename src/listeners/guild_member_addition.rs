@@ -13,11 +13,7 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, new_member: M
 
     let _ = log_channel
         .send_message(&ctx.http, |message| {
-            message.content(format!(
-                "User joined:\nTag: {}\nID: {}",
-                user.tag(),
-                user.id
-            ));
+            message.content(format!("User joined:\nTag: {}\nID: {}", user.tag(), user.id));
             message.add_file(&avatar[..]);
             message
         })

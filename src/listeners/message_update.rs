@@ -2,12 +2,7 @@ use crate::data::{cache::BotId, db::LogType};
 use crate::db::log::{check_log_type, log_channel_say};
 use serenity::{model::prelude::*, prelude::*};
 
-pub async fn message_update(
-    ctx: Context,
-    old: Option<Message>,
-    new: Option<Message>,
-    _: MessageUpdateEvent,
-) {
+pub async fn message_update(ctx: Context, old: Option<Message>, new: Option<Message>, _: MessageUpdateEvent) {
     if old.is_none() || new.is_none() {
         return;
     }
@@ -25,10 +20,7 @@ pub async fn message_update(
         return;
     }
 
-    if check_log_type(LogType::MessageEdited, guildid)
-        .await
-        .is_err()
-    {
+    if check_log_type(LogType::MessageEdited, guildid).await.is_err() {
         return;
     }
 

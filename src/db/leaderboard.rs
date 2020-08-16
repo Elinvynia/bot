@@ -4,21 +4,18 @@ use serenity::model::prelude::*;
 use sqlx::prelude::SqliteQueryAs;
 use sqlx::prelude::{Cursor, Row};
 
-pub async fn get_user_channel_score(
-    guildid: GuildId,
-    channelid: ChannelId,
-    userid: UserId,
-) -> Result<i64, BotError> {
+pub async fn get_user_channel_score(guildid: GuildId, channelid: ChannelId, userid: UserId) -> Result<i64, BotError> {
     let mut conn = connect().await?;
-    let result = sqlx::query("SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;")
-        .bind(&guildid.to_string())
-        .bind(&channelid.to_string())
-        .bind(&userid.to_string())
-        .fetch(&mut conn)
-        .next()
-        .await?
-        .ok_or_else(|| "No record yet.".to_string())?
-        .try_get(0)?;
+    let result =
+        sqlx::query("SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;")
+            .bind(&guildid.to_string())
+            .bind(&channelid.to_string())
+            .bind(&userid.to_string())
+            .fetch(&mut conn)
+            .next()
+            .await?
+            .ok_or_else(|| "No record yet.".to_string())?
+            .try_get(0)?;
 
     Ok(result)
 }

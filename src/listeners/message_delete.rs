@@ -9,10 +9,7 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
         _ => return,
     };
 
-    if check_log_type(LogType::MessageDeleted, guildid)
-        .await
-        .is_err()
-    {
+    if check_log_type(LogType::MessageDeleted, guildid).await.is_err() {
         return;
     }
 

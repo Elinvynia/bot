@@ -18,8 +18,7 @@ pub enum LogType {
     ChannelDeleted = 1 << 7,
     CategoryCreated = 1 << 8,
     CategoryDeleted = 1 << 9,
-    Presence = 1 << 10,
-    All = (1 << 10) + 1,
+    All = (1 << 10) - 1,
 }
 
 impl std::fmt::Display for LogType {
@@ -34,7 +33,6 @@ impl std::fmt::Display for LogType {
             LogType::ChannelDeleted => "Channel deletion",
             LogType::CategoryCreated => "Category creation",
             LogType::CategoryDeleted => "Category deletion",
-            LogType::Presence => "Presence",
             LogType::All => "All",
         };
         write!(fmt, "{}", msg)
@@ -53,7 +51,6 @@ impl TryFrom<String> for LogType {
             "chandelete" => Ok(LogType::ChannelDeleted),
             "catcreate" => Ok(LogType::CategoryCreated),
             "catdelete" => Ok(LogType::CategoryDeleted),
-            "presence" => Ok(LogType::Presence),
             "all" => Ok(LogType::All),
             _ => Err(BotError::CustomError("".into())),
         }
