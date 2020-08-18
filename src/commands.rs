@@ -7,6 +7,14 @@ use general::ping::*;
 #[commands(ping)]
 struct General;
 
+pub mod roles;
+use roles::addreactrole::*;
+use roles::removereactrole::*;
+
+#[group]
+#[commands(addreactrole, removereactrole)]
+struct Roles;
+
 pub mod settings;
 use settings::log::*;
 use settings::prefix::*;

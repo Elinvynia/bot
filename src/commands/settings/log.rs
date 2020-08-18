@@ -39,7 +39,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                 .execute(&mut conn)
                 .await?;
         }
-        return Ok(())
+        return Ok(());
     }
 
     let log_channel = get_log_channel(guild_id).await?;

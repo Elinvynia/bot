@@ -1,7 +1,7 @@
 use serenity::{
     model::prelude::*,
     prelude::*,
-    utils::{parse_channel, parse_username},
+    utils::{parse_channel, parse_emoji, parse_role, parse_username},
 };
 
 // A more detailed user parsing function
@@ -95,6 +95,99 @@ pub async fn parse_chan(
         let cname = &value.name;
         if cname.contains(name) {
             return Some(*key);
+        }
+    }
+
+    None
+}
+
+// A more detailed role parsing function
+// Priority of parsing:
+// 1. Mention
+// 2. Role ID
+// 3. Role name
+// 4. Part of a role name
+pub async fn parse_rol(name: &str, optional_gid: Option<&GuildId>, optional_ctx: Option<&Context>) -> Option<RoleId> {
+    if let Some(x) = parse_role(&name) {
+        return Some(RoleId(x));
+    }
+
+    if optional_gid.is_none() || optional_ctx.is_none() {
+        return None;
+    }
+
+    let gid = optional_gid.unwrap();
+    let ctx = optional_ctx.unwrap();
+
+    if let Ok(id) = name.parse::<u64>() {
+        if let Some(x) = RoleId(id).to_role_cached(&ctx).await {
+            return Some(x.id);
+        }
+    }
+
+    let guild = match gid.to_guild_cached(&ctx).await {
+        Some(g) => g,
+        None => return None,
+    };
+
+    for (key, value) in guild.roles.iter() {
+        let rname = &value.name;
+        if rname == name {
+            return Some(*key);
+        }
+    }
+
+    for (key, value) in guild.roles.iter() {
+        let rname = &value.name;
+        if rname.contains(name) {
+            return Some(*key);
+        }
+    }
+
+    None
+}
+
+// A more detailed reaction parsing function
+// Priority of parsing:
+// 1. Reaction
+// 2. Reaction ID
+// 3. Reaction name
+// 4. Part of a reaction name
+pub async fn parse_reaction(name: &str, gid: &GuildId, ctx: &Context) -> Option<Emoji> {
+    let guild = match gid.to_guild_cached(&ctx).await {
+        Some(g) => g,
+        None => return None,
+    };
+
+    if let Some(x) = parse_emoji(name) {
+        for (_key, value) in guild.emojis.iter() {
+            let ename = &value.name;
+            if ename == &x.name {
+                return Some(value.clone());
+            }
+        }
+    }
+
+    if let Ok(id) = name.parse::<u64>() {
+        for (_key, value) in guild.emojis.iter() {
+            let eid = value.id.as_u64();
+            if eid == &id {
+                return Some(value.clone());
+            }
+        }
+    }
+
+    for (_key, value) in guild.emojis.iter() {
+        let ename = &value.name;
+        if ename == name {
+            return Some(value.clone());
+        }
+    }
+
+    for (_key, value) in guild.emojis.iter() {
+        let ename = &value.name;
+        if ename.contains(name) {
+            return Some(value.clone());
         }
     }
 

@@ -65,7 +65,8 @@ async fn main() {
         .group(&SETTINGS_GROUP)
         .group(&ADMIN_GROUP)
         .group(&FUN_GROUP)
-        .group(&GENERAL_GROUP);
+        .group(&GENERAL_GROUP)
+        .group(&ROLES_GROUP);
 
     let mut client = Client::new(&token)
         .add_intent(GatewayIntents::GUILDS)
