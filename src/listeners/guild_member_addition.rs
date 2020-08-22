@@ -21,18 +21,15 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_membe
         .await;
 
     if let Ok(mut conn) = connect().await {
-        println!("DB worked");
         let mut q = sqlx::query("SELECT * FROM joinrole WHERE guild_id = ?1")
         .bind(guildid.to_string())
         .fetch(&mut conn);
 
         if let Ok(Some(row)) = q.next().await {
-            println!("Found row");
             let role_id: String = row.get("role_id");
             let rid: u64 = role_id.parse().unwrap();
 
-            let _b = new_member.add_role(&ctx, rid).await;
-            println!("added role {:?}", _b);
+            let _ = new_member.add_role(&ctx, rid).await;
         }
     }
 }
