@@ -10,9 +10,10 @@ struct General;
 pub mod roles;
 use roles::addreactrole::*;
 use roles::removereactrole::*;
+use roles::addjoinrole::*;
 
 #[group]
-#[commands(addreactrole, removereactrole)]
+#[commands(addreactrole, removereactrole, addjoinrole)]
 struct Roles;
 
 pub mod settings;

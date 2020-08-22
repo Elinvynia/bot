@@ -12,6 +12,7 @@ use serenity::{
 
 #[command]
 #[only_in(guilds)]
+#[owners_only]
 #[num_args(2)]
 #[description("Makes the reaction to the message above add the role to a user.")]
 #[usage("addreactrole <emoji> <role>")]
@@ -50,7 +51,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     parent_msg.react(&ctx, reaction).await?;
 
     let roleid = role.id;
-    let collector = ReactionCollectorBuilder::new(&ctx)
+    let mut collector = ReactionCollectorBuilder::new(&ctx)
         .message_id(parent_msg.id)
         .removed(true)
         .filter(move |reaction| match reaction.as_ref().emoji {
@@ -58,8 +59,6 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
             _ => false,
         })
         .await;
-
-    let http = &ctx.http;
 
     let _ = msg.delete(&ctx).await;
 
@@ -71,25 +70,26 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
         .execute(&mut conn)
         .await?;
 
-    let _: Vec<_> = collector
-        .then(|action| async move {
-            match action.as_ref() {
+    let ctx = ctx.clone();
+    tokio::spawn(async move {
+        let http = &ctx.http;
+        while let Some(event) = collector.next().await {
+            match event.as_ref() {
                 ReactionAction::Added(a) => {
                     let uid = a.user_id.unwrap();
                     let guild = a.guild_id.unwrap().to_partial_guild(&http).await.unwrap();
-                    let mut member = guild.member(&http, uid).await.unwrap();
+                    let mut member = guild.member(&ctx, uid).await.unwrap();
                     let _ = member.add_role(&http, roleid).await;
                 }
                 ReactionAction::Removed(r) => {
                     let uid = r.user_id.unwrap();
                     let guild = r.guild_id.unwrap().to_partial_guild(&http).await.unwrap();
-                    let mut member = guild.member(&http, uid).await.unwrap();
+                    let mut member = guild.member(&ctx, uid).await.unwrap();
                     let _ = member.remove_role(&http, roleid).await;
                 }
             };
-        })
-        .collect()
-        .await;
+        }
+    });
 
     Ok(())
 }

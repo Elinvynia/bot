@@ -1,9 +1,9 @@
 use crate::{data::error::BotError, db::connect};
+use log::info;
 use serenity::{collector::*, futures::StreamExt, model::prelude::*, prelude::*};
 use sqlx::prelude::*;
 
 pub async fn start_reactions(ctx: &Context) -> Result<(), BotError> {
-    println!("Starting reaction roles");
     let mut conn = connect().await?;
 
     let mut q = sqlx::query("SELECT * FROM reactionroles").fetch(&mut conn);
@@ -56,5 +56,6 @@ pub async fn start_reactions(ctx: &Context) -> Result<(), BotError> {
         });
     }
 
+    info!("Reaction roles started.");
     Ok(())
 }

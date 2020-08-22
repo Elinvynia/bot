@@ -55,12 +55,13 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
     };
 
     let mut message = format!("__**{}**__\n\n", guild.name);
+    message.push_str(&format!("**ID:** {}\n", guild.id));
     message.push_str(&format!(
         "**Description:** {}\n",
         guild.description.unwrap_or("None.".into())
     ));
-    message.push_str(&format!("**ID:** {}\n", guild.id));
     message.push_str(&format!("**Members:** {}\n", guild.member_count));
+    message.push_str(&format!("**Created At:** {}\n", guild.member_count));
     message.push_str(&format!("**Large:** {}\n", guild.large));
     message.push_str(&format!("**Premium Tier:** {}\n", tier));
     message.push_str(&format!("**Boosters:** {}\n", guild.premium_subscription_count));

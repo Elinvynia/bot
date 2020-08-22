@@ -25,6 +25,8 @@ pub async fn setup_db() -> Result<(), BotError> {
     .execute(&mut conn).await?;
     sqlx::query("CREATE TABLE IF NOT EXISTS reactionroles (guild_id TEXT NOT NULL, message_id TEXT NOT NULL, role_id TEXT NOT NULL, reaction_id TEXT NOT NULL, PRIMARY KEY (guild_id, message_id, role_id, reaction_id));")
     .execute(&mut conn).await?;
+    sqlx::query("CREATE TABLE IF NOT EXISTS joinrole (guild_id TEXT NOT NULL, role_id TEXT NOT NULL, PRIMARY KEY (guild_id, role_id));")
+    .execute(&mut conn).await?;
     Ok(())
 }
 

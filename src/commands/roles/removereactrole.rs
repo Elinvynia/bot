@@ -7,6 +7,7 @@ use serenity::{
 
 #[command]
 #[only_in(guilds)]
+#[owners_only]
 #[num_args(1)]
 #[description("Makes the reaction to the message above no longer add the role to a user.")]
 #[usage("removereactrole <emoji>")]
