@@ -1,5 +1,8 @@
 use crate::data::db::LogType;
-use crate::db::{connect, log::{check_log_type, get_log_channel}};
+use crate::db::{
+    connect,
+    log::{check_log_type, get_log_channel},
+};
 use serenity::{model::prelude::*, prelude::*};
 use sqlx::prelude::*;
 
@@ -22,8 +25,8 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_membe
 
     if let Ok(mut conn) = connect().await {
         let mut q = sqlx::query("SELECT * FROM joinrole WHERE guild_id = ?1")
-        .bind(guildid.to_string())
-        .fetch(&mut conn);
+            .bind(guildid.to_string())
+            .fetch(&mut conn);
 
         if let Ok(Some(row)) = q.next().await {
             let role_id: String = row.get("role_id");

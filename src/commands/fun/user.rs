@@ -1,5 +1,4 @@
 use crate::utils::parse::parse_user;
-use chrono::DateTime;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -13,30 +12,31 @@ use serenity::{
 #[usage("user <optional: person>")]
 #[example("user Elinvynia")]
 async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let user_id = if args.len() == 1 {
-        match parse_user(
-            &args.quoted().current().unwrap().to_string(),
-            msg.guild_id.as_ref(),
-            Some(&ctx),
-        )
-        .await
-        {
-            Some(i) => i,
-            None => msg.author.id,
-        }
+    let user_id;
+    if !args.is_empty() && msg.guild_id.is_some() {
+        let name: String = args.single().unwrap();
+        let gid = msg.guild_id.unwrap();
+
+        match parse_user(&name, Some(&gid), Some(&ctx)).await {
+            Some(uid) => user_id = uid,
+            None => return Ok(()),
+        };
     } else {
-        msg.author.id
-    };
+        user_id = msg.author.id
+    }
 
     let user = user_id.to_user(ctx).await?;
     let mut message = String::from("User found!\n");
     message.push_str(&format!("**Tag:** {}\n", user.tag()));
     message.push_str(&format!("**ID:** {}\n", user.id));
-    message.push_str(&format!("**Created At:** {}\n", user.id.created_at()));
+    message.push_str(&format!("**Created At:** {}\n", user.id.created_at().format("%F %T")));
 
     if let Some(guild) = msg.guild(&ctx).await {
         if let Ok(member) = guild.member(&ctx, user_id).await {
-            message.push_str(&format!("**Joined At:** {}\n", member.joined_at.unwrap()));
+            message.push_str(&format!(
+                "**Joined At:** {}\n",
+                member.joined_at.unwrap().format("%F %T")
+            ));
             message.push_str(&format!("**Nickname:** {}\n", member.nick.unwrap_or("None.".into())));
 
             let mut roles = vec![];

@@ -22,11 +22,13 @@ pub async fn setup_db() -> Result<(), BotError> {
     sqlx::query("CREATE TABLE IF NOT EXISTS leaderboard (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, channel_id TEXT NOT NULL, points INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY (guild_id, user_id, channel_id));")
     .execute(&mut conn).await?;
     sqlx::query("CREATE TABLE IF NOT EXISTS money (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, money INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY (guild_id, user_id));")
-    .execute(&mut conn).await?;
+        .execute(&mut conn)
+        .await?;
     sqlx::query("CREATE TABLE IF NOT EXISTS reactionroles (guild_id TEXT NOT NULL, message_id TEXT NOT NULL, role_id TEXT NOT NULL, reaction_id TEXT NOT NULL, PRIMARY KEY (guild_id, message_id, role_id, reaction_id));")
     .execute(&mut conn).await?;
     sqlx::query("CREATE TABLE IF NOT EXISTS joinrole (guild_id TEXT NOT NULL, role_id TEXT NOT NULL, PRIMARY KEY (guild_id, role_id));")
-    .execute(&mut conn).await?;
+        .execute(&mut conn)
+        .await?;
     Ok(())
 }
 

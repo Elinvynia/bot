@@ -1,0 +1,27 @@
+use crate::db::connect;
+use serenity::{
+    framework::standard::{macros::command, Args, CommandResult},
+    model::prelude::*,
+    prelude::*,
+};
+
+#[command]
+#[only_in(guilds)]
+#[owners_only]
+#[num_args(0)]
+#[description("Removes a join role from the current guild.")]
+#[usage("removejoinrole")]
+#[example("removejoinrole")]
+async fn removejoinrole(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    let mut conn = connect().await?;
+    let gid = msg.guild_id.unwrap();
+
+    sqlx::query("REMOVE FROM joinrole WHERE guild_id = ?1;")
+        .bind(gid.to_string())
+        .execute(&mut conn)
+        .await?;
+
+    msg.channel_id.say(&ctx, "Join role removed!").await?;
+
+    Ok(())
+}

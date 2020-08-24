@@ -1,4 +1,4 @@
-# Eli Bot
+# Elin Bot
 
 A Discord bot written using the Serenity framework in Rust. With a focus on proper logging and zero embeds, this general purpose bot was made to fill in the gap in the market. Everyone is encouraged to run their own.
 

@@ -8,12 +8,13 @@ use general::ping::*;
 struct General;
 
 pub mod roles;
-use roles::addreactrole::*;
-use roles::removereactrole::*;
 use roles::addjoinrole::*;
+use roles::addreactrole::*;
+use roles::removejoinrole::*;
+use roles::removereactrole::*;
 
 #[group]
-#[commands(addreactrole, removereactrole, addjoinrole)]
+#[commands(addreactrole, removereactrole, addjoinrole, removejoinrole)]
 struct Roles;
 
 pub mod settings;
@@ -34,12 +35,13 @@ struct Admin;
 
 pub mod fun;
 use fun::avatar::*;
+use fun::emoji::*;
 use fun::guild::*;
 use fun::leaderboard::*;
 use fun::user::*;
 
 #[group]
-#[commands(avatar, user, leaderboard, guild)]
+#[commands(avatar, user, leaderboard, guild, emoji)]
 struct Fun;
 
 pub mod help;

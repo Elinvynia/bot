@@ -65,11 +65,11 @@ fn command_help(groups: &[&'static CommandGroup], arg: String) -> String {
 
     let command = matched_command.unwrap();
 
-    s.push_str(&format!("Command: **{}**", command.options.names.first().unwrap()));
+    s.push_str(&format!("**Command:** __{}__", command.options.names.first().unwrap()));
 
     s.push_str("\n");
     if let Some(description) = command.options.desc {
-        s.push_str("Description: ");
+        s.push_str("**Description:** ");
         s.push_str(description);
     } else {
         s.push_str("No description available.");
@@ -77,7 +77,7 @@ fn command_help(groups: &[&'static CommandGroup], arg: String) -> String {
 
     s.push_str("\n");
     if let Some(usage) = command.options.usage {
-        s.push_str("Usage: ");
+        s.push_str("**Usage:** ");
         s.push_str(usage);
     } else {
         s.push_str("No usage available.");
@@ -85,7 +85,7 @@ fn command_help(groups: &[&'static CommandGroup], arg: String) -> String {
 
     s.push_str("\n");
     if !command.options.examples.is_empty() {
-        s.push_str("Examples: ");
+        s.push_str("**Examples:** ");
         for x in command.options.examples {
             s.push_str(x);
         }

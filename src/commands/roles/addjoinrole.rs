@@ -1,7 +1,4 @@
-use crate::{
-    db::connect,
-    utils::parse::parse_rol,
-};
+use crate::{db::connect, utils::parse::parse_rol};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -33,7 +30,9 @@ async fn addjoinrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
         .execute(&mut conn)
         .await?;
 
-    msg.reply(&ctx, format!("Join role {} added!", role.name)).await?;
+    msg.channel_id
+        .say(&ctx, format!("Join role {} added!", role.name))
+        .await?;
 
     Ok(())
 }
