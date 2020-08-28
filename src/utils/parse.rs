@@ -16,12 +16,15 @@ pub async fn parse_user(name: &str, optional_gid: Option<&GuildId>, optional_ctx
         return Some(UserId(x));
     }
 
-    if optional_gid.is_none() || optional_ctx.is_none() {
-        return None;
-    }
+    let gid = match optional_gid {
+        Some(g) => g,
+        None => return None,
+    };
 
-    let gid = optional_gid.unwrap();
-    let ctx = optional_ctx.unwrap();
+    let ctx = match optional_ctx {
+        Some(c) => c,
+        None => return None,
+    };
 
     let guild = match gid.to_guild_cached(&ctx).await {
         Some(g) => g,
@@ -66,12 +69,15 @@ pub async fn parse_chan(
         return Some(ChannelId(x));
     }
 
-    if optional_gid.is_none() || optional_ctx.is_none() {
-        return None;
-    }
+    let gid = match optional_gid {
+        Some(g) => g,
+        None => return None,
+    };
 
-    let gid = optional_gid.unwrap();
-    let ctx = optional_ctx.unwrap();
+    let ctx = match optional_ctx {
+        Some(c) => c,
+        None => return None,
+    };
 
     if let Ok(id) = name.parse::<u64>() {
         if let Some(x) = ChannelId(id).to_channel_cached(&ctx).await {
@@ -116,8 +122,15 @@ pub async fn parse_rol(name: &str, optional_gid: Option<&GuildId>, optional_ctx:
         return None;
     }
 
-    let gid = optional_gid.unwrap();
-    let ctx = optional_ctx.unwrap();
+    let gid = match optional_gid {
+        Some(g) => g,
+        None => return None,
+    };
+
+    let ctx = match optional_ctx {
+        Some(c) => c,
+        None => return None,
+    };
 
     if let Ok(id) = name.parse::<u64>() {
         if let Some(x) = RoleId(id).to_role_cached(&ctx).await {

@@ -1,5 +1,5 @@
 use crate::{
-    data::db::LogType,
+    data::{db::LogType, error::BotError},
     db::{
         connect,
         log::{get_log_channel, get_log_type},
@@ -22,20 +22,20 @@ use std::convert::TryInto;
 #[usage = "log  |  log reset  |  log <enable|disable> <category>"]
 #[example = "log enable join"]
 async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guild_id = msg.guild_id.unwrap();
-    let cid = msg.channel_id.to_string();
-    let gid = msg.guild_id.unwrap().0 as i64;
     let mut conn = connect().await?;
 
+    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
+    let channel_id = msg.channel_id.to_string();
+
     if args.is_empty() {
-        return log_channel(ctx, msg, &mut conn, guild_id, cid).await;
+        return log_channel(ctx, msg, &mut conn, guild_id, channel_id).await;
     }
 
     if args.len() == 1 {
-        let arg = args.single::<String>().unwrap();
+        let arg = args.single::<String>()?;
         if &arg == "reset" {
             sqlx::query("UPDATE log SET log_type = 0 WHERE guild_id = ?1;")
-                .bind(&gid.to_string())
+                .bind(&guild_id.to_string())
                 .execute(&mut conn)
                 .await?;
         }
@@ -65,7 +65,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
     sqlx::query("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")
         .bind(&log_type.to_string())
-        .bind(&gid.to_string())
+        .bind(&guild_id.to_string())
         .execute(&mut conn)
         .await?;
 

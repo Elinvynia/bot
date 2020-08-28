@@ -1,4 +1,4 @@
-use crate::{db::connect, utils::parse::parse_reaction};
+use crate::{data::error::BotError, db::connect, utils::parse::parse_reaction};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,10 +14,9 @@ use serenity::{
 #[example("removereactrole :heart:")]
 async fn removereactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut conn = connect().await?;
+    let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    let gid = msg.guild_id.unwrap();
-
-    let reaction = match parse_reaction(&args.single::<String>().unwrap(), &gid, &ctx).await {
+    let reaction = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
         Some(r) => r,
         None => return Ok(()),
     };

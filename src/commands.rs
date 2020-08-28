@@ -1,47 +1,44 @@
 use serenity::framework::standard::macros::group;
+pub mod help;
 
 pub mod general;
-use general::ping::*;
+pub use general::*;
 
 #[group]
 #[commands(ping)]
 struct General;
 
 pub mod roles;
-use roles::addjoinrole::*;
-use roles::addreactrole::*;
-use roles::removejoinrole::*;
-use roles::removereactrole::*;
+pub use roles::*;
 
 #[group]
 #[commands(addreactrole, removereactrole, addjoinrole, removejoinrole)]
 struct Roles;
 
 pub mod settings;
-use settings::log::*;
-use settings::prefix::*;
+pub use settings::*;
 
 #[group]
 #[commands(log, prefix)]
 struct Settings;
 
 pub mod admin;
-use admin::ban::*;
-use admin::kick::*;
+pub use admin::*;
 
 #[group]
 #[commands(ban, kick)]
 struct Admin;
 
-pub mod fun;
-use fun::avatar::*;
-use fun::emoji::*;
-use fun::guild::*;
-use fun::leaderboard::*;
-use fun::user::*;
+pub mod utilities;
+pub use utilities::*;
 
 #[group]
 #[commands(avatar, user, leaderboard, guild, emoji)]
-struct Fun;
+struct Utilities;
 
-pub mod help;
+pub mod fun;
+pub use fun::*;
+
+#[group]
+#[commands(setmoney)]
+struct Fun;

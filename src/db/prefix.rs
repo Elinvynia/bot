@@ -16,6 +16,6 @@ pub async fn get_prefix(guildid: GuildId, _ctxx: &Context) -> Result<String, Bot
         let y = x.try_get(0)?;
         Ok(y)
     } else {
-        Err(BotError::CustomError("".to_string()))
+        Err(BotError::PrefixNotFound)
     }
 }

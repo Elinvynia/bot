@@ -34,7 +34,7 @@ pub async fn message(new_message: Message) {
                 .execute(&mut conn)
                 .await;
         }
-        Err(BotError::CustomError(e)) if e == "No record yet." => {
+        Err(BotError::NoRecordYet) => {
             let _ =
                 sqlx::query("INSERT INTO leaderboard (guild_id, channel_id, user_id, points) values (?1, ?2, ?3, 1);")
                     .bind(&guild_id.as_u64().to_string())

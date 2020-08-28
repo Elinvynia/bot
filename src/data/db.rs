@@ -55,7 +55,7 @@ impl TryFrom<String> for LogType {
             "catdelete" => Ok(LogType::CategoryDeleted),
             "update" => Ok(LogType::UserUpdated),
             "all" => Ok(LogType::All),
-            _ => Err(BotError::CustomError("".into())),
+            _ => Err(BotError::LogTypeNotFound),
         }
     }
 }

@@ -14,7 +14,7 @@ pub async fn get_user_channel_score(guildid: GuildId, channelid: ChannelId, user
             .fetch(&mut conn)
             .next()
             .await?
-            .ok_or_else(|| "No record yet.".to_string())?
+            .ok_or_else(|| BotError::NoRecordYet)?
             .try_get(0)?;
 
     Ok(result)

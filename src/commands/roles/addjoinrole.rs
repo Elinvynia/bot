@@ -1,4 +1,4 @@
-use crate::{db::connect, utils::parse::parse_rol};
+use crate::{data::error::BotError, db::connect, utils::parse::parse_rol};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,9 +14,9 @@ use serenity::{
 #[example("addjoinrole New")]
 async fn addjoinrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut conn = connect().await?;
-    let gid = msg.guild_id.unwrap();
+    let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    let role = match parse_rol(&args.single::<String>().unwrap(), Some(&gid), Some(&ctx)).await {
+    let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(&ctx)).await {
         Some(rid) => match rid.to_role_cached(&ctx.cache).await {
             Some(r) => r,
             None => return Ok(()),

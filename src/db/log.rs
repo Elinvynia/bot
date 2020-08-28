@@ -9,8 +9,9 @@ pub async fn check_log_type(log_type: LogType, guildid: GuildId) -> Result<(), B
     let converted_log_type = log_type as i64;
 
     if enabled_log_type & converted_log_type != converted_log_type {
-        return Err(BotError::CustomError("".into()));
+        return Err(BotError::LogTypeDisabled);
     }
+
     Ok(())
 }
 

@@ -3,10 +3,10 @@ use crate::db::log::{check_log_type, get_log_channel};
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>, new: Member) {
-    if old_if_available.is_none() {
-        return;
+    let old = match old_if_available {
+        Some(m) => m,
+        None => return,
     };
-    let old = old_if_available.unwrap();
     let guildid = new.guild_id;
 
     if check_log_type(LogType::UserUpdated, guildid).await.is_err() {
@@ -22,24 +22,37 @@ pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>,
     let nickname_changed = old.nick != new.nick;
     let avatar_changed = old.user.avatar != new.user.avatar;
 
-    let url = new.user.avatar_url().unwrap();
+    if !username_changed && !nickname_changed && !avatar_changed {
+        return;
+    };
 
-    let _ = log_channel.send_message(&ctx, |message| {
-        let mut content = String::new();
-        content.push_str("User Updated\n");
-        content.push_str(&format!("Username: {}\n", new.user.name));
-        content.push_str(&format!("ID: {}\n", new.user.id));
-        if username_changed {
-            content.push_str(&format!("Username changed: {} to {}\n", old.user.name, new.user.name));
-        };
-        if nickname_changed {
-            content.push_str(&format!("Nickname changed: {} to {}\n", old.nick.unwrap_or("None".into()), new.nick.unwrap_or("None".into())));
-        };
-        if avatar_changed {
-            content.push_str("Avatar changed.\n");
-            message.add_file(url.as_str());
-        };
-        message.content(content);
-        message
-    }).await;
+    let url = match new.user.avatar_url() {
+        Some(u) => u,
+        None => return,
+    };
+
+    let _ = log_channel
+        .send_message(&ctx, |message| {
+            let mut content = String::new();
+            content.push_str("User Updated\n");
+            content.push_str(&format!("Username: {}\n", new.user.name));
+            content.push_str(&format!("ID: {}\n", new.user.id));
+            if username_changed {
+                content.push_str(&format!("Username changed: {} to {}\n", old.user.name, new.user.name));
+            };
+            if nickname_changed {
+                content.push_str(&format!(
+                    "Nickname changed: {} to {}\n",
+                    old.nick.unwrap_or("None".into()),
+                    new.nick.unwrap_or("None".into())
+                ));
+            };
+            if avatar_changed {
+                content.push_str("Avatar changed.\n");
+                message.add_file(url.as_str());
+            };
+            message.content(content);
+            message
+        })
+        .await;
 }

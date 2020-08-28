@@ -7,7 +7,11 @@ pub async fn guild_member_removal(ctx: Context, guildid: GuildId, user: User, _m
         return;
     }
 
-    let log_channel = get_log_channel(guildid).await.unwrap();
+    let log_channel = match get_log_channel(guildid).await {
+        Ok(c) => c,
+        Err(_) => return,
+    };
+
     let avatar = user.face().replace("size=1024", "size=128");
 
     let _ = log_channel

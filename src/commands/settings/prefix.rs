@@ -1,4 +1,7 @@
-use crate::{data::cache::GuildPrefixes, db::connect};
+use crate::{
+    data::{cache::GuildPrefixes, error::BotError},
+    db::connect,
+};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,7 +17,7 @@ use serenity::{
 #[example = "prefix !"]
 async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let mut conn = connect().await?;
-    let guildid = msg.guild_id.unwrap();
+    let guildid = msg.guild_id.ok_or(BotError::NoneError)?;
     let pref = args.current().unwrap_or("!");
 
     let _ = sqlx::query("INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)")
@@ -25,7 +28,7 @@ async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 
     {
         let mut data = ctx.data.write().await;
-        let prefixes = data.get_mut::<GuildPrefixes>().unwrap();
+        let prefixes = data.get_mut::<GuildPrefixes>().ok_or(BotError::NoneError)?;
         prefixes.insert(guildid, pref.to_string());
     }
 

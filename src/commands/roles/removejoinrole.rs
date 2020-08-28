@@ -1,4 +1,4 @@
-use crate::db::connect;
+use crate::{data::error::BotError, db::connect};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,7 +14,7 @@ use serenity::{
 #[example("removejoinrole")]
 async fn removejoinrole(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     let mut conn = connect().await?;
-    let gid = msg.guild_id.unwrap();
+    let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
     sqlx::query("REMOVE FROM joinrole WHERE guild_id = ?1;")
         .bind(gid.to_string())

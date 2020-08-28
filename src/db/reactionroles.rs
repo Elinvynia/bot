@@ -9,20 +9,25 @@ pub async fn start_reactions(ctx: &Context) -> Result<(), BotError> {
     let mut q = sqlx::query("SELECT * FROM reactionroles").fetch(&mut conn);
 
     while let Ok(Some(x)) = q.next().await {
-        let guild_id: String = x.get("guild_id");
-        let guild_id: u64 = guild_id.parse().unwrap();
-        let _guild_id = GuildId(guild_id);
-
         let message_id: String = x.get("message_id");
-        let message_id: u64 = message_id.parse().unwrap();
+        let message_id: u64 = match message_id.parse() {
+            Ok(id) => id,
+            Err(_) => continue,
+        };
         let message_id = MessageId(message_id);
 
         let role_id: String = x.get("role_id");
-        let role_id: u64 = role_id.parse().unwrap();
+        let role_id: u64 = match role_id.parse() {
+            Ok(id) => id,
+            Err(_) => continue,
+        };
         let role_id = RoleId(role_id);
 
         let reaction_id: String = x.get("reaction_id");
-        let reaction_id: u64 = reaction_id.parse().unwrap();
+        let reaction_id: u64 = match reaction_id.parse() {
+            Ok(id) => id,
+            Err(_) => continue,
+        };
         let reaction_id = EmojiId(reaction_id);
 
         let mut collector = ReactionCollectorBuilder::new(&ctx)

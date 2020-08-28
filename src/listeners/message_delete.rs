@@ -3,7 +3,11 @@ use crate::db::log::{check_log_type, log_channel_say};
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
-    let channel: Channel = channel.to_channel(&ctx).await.unwrap();
+    let channel: Channel = match channel.to_channel(&ctx).await {
+        Ok(c) => c,
+        Err(_) => return,
+    };
+
     let guildid = match channel.clone() {
         Channel::Guild(g) => g.guild_id,
         _ => return,

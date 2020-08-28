@@ -7,7 +7,11 @@ pub async fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
         return;
     }
 
-    let log_channel = get_log_channel(guildid).await.unwrap();
+    let log_channel = match get_log_channel(guildid).await {
+        Ok(c) => c,
+        Err(_) => return,
+    };
+
     let avatar = user.face().replace("size=1024", "size=128");
 
     let _ = log_channel

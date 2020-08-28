@@ -1,4 +1,5 @@
 use crate::{
+    data::error::BotError,
     db::connect,
     utils::parse::{parse_reaction, parse_rol},
 };
@@ -22,23 +23,23 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     let x = msg
         .channel(ctx)
         .await
-        .unwrap()
+        .ok_or(BotError::NoneError)?
         .guild()
-        .unwrap()
+        .ok_or(BotError::NoneError)?
         .messages(ctx, |builder| builder.before(msg.id).limit(1))
         .await?;
     if x.is_empty() {
         return Ok(());
     };
 
-    let gid = msg.guild_id.unwrap();
+    let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    let reaction = match parse_reaction(&args.single::<String>().unwrap(), &gid, &ctx).await {
+    let reaction = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
         Some(r) => r,
         None => return Ok(()),
     };
 
-    let role = match parse_rol(&args.single::<String>().unwrap(), Some(&gid), Some(&ctx)).await {
+    let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(&ctx)).await {
         Some(rid) => match rid.to_role_cached(&ctx.cache).await {
             Some(r) => r,
             None => return Ok(()),
@@ -47,7 +48,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     };
 
     let reactionid = reaction.id;
-    let parent_msg = x.get(0).unwrap().clone();
+    let parent_msg = x.get(0).ok_or(BotError::NoneError)?.clone();
     parent_msg.react(&ctx, reaction).await?;
 
     let roleid = role.id;
@@ -60,7 +61,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
         })
         .await;
 
-    let _ = msg.delete(&ctx).await;
+    msg.delete(&ctx).await?;
 
     sqlx::query("INSERT INTO reactionroles (guild_id, message_id, role_id, reaction_id) values (?1, ?2, ?3, ?4)")
         .bind(gid.to_string())
@@ -76,13 +77,19 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
         while let Some(event) = collector.next().await {
             match event.as_ref() {
                 ReactionAction::Added(a) => {
-                    let uid = a.user_id.unwrap();
+                    let uid = match a.user_id {
+                        Some(id) => id,
+                        None => continue,
+                    };
                     let guild = a.guild_id.unwrap().to_partial_guild(&http).await.unwrap();
                     let mut member = guild.member(&ctx, uid).await.unwrap();
                     let _ = member.add_role(&http, roleid).await;
                 }
                 ReactionAction::Removed(r) => {
-                    let uid = r.user_id.unwrap();
+                    let uid = match r.user_id {
+                        Some(id) => id,
+                        None => continue,
+                    };
                     let guild = r.guild_id.unwrap().to_partial_guild(&http).await.unwrap();
                     let mut member = guild.member(&ctx, uid).await.unwrap();
                     let _ = member.remove_role(&http, roleid).await;

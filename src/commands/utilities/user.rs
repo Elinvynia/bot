@@ -1,4 +1,4 @@
-use crate::utils::parse::parse_user;
+use crate::{data::error::BotError, utils::parse::parse_user};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,8 +14,8 @@ use serenity::{
 async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id;
     if !args.is_empty() && msg.guild_id.is_some() {
-        let name: String = args.single().unwrap();
-        let gid = msg.guild_id.unwrap();
+        let name: String = args.single()?;
+        let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
         match parse_user(&name, Some(&gid), Some(&ctx)).await {
             Some(uid) => user_id = uid,
@@ -35,13 +35,13 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         if let Ok(member) = guild.member(&ctx, user_id).await {
             message.push_str(&format!(
                 "**Joined At:** {}\n",
-                member.joined_at.unwrap().format("%F %T")
+                member.joined_at.ok_or(BotError::NoneError)?.format("%F %T")
             ));
             message.push_str(&format!("**Nickname:** {}\n", member.nick.unwrap_or("None.".into())));
 
             let mut roles = vec![];
             for role in member.roles {
-                roles.push(role.to_role_cached(&ctx).await.unwrap().name)
+                roles.push(role.to_role_cached(&ctx).await.ok_or(BotError::NoneError)?.name)
             }
             message.push_str(&format!("**Roles:** {}\n", roles.join(", ".into())))
         };

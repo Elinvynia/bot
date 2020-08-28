@@ -1,3 +1,4 @@
+use crate::data::error::BotError;
 use serenity::{
     framework::standard::{macros::command, CommandResult},
     model::prelude::*,
@@ -10,7 +11,7 @@ use serenity::{
 #[usage("guild")]
 #[example("guild")]
 async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = match msg.guild_id.unwrap().to_guild_cached(&ctx).await {
+    let guild = match msg.guild_id.ok_or(BotError::NoneError)?.to_guild_cached(&ctx).await {
         Some(g) => g,
         None => {
             msg.channel_id.say(&ctx.http, "Guild not found in cache.").await?;

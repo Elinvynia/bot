@@ -64,6 +64,7 @@ async fn main() {
         .help(&HELP)
         .group(&SETTINGS_GROUP)
         .group(&ADMIN_GROUP)
+        .group(&UTILITIES_GROUP)
         .group(&FUN_GROUP)
         .group(&GENERAL_GROUP)
         .group(&ROLES_GROUP);

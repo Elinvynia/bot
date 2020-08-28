@@ -1,4 +1,4 @@
-use crate::utils::parse::parse_user;
+use crate::{data::error::BotError, utils::parse::parse_user};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -15,7 +15,7 @@ use serenity::{
 #[example("ban @Elinvynia \"Abusive language\"")]
 async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let banned_id = parse_user(
-        &args.quoted().current().unwrap().to_string(),
+        &args.quoted().current().ok_or(BotError::NoneError)?.to_string(),
         msg.guild_id.as_ref(),
         Some(&ctx),
     )
@@ -27,21 +27,21 @@ async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let arg_reason = args.current().unwrap_or("");
     let reason = format!("Eli Bot | {}", arg_reason);
 
-    let channel = banned.create_dm_channel(&ctx).await.unwrap();
+    let channel = banned.create_dm_channel(&ctx).await?;
 
     channel
         .say(
             &ctx.http,
             format!(
                 "You have been banned from {}\nReason: {}",
-                msg.guild(&ctx.cache).await.unwrap().name,
+                msg.guild(&ctx.cache).await.ok_or(BotError::NoneError)?.name,
                 &arg_reason
             ),
         )
         .await?;
 
     msg.guild_id
-        .unwrap()
+        .ok_or(BotError::NoneError)?
         .ban_with_reason(&ctx.http, banned, 0, reason)
         .await?;
 

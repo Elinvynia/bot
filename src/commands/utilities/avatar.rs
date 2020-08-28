@@ -1,4 +1,4 @@
-use crate::utils::parse::parse_user;
+use crate::{data::error::BotError, utils::parse::parse_user};
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,7 +14,7 @@ use serenity::{
 async fn avatar(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id = if args.len() == 1 {
         match parse_user(
-            &args.quoted().current().unwrap().to_string(),
+            &args.quoted().current().ok_or(BotError::NoneError)?.to_string(),
             msg.guild_id.as_ref(),
             Some(&ctx),
         )
