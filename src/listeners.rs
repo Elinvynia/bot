@@ -8,6 +8,7 @@ pub mod channel_delete;
 pub mod guild_ban_addition;
 pub mod guild_member_addition;
 pub mod guild_member_removal;
+pub mod guild_member_update;
 pub mod message;
 pub mod message_delete;
 pub mod message_update;
@@ -48,6 +49,10 @@ impl EventHandler for Handler {
 
     async fn guild_member_removal(&self, ctx: Context, gid: GuildId, user: User, member: Option<Member>) {
         guild_member_removal::guild_member_removal(ctx, gid, user, member).await
+    }
+
+    async fn guild_member_update(&self, ctx: Context, old_if_available: Option<Member>, new: Member) {
+        guild_member_update::guild_member_update(ctx, old_if_available, new).await
     }
 
     async fn message(&self, _ctx: Context, new_message: Message) {
