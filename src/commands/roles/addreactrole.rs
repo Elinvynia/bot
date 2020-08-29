@@ -81,8 +81,18 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
                         Some(id) => id,
                         None => continue,
                     };
-                    let guild = a.guild_id.unwrap().to_partial_guild(&http).await.unwrap();
-                    let mut member = guild.member(&ctx, uid).await.unwrap();
+                    let gid = match a.guild_id {
+                        Some(id) => id,
+                        None => continue,
+                    };
+                    let guild = match gid.to_partial_guild(&http).await {
+                        Ok(g) => g,
+                        Err(_) => continue,
+                    };
+                    let mut member = match guild.member(&ctx, uid).await {
+                        Ok(m) => m,
+                        Err(_) => continue,
+                    };
                     let _ = member.add_role(&http, roleid).await;
                 }
                 ReactionAction::Removed(r) => {
@@ -90,8 +100,18 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
                         Some(id) => id,
                         None => continue,
                     };
-                    let guild = r.guild_id.unwrap().to_partial_guild(&http).await.unwrap();
-                    let mut member = guild.member(&ctx, uid).await.unwrap();
+                    let gid = match r.guild_id {
+                        Some(id) => id,
+                        None => continue,
+                    };
+                    let guild = match gid.to_partial_guild(&http).await {
+                        Ok(g) => g,
+                        Err(_) => continue,
+                    };
+                    let mut member = match guild.member(&ctx, uid).await {
+                        Ok(m) => m,
+                        Err(_) => continue,
+                    };
                     let _ = member.remove_role(&http, roleid).await;
                 }
             };

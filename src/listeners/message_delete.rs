@@ -17,21 +17,33 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
         return;
     }
 
-    if let Some(x) = ctx.cache.message(&channel.id(), &deleted_message_id).await {
-        let data = ctx.data.read();
-        if x.author.id == *data.await.get::<BotId>().unwrap() {
-            return;
-        }
-        let _ = log_channel_say(
-            &ctx,
-            guildid,
-            &format!(
-                "Message by {} deleted in channel {}:\n{}",
-                x.author,
-                x.channel(&ctx.cache).await.unwrap(),
-                x.content
-            ),
-        )
-        .await;
-    }
+    let message = match ctx.cache.message(&channel.id(), &deleted_message_id).await {
+        Some(m) => m,
+        None => return,
+    };
+
+    let data = ctx.data.read().await;
+    let botid = match data.get::<BotId>() {
+        Some(id) => id,
+        None => return,
+    };
+
+    if &message.author.id == botid {
+        return;
+    };
+
+    let channel = match message.channel(&ctx.cache).await {
+        Some(c) => c,
+        None => return,
+    };
+
+    let _ = log_channel_say(
+        &ctx,
+        guildid,
+        &format!(
+            "Message by {} deleted in channel {}:\n{}",
+            message.author, channel, message.content
+        ),
+    )
+    .await;
 }
