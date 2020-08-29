@@ -1,4 +1,4 @@
-use crate::db::connect;
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,

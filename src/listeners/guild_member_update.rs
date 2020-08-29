@@ -1,5 +1,4 @@
-use crate::data::db::LogType;
-use crate::db::log::{check_log_type, get_log_channel};
+use crate::prelude::*;
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>, new: Member) {
@@ -43,8 +42,8 @@ pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>,
             if nickname_changed {
                 content.push_str(&format!(
                     "Nickname changed: {} to {}\n",
-                    old.nick.unwrap_or("None".into()),
-                    new.nick.unwrap_or("None".into())
+                    old.nick.unwrap_or_else(|| "None".into()),
+                    new.nick.unwrap_or_else(|| "None".into())
                 ));
             };
             if avatar_changed {

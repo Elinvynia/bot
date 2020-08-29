@@ -1,5 +1,4 @@
-use crate::data::{cache::BotId, db::LogType};
-use crate::db::log::{check_log_type, log_channel_say};
+use crate::prelude::*;
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn message_update(ctx: Context, old: Option<Message>, new: Option<Message>, _: MessageUpdateEvent) {

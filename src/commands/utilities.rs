@@ -3,7 +3,6 @@ pub mod emoji;
 pub mod guild;
 pub mod leaderboard;
 pub mod user;
-
 pub use avatar::*;
 pub use emoji::*;
 pub use guild::*;

@@ -37,7 +37,10 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                 "**Joined At:** {}\n",
                 member.joined_at.ok_or(BotError::NoneError)?.format("%F %T")
             ));
-            message.push_str(&format!("**Nickname:** {}\n", member.nick.unwrap_or("None.".into())));
+            message.push_str(&format!(
+                "**Nickname:** {}\n",
+                member.nick.unwrap_or_else(|| "None.".into())
+            ));
 
             let mut roles = vec![];
             for role in member.roles {

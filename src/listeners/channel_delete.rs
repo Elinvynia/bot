@@ -1,5 +1,4 @@
-use crate::data::db::LogType;
-use crate::db::log::{check_log_type, log_channel_say};
+use crate::prelude::*;
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn channel_delete(ctx: Context, channel: &GuildChannel) {

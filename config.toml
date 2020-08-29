@@ -1,2 +1,3 @@
 default_prefix = "!"
 discord_token = "Please insert your Discord bot token here."
+bot_owners = []

@@ -1,5 +1,4 @@
-use crate::data::db::LogType;
-use crate::db::log::{check_log_type, get_log_channel};
+use crate::prelude::*;
 use serenity::{model::prelude::*, prelude::*};
 
 pub async fn guild_member_removal(ctx: Context, guildid: GuildId, user: User, _member: Option<Member>) {

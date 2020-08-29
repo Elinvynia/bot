@@ -1,4 +1,4 @@
-use crate::{data::error::BotError, utils::parse::parse_user};
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -14,35 +14,25 @@ use serenity::{
 #[usage("kick <person> <optional: reason>")]
 #[example("kick @Elinvynia \"Abusive language\"")]
 async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let kicked_id = parse_user(
-        &args.quoted().current().ok_or(BotError::NoneError)?.to_string(),
-        msg.guild_id.as_ref(),
-        Some(&ctx),
-    )
-    .await
-    .ok_or("arg passed isn't a valid user mention")?;
+    args.quoted();
+
+    let kicked_id = match parse_user(&args.single::<String>()?, msg.guild_id.as_ref(), Some(&ctx)).await {
+        Some(id) => id,
+        None => return Ok(()),
+    };
+
     let kicked = kicked_id.to_user(ctx).await?;
-
-    args.advance();
-    let arg_reason = args.current().unwrap_or("");
-    let reason = format!("Eli Bot | {}", &arg_reason);
-
+    let reason = format!("Eli Bot | {}", args.single::<String>().unwrap_or_else(|_| "".into()));
     let channel = kicked.create_dm_channel(&ctx).await?;
-
     let guild = msg.guild(&ctx.cache).await.ok_or(BotError::NoneError)?;
-    let guild_name = &guild.name;
-
-    channel
-        .say(
-            &ctx.http,
-            format!("You have been kicked from {}\nReason: {}", &guild_name, &arg_reason),
-        )
-        .await?;
 
     msg.guild_id
         .ok_or(BotError::NoneError)?
-        .kick_with_reason(&ctx.http, kicked, &reason)
+        .kick_with_reason(&ctx, kicked, &reason)
         .await?;
+
+    let kicked_message = format!("You have been kicked from {}\nReason: {}", &guild.name, &reason);
+    channel.say(&ctx, kicked_message).await?;
 
     Ok(())
 }

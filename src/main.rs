@@ -1,3 +1,5 @@
+mod prelude;
+
 mod commands;
 use commands::help::*;
 use commands::*;
