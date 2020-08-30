@@ -1,4 +1,4 @@
-use crate::{data::error::BotError, db::connect, utils::parse::parse_reaction};
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -26,6 +26,8 @@ async fn removereactrole(ctx: &Context, msg: &Message, mut args: Args) -> Comman
         .bind(gid.to_string())
         .execute(&mut conn)
         .await?;
+
+    msg.channel_id.say(&ctx, "Reaction role removed!").await?;
 
     Ok(())
 }

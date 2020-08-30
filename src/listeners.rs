@@ -14,6 +14,7 @@ pub mod message_delete;
 pub mod message_update;
 pub mod presence_update;
 pub mod ready;
+pub mod voice_state_update;
 
 pub struct Handler;
 
@@ -79,5 +80,9 @@ impl EventHandler for Handler {
 
     async fn ready(&self, ctx: Context, ready: Ready) {
         ready::ready(ctx, ready).await
+    }
+
+    async fn voice_state_update(&self, ctx: Context, gid: Option<GuildId>, old: Option<VoiceState>, new: VoiceState) {
+        voice_state_update::voice_state_update(ctx, gid, old, new).await
     }
 }

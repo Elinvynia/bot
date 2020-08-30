@@ -1,10 +1,4 @@
-use crate::{
-    data::{db::LogType, error::BotError},
-    db::{
-        connect,
-        log::{get_log_channel, get_log_type},
-    },
-};
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -18,8 +12,8 @@ use std::convert::TryInto;
 #[owners_only]
 #[min_args(0)]
 #[max_args(2)]
-#[description = "Sets the log channel. |  Resets the enabled flags.  |  Toggles which type of event is logged in the log channel."]
-#[usage = "log  |  log reset  |  log <enable|disable> <category>"]
+#[description = "Sets the log channel.  |  Toggles which type of event is logged in the log channel."]
+#[usage = "log  |  log <enable|disable> <category>"]
 #[example = "log enable join"]
 async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut conn = connect().await?;
@@ -32,13 +26,6 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     }
 
     if args.len() == 1 {
-        let arg = args.single::<String>()?;
-        if &arg == "reset" {
-            sqlx::query("UPDATE log SET log_type = 0 WHERE guild_id = ?1;")
-                .bind(&guild_id.to_string())
-                .execute(&mut conn)
-                .await?;
-        }
         return Ok(());
     }
 
@@ -52,12 +39,20 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     match &on_off[..] {
         "enable" => {
             let kind: LogType = log_kind.try_into()?;
-            log_type |= kind as i64;
+            if kind == LogType::All {
+                log_type = LogType::All as i64
+            } else {
+                log_type |= kind as i64;
+            }
             message = format!("{} messages will now be logged!", kind.to_string());
         }
         "disable" => {
             let kind: LogType = log_kind.try_into()?;
-            log_type &= !(kind as i64);
+            if kind == LogType::All {
+                log_type = 0 as i64;
+            } else {
+                log_type &= !(kind as i64);
+            }
             message = format!("{} messages will no longer be logged!", kind.to_string());
         }
         _ => return Ok(()),

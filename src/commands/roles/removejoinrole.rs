@@ -1,4 +1,4 @@
-use crate::{data::error::BotError, db::connect};
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -8,7 +8,6 @@ use serenity::{
 #[command]
 #[only_in(guilds)]
 #[owners_only]
-#[num_args(0)]
 #[description("Removes a join role from the current guild.")]
 #[usage("removejoinrole")]
 #[example("removejoinrole")]

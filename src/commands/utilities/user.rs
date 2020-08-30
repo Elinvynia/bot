@@ -1,4 +1,4 @@
-use crate::{data::error::BotError, utils::parse::parse_user};
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
@@ -46,7 +46,7 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             for role in member.roles {
                 roles.push(role.to_role_cached(&ctx).await.ok_or(BotError::NoneError)?.name)
             }
-            message.push_str(&format!("**Roles:** {}\n", roles.join(", ".into())))
+            message.push_str(&format!("**Roles:** {}\n", roles.join(", ")))
         };
     };
 

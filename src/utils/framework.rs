@@ -63,7 +63,7 @@ pub async fn dispatch_error(context: &Context, msg: &Message, error: DispatchErr
                 )
                 .await;
         }
-        _ => error!("Unhandled dispatch error."),
+        _ => error!("Unhandled dispatch error. {:?}", error),
     }
 }
 

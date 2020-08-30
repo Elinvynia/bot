@@ -1,5 +1,6 @@
 use serenity::framework::standard::macros::group;
 pub mod help;
+pub use help::*;
 
 pub mod general;
 pub use general::*;

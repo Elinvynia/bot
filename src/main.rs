@@ -1,22 +1,13 @@
-mod prelude;
-
 mod commands;
-use commands::help::*;
-use commands::*;
-
 mod data;
-use data::cache::{BotId, BotOwners, DefaultPrefix, GuildPrefixes, ShardManagerContainer};
-
-mod utils;
-use utils::framework::{after, dispatch_error, dynamic_prefix, log_dm};
-
 mod db;
-use db::setup_db;
-
 mod listeners;
-use listeners::Handler;
-
-use serenity::{client::bridge::gateway::GatewayIntents, framework::StandardFramework, http::Http, prelude::*};
+mod prelude;
+mod utils;
+use crate::{commands::*, db::setup_db, listeners::Handler, prelude::*, utils::framework::*};
+use serenity::{
+    client::bridge::gateway::GatewayIntents, framework::StandardFramework, http::Http, model::prelude::*, prelude::*,
+};
 use std::{
     collections::{HashMap, HashSet},
     env,
@@ -25,8 +16,8 @@ use std::{
 
 #[tokio::main]
 async fn main() {
-    dotenv::dotenv().ok();
     pretty_env_logger::init();
+    dotenv::dotenv().ok();
 
     let mut settings = config::Config::default();
     settings
@@ -42,7 +33,7 @@ async fn main() {
     } else {
         token = settings
             .get_str("discord_token")
-            .expect("discord_token not found in settings.");
+            .expect("discord_token not found in config.");
     }
 
     let http = Http::new_with_token(&token);
@@ -95,17 +86,25 @@ async fn main() {
     //Set the cache for each channel to 100 messages.
     client.cache_and_http.cache.set_max_messages(100).await;
 
+    //Collect the bot owners.
+    let mut bot_owners: Vec<UserId> = settings
+        .get_array("bot_owners")
+        .expect("bot_owners not found in config.")
+        .into_iter()
+        .map(|x| UserId(x.try_into::<u64>().expect("Failed to decode owner ID into UserId.")))
+        .collect();
+    bot_owners.push(ownerid);
+
     //Fill the data with previously gathered and default values.
     {
         let mut data = client.data.write().await;
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
         data.insert::<BotId>(botid);
-        let x = vec![ownerid];
-        data.insert::<BotOwners>(x);
+        data.insert::<BotOwners>(bot_owners);
         data.insert::<DefaultPrefix>(
             settings
                 .get_str("default_prefix")
-                .expect("default_prefix not found in settings."),
+                .expect("default_prefix not found in config."),
         );
         let map = HashMap::new();
         data.insert::<GuildPrefixes>(map);

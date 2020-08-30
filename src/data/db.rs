@@ -7,7 +7,7 @@ pub struct LeaderboardEntry {
     pub points: i64,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LogType {
     MessageDeleted = 1 << 1,
     MessageEdited = 1 << 2,
@@ -19,7 +19,8 @@ pub enum LogType {
     CategoryCreated = 1 << 8,
     CategoryDeleted = 1 << 9,
     UserUpdated = 1 << 10,
-    All = (1 << 11) - 1,
+    VoiceUpdate = 1 << 11,
+    All = (1 << 12) - 1,
 }
 
 impl std::fmt::Display for LogType {
@@ -35,6 +36,7 @@ impl std::fmt::Display for LogType {
             LogType::CategoryCreated => "Category creation",
             LogType::CategoryDeleted => "Category deletion",
             LogType::UserUpdated => "User update",
+            LogType::VoiceUpdate => "Voice update",
             LogType::All => "All",
         };
         write!(fmt, "{}", msg)
@@ -54,6 +56,7 @@ impl TryFrom<String> for LogType {
             "catcreate" => Ok(LogType::CategoryCreated),
             "catdelete" => Ok(LogType::CategoryDeleted),
             "update" => Ok(LogType::UserUpdated),
+            "voiceupdate" => Ok(LogType::VoiceUpdate),
             "all" => Ok(LogType::All),
             _ => Err(BotError::LogTypeNotFound),
         }

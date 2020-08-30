@@ -1,8 +1,4 @@
-use crate::{
-    data::error::BotError,
-    db::connect,
-    utils::parse::{parse_reaction, parse_rol},
-};
+use crate::prelude::*;
 use serenity::{
     collector::*,
     framework::standard::{macros::command, Args, CommandResult},

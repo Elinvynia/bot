@@ -20,13 +20,16 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
     let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
 
     if args.len() == 1 {
-        let channel_id = parse_chan(
+        let channel_id = match parse_chan(
             &args.quoted().current().ok_or(BotError::NoneError)?.to_string(),
             Some(&guild_id),
             Some(&ctx),
         )
         .await
-        .ok_or("Failed to parse channel.")?;
+        {
+            Some(c) => c,
+            None => return Ok(()),
+        };
         let channel = channel_id.to_channel_cached(&ctx).await.ok_or("Channel not found.")?;
         let rows = get_user_channel_scores(guild_id, channel_id).await?;
         let mut result = "".to_string();

@@ -1,4 +1,4 @@
-use crate::data::error::BotError;
+use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, CommandResult},
     model::prelude::*,
@@ -11,13 +11,12 @@ use serenity::{
 #[usage("guild")]
 #[example("guild")]
 async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = match msg.guild_id.ok_or(BotError::NoneError)?.to_guild_cached(&ctx).await {
-        Some(g) => g,
-        None => {
-            msg.channel_id.say(&ctx.http, "Guild not found in cache.").await?;
-            return Ok(());
-        }
-    };
+    let guild = msg
+        .guild_id
+        .ok_or(BotError::NoneError)?
+        .to_guild_cached(&ctx)
+        .await
+        .ok_or(BotError::NoneError)?;
 
     let owner = guild
         .owner_id
@@ -29,13 +28,13 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
         ExplicitContentFilter::None => "Don't scan any messages.",
         ExplicitContentFilter::WithoutRole => "Scan messages from members without a role.",
         ExplicitContentFilter::All => "Scan messages sent by all members.",
-        _ => unreachable!(),
+        _ => "ERROR",
     };
 
     let notifications = match guild.default_message_notifications {
         DefaultMessageNotificationLevel::All => "Receive notifications for everything.",
         DefaultMessageNotificationLevel::Mentions => "Receive only mentions.",
-        _ => unreachable!(),
+        _ => "ERROR",
     };
 
     let verification = match guild.verification_level {
@@ -44,7 +43,7 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
         VerificationLevel::Medium => "Must also be a registered user on Discord for longer than 5 minutes.",
         VerificationLevel::High => "Must also be a member of the guild for longer than 10 minutes.",
         VerificationLevel::Higher => "Must have a verified phone on the user's Discord account.",
-        _ => unreachable!(),
+        _ => "ERROR",
     };
 
     let tier = match guild.premium_tier {
@@ -52,7 +51,7 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
         PremiumTier::Tier1 => "Tier 1",
         PremiumTier::Tier2 => "Tier 2",
         PremiumTier::Tier3 => "Tier 3",
-        _ => unreachable!(),
+        _ => "ERROR",
     };
 
     let mut message = format!("__**{}**__\n\n", guild.name);

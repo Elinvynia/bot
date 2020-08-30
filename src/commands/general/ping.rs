@@ -1,5 +1,4 @@
-use crate::data::cache::ShardManagerContainer;
-use log::error;
+use crate::prelude::*;
 use serenity::{
     client::bridge::gateway::ShardId,
     framework::standard::{macros::command, CommandResult},
@@ -13,23 +12,11 @@ use serenity::{
 #[example = "ping"]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read().await;
-    let shard_manager = match data.get::<ShardManagerContainer>() {
-        Some(v) => v,
-        None => {
-            error!("There was a problem getting the shard manager.");
-            return Ok(());
-        }
-    };
+    let shard_manager = data.get::<ShardManagerContainer>().ok_or(BotError::NoneError)?;
 
     let manager = shard_manager.lock().await;
     let runners = manager.runners.lock().await;
-    let runner = match runners.get(&ShardId(ctx.shard_id)) {
-        Some(runner) => runner,
-        None => {
-            error!("No shard found.");
-            return Ok(());
-        }
-    };
+    let runner = runners.get(&ShardId(ctx.shard_id)).ok_or(BotError::NoneError)?;
 
     match runner.latency {
         Some(x) => {
