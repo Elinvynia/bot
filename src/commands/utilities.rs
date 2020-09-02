@@ -1,9 +1,11 @@
 pub mod avatar;
+pub mod choose;
 pub mod emoji;
 pub mod guild;
 pub mod leaderboard;
 pub mod user;
 pub use avatar::*;
+pub use choose::*;
 pub use emoji::*;
 pub use guild::*;
 pub use leaderboard::*;

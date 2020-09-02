@@ -34,7 +34,7 @@ pub mod utilities;
 pub use utilities::*;
 
 #[group]
-#[commands(avatar, user, leaderboard, guild, emoji)]
+#[commands(avatar, user, leaderboard, guild, emoji, choose)]
 struct Utilities;
 
 pub mod fun;
