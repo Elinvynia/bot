@@ -20,7 +20,8 @@ pub enum LogType {
     CategoryDeleted = 1 << 9,
     UserUpdated = 1 << 10,
     VoiceUpdate = 1 << 11,
-    All = (1 << 12) - 1,
+    PresenceUpdate = 1 << 12,
+    All = (1 << 13) - 1,
 }
 
 impl std::fmt::Display for LogType {
@@ -37,6 +38,7 @@ impl std::fmt::Display for LogType {
             LogType::CategoryDeleted => "Category deletion",
             LogType::UserUpdated => "User update",
             LogType::VoiceUpdate => "Voice update",
+            LogType::PresenceUpdate => "Prese update",
             LogType::All => "All",
         };
         write!(fmt, "{}", msg)
@@ -57,6 +59,7 @@ impl TryFrom<String> for LogType {
             "catdelete" => Ok(LogType::CategoryDeleted),
             "update" => Ok(LogType::UserUpdated),
             "voiceupdate" => Ok(LogType::VoiceUpdate),
+            "presenceupdate" => Ok(LogType::PresenceUpdate),
             "all" => Ok(LogType::All),
             _ => Err(BotError::LogTypeNotFound),
         }

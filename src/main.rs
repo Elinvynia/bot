@@ -16,8 +16,8 @@ use std::{
 
 #[tokio::main]
 async fn main() {
-    pretty_env_logger::init();
     dotenv::dotenv().ok();
+    pretty_env_logger::init();
 
     let mut settings = config::Config::default();
     settings

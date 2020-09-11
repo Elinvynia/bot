@@ -30,3 +30,9 @@ pub struct GuildPrefixes;
 impl TypeMapKey for GuildPrefixes {
     type Value = HashMap<GuildId, String>;
 }
+
+pub struct Presences;
+
+impl TypeMapKey for Presences {
+    type Value = HashMap<UserId, Presence>;
+}
