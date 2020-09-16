@@ -27,7 +27,7 @@ pub mod admin;
 pub use admin::*;
 
 #[group]
-#[commands(ban, kick)]
+#[commands(ban, kick, purge)]
 struct Admin;
 
 pub mod utilities;
