@@ -42,13 +42,14 @@ pub async fn message_update(ctx: Context, old: Option<Message>, new: Option<Mess
         None => return,
     };
 
-    let _ = log_channel_say(
-        &ctx,
-        guildid,
-        &format!(
-            "Message by {} updated in channel {} from:\n{}\nTo:\n{}",
-            new_m.author, channel, old_m.content, new_m.content
-        ),
-    )
-    .await;
+    let mut message = String::from("**Message Updated**\n");
+    message += &format!("ID: {}\n", new_m.author.id);
+    message += &format!("Tag: {}\n", new_m.author.tag());
+    message += &format!("Ping: {}\n", new_m.author.mention());
+    message += &format!("Channel: {}\n", channel);
+    message += &format!("Old Message: \n{}\n", old_m.content);
+    message += "---\n";
+    message += &format!("New Message: \n{}\n", new_m.content);
+
+    let _ = log_channel_say(&ctx, guildid, &message).await;
 }

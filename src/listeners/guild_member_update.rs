@@ -32,22 +32,21 @@ pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>,
 
     let _ = log_channel
         .send_message(&ctx, |message| {
-            let mut content = String::new();
-            content.push_str("User Updated\n");
-            content.push_str(&format!("Username: {}\n", new.user.name));
-            content.push_str(&format!("ID: {}\n", new.user.id));
+            let mut content = String::from("**User Updated**\n");
+            content += &format!("Username: {}\n", new.user.name);
+            content += &format!("ID: {}\n", new.user.id);
             if username_changed {
-                content.push_str(&format!("Username changed: {} to {}\n", old.user.name, new.user.name));
+                content += &format!("Username changed: {} to {}\n", old.user.name, new.user.name);
             };
             if nickname_changed {
-                content.push_str(&format!(
+                content += &format!(
                     "Nickname changed: {} to {}\n",
                     old.nick.unwrap_or_else(|| "None".into()),
                     new.nick.unwrap_or_else(|| "None".into())
-                ));
+                );
             };
             if avatar_changed {
-                content.push_str("Avatar changed.\n");
+                content += "Avatar changed.\n";
                 message.add_file(url.as_str());
             };
             message.content(content);

@@ -8,5 +8,10 @@ pub async fn channel_create(ctx: Context, channel: &GuildChannel) {
         return;
     }
 
-    let _ = log_channel_say(&ctx, guildid, &format!("Channel created: {}", channel.name)).await;
+    let mut msg = String::from("**Channel Created**\n");
+    msg += &format!("ID: {}\n", channel.id);
+    msg += &format!("Name: {}\n", channel.name);
+    msg += &format!("NSFW: {}\n", channel.nsfw);
+
+    let _ = log_channel_say(&ctx, guildid, &msg).await;
 }

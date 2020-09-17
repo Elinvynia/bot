@@ -16,22 +16,21 @@ pub async fn voice_state_update(ctx: Context, gid: Option<GuildId>, old: Option<
         None => return,
     };
 
-    let mut message = String::new();
-    message.push_str("Voice State Updated\n");
-    message.push_str(&format!("Username: {}\n", user.tag()));
-    message.push_str(&format!("ID: {}\n", user.id));
+    let mut message = String::from("**Voice State Updated**\n");
+    message += &format!("ID: {}\n", user.id);
+    message += &format!("Tag: {}\n", user.tag());
+    message += &format!("Ping: {}\n", user.mention());
 
     let old = match old {
         Some(o) => o,
         None => {
             if let Some(vc) = new.channel_id {
-                message.push_str(&format!(
-                    "Joined voice channel: {}\n",
-                    vc.to_channel(&ctx)
-                        .await
-                        .ok()
-                        .map_or("Failed to get channel name.".to_string(), |c| c.to_string())
-                ));
+                let channel = vc
+                    .to_channel(&ctx)
+                    .await
+                    .ok()
+                    .map_or("Failed to get channel name.".to_string(), |c| c.to_string());
+                message += &format!("Joined voice channel: {}\n", channel);
                 let _ = log_channel_say(&ctx, gid, &message).await;
             };
             return;
@@ -40,41 +39,41 @@ pub async fn voice_state_update(ctx: Context, gid: Option<GuildId>, old: Option<
 
     if old.deaf != new.deaf {
         if old.deaf {
-            message.push_str("User is no longer deafened.\n");
+            message += "User is no longer deafened.\n";
         } else {
-            message.push_str("User has been deafened.\n");
+            message += "User has been deafened.\n";
         }
     };
 
     if old.mute != new.mute {
         if old.mute {
-            message.push_str("User is no longer muted.\n");
+            message += "User is no longer muted.\n";
         } else {
-            message.push_str("User has been muted.\n");
+            message += "User has been muted.\n";
         }
     };
 
     if old.self_deaf != new.self_deaf {
         if old.self_deaf {
-            message.push_str("User is no longer self-deafened.\n");
+            message += "User is no longer self-deafened.\n";
         } else {
-            message.push_str("User has been self-deafened.\n");
+            message += "User has been self-deafened.\n";
         }
     };
 
     if old.self_mute != new.self_mute {
         if old.self_mute {
-            message.push_str("User is no longer self-muted.\n");
+            message += "User is no longer self-muted.\n";
         } else {
-            message.push_str("User has been self-muted.\n");
+            message += "User has been self-muted.\n";
         }
     };
 
     if old.suppress != new.suppress {
         if old.suppress {
-            message.push_str("User is no longer suppressed.\n");
+            message += "User is no longer suppressed.\n";
         } else {
-            message.push_str("User has been suppressed.\n");
+            message += "User has been suppressed.\n";
         }
     };
 
@@ -84,28 +83,27 @@ pub async fn voice_state_update(ctx: Context, gid: Option<GuildId>, old: Option<
                 Some(id) => id,
                 None => return,
             };
-            message.push_str(&format!(
-                "User left voice channel: {}\n",
-                cid.to_channel(&ctx)
-                    .await
-                    .ok()
-                    .map_or("Failed to get channel name".to_string(), |c| c.to_string())
-            ));
+            let channel = cid
+                .to_channel(&ctx)
+                .await
+                .ok()
+                .map_or("Failed to get channel name".to_string(), |c| c.to_string());
+            message += &format!("User left voice channel: {}\n", channel);
         };
 
         if let Some(oid) = old.channel_id {
             if let Some(nid) = new.channel_id {
-                message.push_str(&format!(
-                    "User moved from channel {} to channel {}\n",
-                    oid.to_channel(&ctx)
-                        .await
-                        .ok()
-                        .map_or("Failed to get channel name".to_string(), |c| c.to_string()),
-                    nid.to_channel(&ctx)
-                        .await
-                        .ok()
-                        .map_or("Failed to get channel name".to_string(), |c| c.to_string()),
-                ));
+                let old_channel = oid
+                    .to_channel(&ctx)
+                    .await
+                    .ok()
+                    .map_or("Failed to get channel name".to_string(), |c| c.to_string());
+                let new_channel = nid
+                    .to_channel(&ctx)
+                    .await
+                    .ok()
+                    .map_or("Failed to get channel name".to_string(), |c| c.to_string());
+                message += &format!("User moved from channel {} to channel {}\n", old_channel, new_channel);
             }
         }
     };

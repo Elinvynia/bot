@@ -8,5 +8,10 @@ pub async fn category_delete(ctx: Context, category: &ChannelCategory) {
         return;
     }
 
-    let _ = log_channel_say(&ctx, guildid, &format!("Category deleted: {}", category.name)).await;
+    let mut msg = String::from("**Category Deleted**\n");
+    msg += &format!("ID: {}\n", category.id);
+    msg += &format!("Name: {}\n", category.name);
+    msg += &format!("NSFW: {}\n", category.nsfw);
+
+    let _ = log_channel_say(&ctx, guildid, &msg).await;
 }

@@ -32,14 +32,14 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
         };
         let channel = channel_id.to_channel_cached(&ctx).await.ok_or("Channel not found.")?;
         let rows = get_user_channel_scores(guild_id, channel_id).await?;
-        let mut result = "".to_string();
+        let mut result = String::new();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>()?;
             let user = match guild_id.member(ctx, id).await {
                 Ok(m) => m.user.clone(),
                 Err(_) => ctx.http.get_user(id).await?,
             };
-            result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
+            result += &format!("{}. {} - {}\n", i + 1, user.name, x.points)[..]
         }
 
         msg.channel_id
@@ -47,14 +47,14 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
             .await?;
     } else {
         let rows = get_user_total_scores(guild_id).await?;
-        let mut result = "".to_string();
+        let mut result = String::new();
         for (i, x) in rows.iter().enumerate() {
             let id = x.user_id.parse::<u64>()?;
             let user = match guild_id.member(ctx, id).await {
                 Ok(m) => m.user.clone(),
                 Err(_) => ctx.http.get_user(id).await?,
             };
-            result.push_str(&format!("{}. {} - {}\n", i + 1, user.name, x.points)[..])
+            result += &format!("{}. {} - {}\n", i + 1, user.name, x.points)[..]
         }
 
         msg.channel_id

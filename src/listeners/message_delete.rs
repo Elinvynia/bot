@@ -17,32 +17,29 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
     }
 
     let message = match ctx.cache.message(&channel.id(), &deleted_message_id).await {
-        Some(m) => m,
+        Some(msg) => {
+            let data = ctx.data.read().await;
+            let botid = match data.get::<BotId>() {
+                Some(id) => id,
+                None => return,
+            };
+            if &msg.author.id == botid {
+                return;
+            };
+            let channel = match msg.channel(&ctx.cache).await {
+                Some(c) => c,
+                None => return,
+            };
+            let mut message = String::from("**Message Deleted**\n");
+            message += &format!("ID: {}\n", msg.author.id);
+            message += &format!("Tag: {}\n", msg.author.tag());
+            message += &format!("Ping: {}\n", msg.author.mention());
+            message += &format!("Channel: {}\n", channel);
+            message += &format!("Content: \n{}\n", msg.content);
+            message
+        }
         None => return,
     };
 
-    let data = ctx.data.read().await;
-    let botid = match data.get::<BotId>() {
-        Some(id) => id,
-        None => return,
-    };
-
-    if &message.author.id == botid {
-        return;
-    };
-
-    let channel = match message.channel(&ctx.cache).await {
-        Some(c) => c,
-        None => return,
-    };
-
-    let _ = log_channel_say(
-        &ctx,
-        guildid,
-        &format!(
-            "Message by {} deleted in channel {}:\n{}",
-            message.author, channel, message.content
-        ),
-    )
-    .await;
+    let _ = log_channel_say(&ctx, guildid, &message).await;
 }

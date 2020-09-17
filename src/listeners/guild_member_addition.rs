@@ -14,10 +14,14 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_membe
 
     let user = new_member.clone().user;
     let avatar = user.face().replace("size=1024", "size=128");
+    let mut msg = String::from("**User Joined**\n");
+    msg += &format!("ID: {}\n", user.id);
+    msg += &format!("Tag: {}\n", user.tag());
+    msg += &format!("Ping: {}\n", user.mention());
 
     let _ = log_channel
         .send_message(&ctx.http, |message| {
-            message.content(format!("User joined:\nTag: {}\nID: {}", user.tag(), user.id));
+            message.content(msg);
             message.add_file(&avatar[..]);
             message
         })

@@ -55,21 +55,21 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
     };
 
     let mut message = format!("__**{}**__\n\n", guild.name);
-    message.push_str(&format!("**ID:** {}\n", guild.id));
-    message.push_str(&format!(
+    message += &format!("**ID:** {}\n", guild.id);
+    message += &format!(
         "**Description:** {}\n",
         guild.description.unwrap_or_else(|| "None.".into())
-    ));
-    message.push_str(&format!("**Members:** {}\n", guild.member_count));
-    message.push_str(&format!("**Created At:** {}\n", guild.member_count));
-    message.push_str(&format!("**Large:** {}\n", guild.large));
-    message.push_str(&format!("**Premium Tier:** {}\n", tier));
-    message.push_str(&format!("**Boosters:** {}\n", guild.premium_subscription_count));
-    message.push_str(&format!("**Owner:** {}\n", owner));
-    message.push_str(&format!("**Region:** {}\n", guild.region));
-    message.push_str(&format!("**Content Filter:** {}\n", filter));
-    message.push_str(&format!("**Notification Level:** {}\n", notifications));
-    message.push_str(&format!("**Verification Level:** {}\n", verification));
+    );
+    message += &format!("**Members:** {}\n", guild.member_count);
+    message += &format!("**Created At:** {}\n", guild.member_count);
+    message += &format!("**Large:** {}\n", guild.large);
+    message += &format!("**Premium Tier:** {}\n", tier);
+    message += &format!("**Boosters:** {}\n", guild.premium_subscription_count);
+    message += &format!("**Owner:** {}\n", owner);
+    message += &format!("**Region:** {}\n", guild.region);
+    message += &format!("**Content Filter:** {}\n", filter);
+    message += &format!("**Notification Level:** {}\n", notifications);
+    message += &format!("**Verification Level:** {}\n", verification);
 
     msg.channel_id.say(&ctx.http, message).await?;
 

@@ -44,18 +44,36 @@ pub async fn presence_update(ctx: Context, new_data: PresenceUpdateEvent) {
     }
 
     let mut message = String::from("Presence Update\n");
-    message.push_str(&format!("ID: {}\n", user.id));
-    message.push_str(&format!("Username: {}\n", user.tag()));
+    message += &format!("ID: {}\n", user.id);
+    message += &format!("Username: {}\n", user.tag());
 
     let mut change = false;
     if old_presence.status != new_presence.status {
-        message.push_str(&format!("Status is now {:?}", new_presence.status));
+        message += &format!("Status is now {:?} ", new_presence.status);
+        match new_presence.client_status {
+            Some(ClientStatus { desktop: Some(_), .. }) => message += "on Desktop",
+            Some(ClientStatus { mobile: Some(_), .. }) => message += "on Mobile",
+            Some(ClientStatus { web: Some(_), .. }) => message += "on Web",
+            _ => {}
+        };
+        message += "\n";
         change = true;
     };
 
+    if let Some(newa) = new_presence.activity {
+        message += &format!("Activity is now {:?}", newa);
+        if let Some(olda) = old_presence.activity {
+            if olda.name != newa.name {
+                message += &newa.name;
+            }
+        } else {
+            message += &newa.name;
+        };
+        change = true;
+    };
 
     if !change {
-        return
+        return;
     };
 
     let _ = log_channel_say(&ctx, gid, &message).await;

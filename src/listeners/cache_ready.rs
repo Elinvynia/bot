@@ -1,5 +1,5 @@
-use log::info;
 use crate::prelude::*;
+use log::info;
 use serenity::{model::prelude::*, prelude::*};
 use std::collections::HashMap;
 
@@ -15,7 +15,7 @@ pub async fn cache_ready(ctx: Context, guilds: Vec<GuildId>) {
         };
 
         presences.extend(guild.presences);
-    };
+    }
 
     info!("Presences loaded: {:?}", &presences.len());
 

@@ -16,8 +16,17 @@ async fn purge(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut amount = args.single::<i64>()?;
     let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    msg.channel_id.say(&ctx, format!("Are you sure you want to purge {} messages?\n Type \"yes\" to confirm.", amount)).await?;
-    msg.channel_id.await_reply(&ctx)
+    msg.channel_id
+        .say(
+            &ctx,
+            format!(
+                "Are you sure you want to purge {} messages?\n Type \"yes\" to confirm.",
+                amount
+            ),
+        )
+        .await?;
+    msg.channel_id
+        .await_reply(&ctx)
         .timeout(std::time::Duration::from_secs(15))
         .author_id(msg.author.id)
         .channel_id(msg.channel_id)
@@ -28,30 +37,33 @@ async fn purge(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut last_id: Option<MessageId> = None;
 
     while amount > 100 {
-        let mut msgs: Vec<Message> = vec![];
+        let mut msgs: Vec<Message>;
         if last_id.is_none() {
-            msgs = msg.channel_id.messages(&ctx, |builder| {
-                builder.before(msg.id).limit(amount as u64)
-            }).await?;
+            msgs = msg
+                .channel_id
+                .messages(&ctx, |builder| builder.before(msg.id).limit(amount as u64))
+                .await?;
         } else {
             let lastid = last_id.ok_or(BotError::NoneError)?;
-            msgs = msg.channel_id.messages(&ctx, |builder| {
-                builder.before(lastid).limit(amount as u64)
-            }).await?;
+            msgs = msg
+                .channel_id
+                .messages(&ctx, |builder| builder.before(lastid).limit(amount as u64))
+                .await?;
         }
 
         last_id = Some(msgs.last().ok_or(BotError::NoneError)?.id);
         messages.append(&mut msgs);
         amount -= 100;
-    };
+    }
 
-    let messages = msg.channel_id.messages(&ctx, |builder| {
-        builder.before(msg.id).limit(amount as u64)
-    }).await?;
+    let messages = msg
+        .channel_id
+        .messages(&ctx, |builder| builder.before(msg.id).limit(amount as u64))
+        .await?;
 
     for message in messages {
         message.delete(&ctx).await?;
-    };
+    }
 
     Ok(())
 }

@@ -19,8 +19,7 @@ pub enum BotError {
 
 impl Display for BotError {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        let mut msg = String::new();
-        msg.push_str("[BotError] ");
+        let mut msg = String::from("[BotError] ");
         let error = match self {
             BotError::DbError(e) => e.to_string(),
             BotError::ParseError(e) => e.to_string(),
@@ -32,7 +31,7 @@ impl Display for BotError {
             BotError::LogTypeDisabled => "This log type is disabled".into(),
             BotError::NoRecordYet => "User has no score record yet".into(),
         };
-        msg.push_str(&error);
+        msg += &error;
         f.write_str(&msg)
     }
 }

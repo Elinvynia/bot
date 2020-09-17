@@ -27,26 +27,23 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
     let user = user_id.to_user(ctx).await?;
     let mut message = String::from("User found!\n");
-    message.push_str(&format!("**Tag:** {}\n", user.tag()));
-    message.push_str(&format!("**ID:** {}\n", user.id));
-    message.push_str(&format!("**Created At:** {}\n", user.id.created_at().format("%F %T")));
+    message += &format!("**Tag:** {}\n", user.tag());
+    message += &format!("**ID:** {}\n", user.id);
+    message += &format!("**Created At:** {}\n", user.id.created_at().format("%F %T"));
 
     if let Some(guild) = msg.guild(&ctx).await {
         if let Ok(member) = guild.member(&ctx, user_id).await {
-            message.push_str(&format!(
+            message += &format!(
                 "**Joined At:** {}\n",
                 member.joined_at.ok_or(BotError::NoneError)?.format("%F %T")
-            ));
-            message.push_str(&format!(
-                "**Nickname:** {}\n",
-                member.nick.unwrap_or_else(|| "None.".into())
-            ));
+            );
+            message += &format!("**Nickname:** {}\n", member.nick.unwrap_or_else(|| "None.".into()));
 
             let mut roles = vec![];
             for role in member.roles {
                 roles.push(role.to_role_cached(&ctx).await.ok_or(BotError::NoneError)?.name)
             }
-            message.push_str(&format!("**Roles:** {}\n", roles.join(", ")))
+            message += &format!("**Roles:** {}\n", roles.join(", "))
         };
     };
 
