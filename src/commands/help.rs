@@ -1,7 +1,7 @@
 use crate::data::error::BotError;
 use serenity::{
     client::Context,
-    framework::standard::{macros::help, Args, Command, CommandGroup, CommandResult, HelpOptions},
+    framework::standard::{macros::help, Args, Command, CommandGroup, CommandResult, HelpOptions, OnlyIn},
     model::prelude::*,
 };
 use std::collections::HashSet;
@@ -13,51 +13,72 @@ async fn help(
     args: Args,
     _help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    _owners: HashSet<UserId>,
+    owners: HashSet<UserId>,
 ) -> CommandResult {
-    let mut s = String::new();
+    let mut help_string = String::new();
 
     match args.len() {
-        0 => s.push_str(&command_list(groups)?),
-        1 => s.push_str(&command_help(
-            groups,
-            args.current().ok_or(BotError::NoneError)?.to_string(),
-        )?),
-        _ => s.push_str("Too many arguments."),
+        0 => help_string += &command_list(ctx, groups, msg, owners).await?,
+        1 => {
+            help_string += &command_help(
+                ctx,
+                groups,
+                args.current().ok_or(BotError::NoneError)?.to_string(),
+                msg,
+                owners,
+            ).await?
+        }
+        _ => help_string += "Too many arguments.",
     };
 
-    msg.channel_id.say(&ctx, &s).await?;
+    msg.channel_id.say(&ctx, &help_string).await?;
 
     Ok(())
 }
 
-fn command_list(groups: &[&'static CommandGroup]) -> Result<String, BotError> {
-    let mut s = "Bot made by @Elinvynia".to_string();
-    s.push_str("\n\n");
-    for x in groups {
-        let mut n = format!("**{}:** ", x.name);
-        for y in x.options.commands {
-            let name = y.options.names.first().ok_or(BotError::NoneError)?;
-            n.push_str(&format!("{}, ", &name)[..]);
+async fn command_list(_ctx: &Context, groups: &[&'static CommandGroup], msg: &Message, owners: HashSet<UserId>) -> Result<String, BotError> {
+    let mut help_list = "Bot made by @Elinvynia".to_string();
+    help_list += "\n\n";
+
+    let is_owner = owners.get(&msg.author.id).is_some();
+
+    for group in groups {
+        let mut group_string = format!("**{}:** ", group.name);
+        for command in group.options.commands {
+            let name = command.options.names.first().ok_or(BotError::NoneError)?;
+
+            if command.options.owners_only && !is_owner {
+                group_string += &format!("~~{}~~, ", &name);
+            } else {
+                group_string += &format!("{}, ", &name);
+            }
         }
-        n.push_str("\n");
-        s.push_str(&n[..]);
-        s.remove(s.len() - 3);
+        group_string += "\n";
+        help_list += &group_string;
+        help_list.remove(help_list.len() - 3);
     }
-    s.push_str("\n");
-    s.push_str("source @ <https://github.com/Elinvynia/bot>");
-    Ok(s)
+    help_list += "\n";
+    help_list += "source @ <https://github.com/Elinvynia/bot>";
+    Ok(help_list)
 }
 
-fn command_help(groups: &[&'static CommandGroup], arg: String) -> Result<String, BotError> {
-    let mut s = String::new();
+async fn command_help(
+    ctx: &Context,
+    groups: &[&'static CommandGroup],
+    arg: String,
+    msg: &Message,
+    owners: HashSet<UserId>,
+) -> Result<String, BotError> {
+    let mut help_command = String::new();
+
+    let is_owner = owners.get(&msg.author.id).is_some();
 
     let mut matched_command: Option<&Command> = None;
-    for x in groups {
-        for y in x.options.commands {
-            let name = y.options.names.first().ok_or(BotError::NoneError)?;
+    for group in groups {
+        for command in group.options.commands {
+            let name = command.options.names.first().ok_or(BotError::NoneError)?;
             if name == &arg {
-                matched_command = Some(y);
+                matched_command = Some(command);
             }
         }
     }
@@ -65,40 +86,72 @@ fn command_help(groups: &[&'static CommandGroup], arg: String) -> Result<String,
     let command = match matched_command {
         Some(c) => c,
         None => {
-            s.push_str("No command found.");
-            return Ok(s);
+            help_command += "No command found.";
+            return Ok(help_command);
         }
     };
 
-    s.push_str(&format!(
+    let mut got_permission = false;
+
+    if let Some(gid) = msg.guild_id {
+        let guild = match gid.to_guild_cached(&ctx).await {
+            Some(g) => g,
+            None => return Ok(help_command),
+        };
+        let member = match guild.member(&ctx, msg.author.id).await {
+            Ok(m) => m,
+            Err(_) => return Ok(help_command),
+        };
+        let rid = match member.highest_role_info(&ctx).await {
+            Some(id) => id,
+            None => return Ok(help_command),
+        };
+        let role = match rid.0.to_role_cached(&ctx).await {
+            Some(r) => r,
+            None => return Ok(help_command),
+        };
+        got_permission = role.permissions.contains(command.options.required_permissions);
+    };
+
+    help_command += &format!(
         "**Command:** __{}__",
         command.options.names.first().ok_or(BotError::NoneError)?
-    ));
+    );
 
-    s.push_str("\n");
+    help_command += "\n";
     if let Some(description) = command.options.desc {
-        s.push_str("**Description:** ");
-        s.push_str(description);
+        help_command += &format!("**Description:** {}", description);
     } else {
-        s.push_str("No description available.");
+        help_command += "No description available.";
     }
 
-    s.push_str("\n");
+    help_command += "\n";
     if let Some(usage) = command.options.usage {
-        s.push_str("**Usage:** ");
-        s.push_str(usage);
+        help_command += &format!("**Usage:** {}", usage);
     } else {
-        s.push_str("No usage available.");
+        help_command += "No usage available.";
     }
 
-    s.push_str("\n");
+    help_command += "\n";
     if !command.options.examples.is_empty() {
-        s.push_str("**Examples:** ");
-        for x in command.options.examples {
-            s.push_str(x);
+        help_command += "**Examples:** ";
+        for example in command.options.examples {
+            help_command += example;
         }
     } else {
-        s.push_str("No examples available.")
+        help_command += "No examples available.";
     }
-    Ok(s)
+
+    help_command += "\n";
+    if command.options.owners_only && !is_owner {
+        help_command += "You need to be an owner to use this command.";
+    } else if command.options.only_in == OnlyIn::Guild {
+        if msg.guild_id.is_none() {
+            help_command += "This command can only be used in a guild.";
+        } else if !got_permission {
+            help_command += "You don't have the permissions to use this command.";
+        }
+    };
+
+    Ok(help_command)
 }

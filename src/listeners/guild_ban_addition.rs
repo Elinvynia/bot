@@ -12,10 +12,14 @@ pub async fn guild_ban_addition(ctx: Context, guildid: GuildId, user: User) {
     };
 
     let avatar = user.face().replace("size=1024", "size=128");
+    let mut msg = String::from("**User Banned**\n");
+    msg += &format!("ID: {}\n", user.id);
+    msg += &format!("Tag: {}\n", user.tag());
+    msg += &format!("Ping: {}\n", user.mention());
 
     let _ = log_channel
         .send_message(&ctx, |message| {
-            message.content(format!("User banned:\nTag: {}\nID: {}", user.tag(), user.id));
+            message.content(msg);
             message.add_file(&avatar[..]);
             message
         })
