@@ -42,6 +42,10 @@ pub async fn message_update(ctx: Context, old: Option<Message>, new: Option<Mess
         None => return,
     };
 
+    if old_m.content == new_m.content {
+        return;
+    }
+
     let mut message = String::from("**Message Updated**\n");
     message += &format!("ID: {}\n", new_m.author.id);
     message += &format!("Tag: {}\n", new_m.author.tag());

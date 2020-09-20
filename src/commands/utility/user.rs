@@ -14,13 +14,10 @@ use serenity::{
 async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id;
     if !args.is_empty() && msg.guild_id.is_some() {
-        let name: String = args.single()?;
+        let name: String = error_return_ok!(args.single());
         let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
-        match parse_user(&name, Some(&gid), Some(&ctx)).await {
-            Some(uid) => user_id = uid,
-            None => return Ok(()),
-        };
+        user_id = none_return_ok!(parse_user(&name, Some(&gid), Some(&ctx)).await);
     } else {
         user_id = msg.author.id
     }

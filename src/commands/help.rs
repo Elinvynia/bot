@@ -26,7 +26,8 @@ async fn help(
                 args.current().ok_or(BotError::NoneError)?.to_string(),
                 msg,
                 owners,
-            ).await?
+            )
+            .await?
         }
         _ => help_string += "Too many arguments.",
     };
@@ -36,13 +37,21 @@ async fn help(
     Ok(())
 }
 
-async fn command_list(ctx: &Context, groups: &[&'static CommandGroup], msg: &Message, owners: HashSet<UserId>) -> Result<String, BotError> {
+async fn command_list(
+    ctx: &Context,
+    groups: &[&'static CommandGroup],
+    msg: &Message,
+    owners: HashSet<UserId>,
+) -> Result<String, BotError> {
     let mut help_list = "Bot made by @Elinvynia".to_string();
     help_list += "\n\n";
 
     let is_owner = owners.get(&msg.author.id).is_some();
 
     for group in groups {
+        if group.options.commands.is_empty() {
+            continue;
+        }
         let mut group_string = format!("**{}:** ", group.name);
         for command in group.options.commands {
             let name = command.options.names.first().ok_or(BotError::NoneError)?;
@@ -68,6 +77,7 @@ async fn command_list(ctx: &Context, groups: &[&'static CommandGroup], msg: &Mes
                 got_permission = role.permissions.contains(command.options.required_permissions);
             };
 
+            #[allow(clippy::if_same_then_else)]
             if command.options.owners_only && !is_owner {
                 group_string += &format!("~~{}~~, ", &name);
             } else if command.options.only_in == OnlyIn::Guild && msg.guild_id.is_none() {

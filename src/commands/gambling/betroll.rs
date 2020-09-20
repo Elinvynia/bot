@@ -1,10 +1,10 @@
 use crate::prelude::*;
+use rand::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
     model::prelude::*,
     prelude::*,
 };
-use rand::prelude::*;
 
 #[command]
 #[only_in(guilds)]
@@ -15,17 +15,17 @@ use rand::prelude::*;
 async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guildid = msg.guild_id.ok_or(BotError::NoneError)?;
     let userid = msg.author.id;
+
     let money = get_user_money(guildid, userid).await?;
-    let bet: Money = match args.single() {
-        Ok(m) => m,
-        Err(_) => return Ok(()),
-    };
+    let bet: Money = error_return_ok!(args.single());
+
     if *bet == 0 {
-        return Ok(())
+        return Ok(());
     };
+
     if bet > money {
         msg.channel_id.say(&ctx, "You don't have enough money!").await?;
-        return Ok(())
+        return Ok(());
     };
 
     let roll: u32 = rand::thread_rng().gen_range(1, 101);
@@ -45,7 +45,9 @@ async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult 
         set_user_money(guildid, userid, new_amount).await?;
     }
 
-    msg.channel_id.say(&ctx, &format!("Roll: {}\nYou now have: {}", roll, new_amount)).await?;
+    msg.channel_id
+        .say(&ctx, &format!("Roll: {}\nYou now have: {}", roll, new_amount))
+        .await?;
 
     Ok(())
 }

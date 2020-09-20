@@ -18,10 +18,10 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<Money, B
         Ok(Money(amount as u64))
     } else {
         sqlx::query("INSERT INTO money (guild_id, user_id) values (?1, ?2);")
-        .bind(gid)
-        .bind(uid)
-        .execute(&mut conn)
-        .await?;
+            .bind(gid)
+            .bind(uid)
+            .execute(&mut conn)
+            .await?;
         Ok(Money(0))
     }
 }
@@ -56,4 +56,8 @@ pub async fn add_user_money(guildid: GuildId, userid: UserId, amount: Money) -> 
         .await?;
 
     Ok(())
+}
+
+pub async fn inc_user_money(guildid: GuildId, userid: UserId) -> Result<(), BotError> {
+    add_user_money(guildid, userid, Money(1)).await
 }

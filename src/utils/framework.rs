@@ -124,5 +124,5 @@ pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
     }
 
     // If there is no prefix set, use the default one.
-    return Some(default_prefix);
+    Some(default_prefix)
 }

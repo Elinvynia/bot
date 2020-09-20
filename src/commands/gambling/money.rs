@@ -14,18 +14,14 @@ use serenity::{
 #[example("money Elinvynia")]
 async fn money(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
-    let user_id;
-    if !args.is_empty() && msg.guild_id.is_some() {
-        let name: String = args.single()?;
-        let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
-        match parse_user(&name, Some(&gid), Some(&ctx)).await {
-            Some(uid) => user_id = uid,
-            None => return Ok(()),
-        };
+    let user_id;
+    if !args.is_empty() {
+        let name: String = error_return_ok!(args.single());
+        user_id = none_return_ok!(parse_user(&name, Some(&guild_id), Some(&ctx)).await);
     } else {
-        user_id = msg.author.id
-    }
+        user_id = msg.author.id;
+    };
 
     let money = get_user_money(guild_id, user_id).await?;
     let member = guild_id.member(&ctx, user_id).await?;

@@ -15,21 +15,17 @@ use serenity::{
 #[example("kick @Elinvynia \"Abusive language\"")]
 async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     args.quoted();
+    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    let kicked_id = match parse_user(&args.single::<String>()?, msg.guild_id.as_ref(), Some(&ctx)).await {
-        Some(id) => id,
-        None => return Ok(()),
-    };
+    let kicked_arg: String = error_return_ok!(args.single());
+    let kicked_id = none_return_ok!(parse_user(&kicked_arg, Some(&guild_id), Some(&ctx)).await);
 
     let kicked = kicked_id.to_user(ctx).await?;
     let reason = format!("Eli Bot | {}", args.single::<String>().unwrap_or_else(|_| "".into()));
     let channel = kicked.create_dm_channel(&ctx).await?;
     let guild = msg.guild(&ctx.cache).await.ok_or(BotError::NoneError)?;
 
-    msg.guild_id
-        .ok_or(BotError::NoneError)?
-        .kick_with_reason(&ctx, kicked, &reason)
-        .await?;
+    guild_id.kick_with_reason(&ctx, kicked, &reason).await?;
 
     let kicked_message = format!("You have been kicked from {}\nReason: {}", &guild.name, &reason);
     channel.say(&ctx, kicked_message).await?;

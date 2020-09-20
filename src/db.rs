@@ -6,9 +6,9 @@ use std::{fs::File, path::Path};
 
 pub mod leaderboard;
 pub mod log;
+pub mod money;
 pub mod prefix;
 pub mod reactionroles;
-pub mod money;
 
 pub async fn setup_db() -> Result<(), BotError> {
     let mut conn = connect().await?;

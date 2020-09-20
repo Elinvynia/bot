@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use serenity::{
     framework::standard::{macros::command, Args, CommandResult},
+    futures::StreamExt,
     model::prelude::*,
     prelude::*,
 };
@@ -13,18 +14,14 @@ use serenity::{
 #[usage("purge <num>")]
 #[example("purge 20")]
 async fn purge(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let mut amount = args.single::<i64>()?;
+    let amount: u64 = error_return_ok!(args.single());
     let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    msg.channel_id
-        .say(
-            &ctx,
-            format!(
-                "Are you sure you want to purge {} messages?\n Type \"yes\" to confirm.",
-                amount
-            ),
-        )
-        .await?;
+    let purge_message = format!(
+        "Are you sure you want to purge {} messages?\n Type \"yes\" to confirm.",
+        amount
+    );
+    msg.channel_id.say(&ctx, purge_message).await?;
     msg.channel_id
         .await_reply(&ctx)
         .timeout(std::time::Duration::from_secs(15))
@@ -33,36 +30,11 @@ async fn purge(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         .guild_id(guild_id)
         .filter(|msg| msg.content == "yes");
 
-    let mut messages: Vec<Message> = vec![];
-    let mut last_id: Option<MessageId> = None;
-
-    while amount > 100 {
-        let mut msgs: Vec<Message>;
-        if last_id.is_none() {
-            msgs = msg
-                .channel_id
-                .messages(&ctx, |builder| builder.before(msg.id).limit(amount as u64))
-                .await?;
-        } else {
-            let lastid = last_id.ok_or(BotError::NoneError)?;
-            msgs = msg
-                .channel_id
-                .messages(&ctx, |builder| builder.before(lastid).limit(amount as u64))
-                .await?;
-        }
-
-        last_id = Some(msgs.last().ok_or(BotError::NoneError)?.id);
-        messages.append(&mut msgs);
-        amount -= 100;
-    }
-
-    let messages = msg
-        .channel_id
-        .messages(&ctx, |builder| builder.before(msg.id).limit(amount as u64))
-        .await?;
-
-    for message in messages {
-        message.delete(&ctx).await?;
+    let mut iter = msg.channel_id.messages_iter(&ctx.http).boxed();
+    for _ in 0..amount {
+        if let Some(Ok(message)) = iter.next().await {
+            message.delete(&ctx).await?;
+        };
     }
 
     Ok(())

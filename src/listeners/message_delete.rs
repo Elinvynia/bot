@@ -37,12 +37,12 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
             message += &format!("Channel: {}\n", channel);
             message += &format!("Content: \n{}\n", msg.content);
             message
-        },
+        }
         None => {
             let mut message = String::from("**Message Deleted**\n");
             message += &format!("Message ID: {}\n", deleted_message_id);
             message
-        },
+        }
     };
 
     let _ = log_channel_say(&ctx, guildid, &message).await;

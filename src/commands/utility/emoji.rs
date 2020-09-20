@@ -14,11 +14,7 @@ use serenity::{
 async fn emoji(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let gid = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    let emoji = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
-        Some(e) => e,
-        None => return Ok(()),
-    };
-
+    let emoji = none_return_ok!(parse_reaction(&args.single::<String>()?, &gid, &ctx).await);
     let url = emoji.url();
 
     msg.channel_id

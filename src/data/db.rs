@@ -66,7 +66,6 @@ impl TryFrom<String> for LogType {
     }
 }
 
-
 #[sqlx(transparent)]
 #[derive(Eq, PartialEq, Debug, Copy, Clone, Default, sqlx::Type, Ord, PartialOrd)]
 pub struct Money(pub u64);
@@ -147,4 +146,3 @@ impl From<u8> for Money {
         Self(num as u64)
     }
 }
-
