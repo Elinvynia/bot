@@ -8,6 +8,7 @@ pub mod leaderboard;
 pub mod log;
 pub mod prefix;
 pub mod reactionroles;
+pub mod money;
 
 pub async fn setup_db() -> Result<(), BotError> {
     let mut conn = connect().await?;

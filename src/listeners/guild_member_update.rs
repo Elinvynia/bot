@@ -35,6 +35,8 @@ pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>,
             let mut content = String::from("**User Updated**\n");
             content += &format!("Username: {}\n", new.user.name);
             content += &format!("ID: {}\n", new.user.id);
+            content += &format!("Tag: {}\n", new.user.tag());
+            content += &format!("Ping: {}\n", new.user.mention());
             if username_changed {
                 content += &format!("Username changed: {} to {}\n", old.user.name, new.user.name);
             };

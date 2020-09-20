@@ -36,7 +36,7 @@ async fn help(
     Ok(())
 }
 
-async fn command_list(_ctx: &Context, groups: &[&'static CommandGroup], msg: &Message, owners: HashSet<UserId>) -> Result<String, BotError> {
+async fn command_list(ctx: &Context, groups: &[&'static CommandGroup], msg: &Message, owners: HashSet<UserId>) -> Result<String, BotError> {
     let mut help_list = "Bot made by @Elinvynia".to_string();
     help_list += "\n\n";
 
@@ -46,8 +46,33 @@ async fn command_list(_ctx: &Context, groups: &[&'static CommandGroup], msg: &Me
         let mut group_string = format!("**{}:** ", group.name);
         for command in group.options.commands {
             let name = command.options.names.first().ok_or(BotError::NoneError)?;
+            let mut got_permission = false;
+
+            if let Some(gid) = msg.guild_id {
+                let guild = match gid.to_guild_cached(&ctx).await {
+                    Some(g) => g,
+                    None => return Err(BotError::NoneError),
+                };
+                let member = match guild.member(&ctx, msg.author.id).await {
+                    Ok(m) => m,
+                    Err(_) => return Err(BotError::NoneError),
+                };
+                let rid = match member.highest_role_info(&ctx).await {
+                    Some(id) => id,
+                    None => return Err(BotError::NoneError),
+                };
+                let role = match rid.0.to_role_cached(&ctx).await {
+                    Some(r) => r,
+                    None => return Err(BotError::NoneError),
+                };
+                got_permission = role.permissions.contains(command.options.required_permissions);
+            };
 
             if command.options.owners_only && !is_owner {
+                group_string += &format!("~~{}~~, ", &name);
+            } else if command.options.only_in == OnlyIn::Guild && msg.guild_id.is_none() {
+                group_string += &format!("~~{}~~, ", &name);
+            } else if !got_permission && msg.guild_id.is_some() {
                 group_string += &format!("~~{}~~, ", &name);
             } else {
                 group_string += &format!("{}, ", &name);

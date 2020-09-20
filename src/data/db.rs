@@ -1,5 +1,5 @@
 use crate::data::error::BotError;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, ops::*};
 
 #[derive(Debug, sqlx::FromRow)]
 pub struct LeaderboardEntry {
@@ -65,3 +65,86 @@ impl TryFrom<String> for LogType {
         }
     }
 }
+
+
+#[sqlx(transparent)]
+#[derive(Eq, PartialEq, Debug, Copy, Clone, Default, sqlx::Type, Ord, PartialOrd)]
+pub struct Money(pub u64);
+
+impl Deref for Money {
+    type Target = u64;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for Money {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(fmt, "{}$", self.0)
+    }
+}
+
+impl std::str::FromStr for Money {
+    type Err = BotError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let num: u64 = s.parse()?;
+        Ok(Money(num))
+    }
+}
+
+impl Add for Money {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self(self.0 + other.0)
+    }
+}
+
+impl Sub for Money {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self(self.0 - other.0)
+    }
+}
+
+impl Mul for Money {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        Self(self.0 * other.0)
+    }
+}
+
+impl From<i64> for Money {
+    fn from(num: i64) -> Self {
+        Self(num as u64)
+    }
+}
+
+impl From<u64> for Money {
+    fn from(num: u64) -> Self {
+        Self(num)
+    }
+}
+
+impl From<u32> for Money {
+    fn from(num: u32) -> Self {
+        Self(num as u64)
+    }
+}
+
+impl From<u16> for Money {
+    fn from(num: u16) -> Self {
+        Self(num as u64)
+    }
+}
+
+impl From<u8> for Money {
+    fn from(num: u8) -> Self {
+        Self(num as u64)
+    }
+}
+

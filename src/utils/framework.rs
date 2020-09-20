@@ -111,7 +111,7 @@ pub async fn dynamic_prefix(ctx: &Context, msg: &Message) -> Option<String> {
     }
 
     // Otherwise, fetch it from the db.
-    if let Ok(prefix) = get_prefix(guildid, &ctx).await {
+    if let Ok(prefix) = get_prefix(guildid).await {
         {
             let mut data = ctx.data.write().await;
             let prefixes = match data.get_mut::<GuildPrefixes>() {

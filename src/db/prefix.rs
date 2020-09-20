@@ -1,9 +1,8 @@
-use super::connect;
-use crate::data::error::BotError;
-use serenity::{model::prelude::*, prelude::*};
+use crate::prelude::*;
+use serenity::model::prelude::*;
 use sqlx::prelude::*;
 
-pub async fn get_prefix(guildid: GuildId, _ctxx: &Context) -> Result<String, BotError> {
+pub async fn get_prefix(guildid: GuildId) -> Result<String, BotError> {
     let mut conn = connect().await?;
     let gid: i64 = guildid.into();
 
