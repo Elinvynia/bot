@@ -1,8 +1,10 @@
 pub mod betroll;
 pub mod flip;
+pub mod give;
 pub mod money;
 pub mod setmoney;
 pub use betroll::*;
 pub use flip::*;
+pub use give::*;
 pub use money::*;
 pub use setmoney::*;

@@ -11,7 +11,7 @@ struct Admin;
 pub mod gambling;
 pub use gambling::*;
 #[group]
-#[commands(setmoney, betroll, money, flip)]
+#[commands(setmoney, betroll, money, flip, give)]
 struct Gambling;
 
 pub mod games;
@@ -34,7 +34,7 @@ struct Settings;
 pub mod utility;
 pub use utility::*;
 #[group]
-#[commands(avatar, user, leaderboard, guild, emoji, choose, ping)]
+#[commands(avatar, user, leaderboard, guild, emoji, choose, ping, hug)]
 struct Utility;
 
 #[group]
