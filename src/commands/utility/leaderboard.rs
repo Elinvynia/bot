@@ -48,7 +48,7 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> Co
             Ok(m) => m.user.clone(),
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", processed, user.name, x.points)[..];
+        result += &format!("{}. {} - {}\n", processed + 1, user.name, x.points)[..];
         processed += 1;
     }
 
@@ -74,7 +74,7 @@ async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
             Ok(m) => m.user.clone(),
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", processed, user.name, x.points)[..];
+        result += &format!("{}. {} - {}\n", processed + 1, user.name, x.points)[..];
         processed += 1;
     }
 
