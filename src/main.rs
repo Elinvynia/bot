@@ -84,8 +84,8 @@ async fn main() {
         .await
         .expect("Error creating the client.");
 
-    //Set the cache for each channel to 100 messages.
-    client.cache_and_http.cache.set_max_messages(100).await;
+    //Set the cache for each channel to 10000 messages.
+    client.cache_and_http.cache.set_max_messages(10000).await;
 
     //Collect the bot owners.
     let mut bot_owners: Vec<UserId> = settings

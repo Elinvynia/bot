@@ -59,7 +59,7 @@ pub async fn inc_user_channel_score(guildid: GuildId, channelid: ChannelId, user
 
 pub async fn get_user_total_scores(guildid: GuildId) -> Result<Vec<LeaderboardEntry>, BotError> {
     let mut conn = connect().await?;
-    let result = sqlx::query_as("SELECT user_id, SUM(points) as points FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC LIMIT 10;")
+    let result = sqlx::query_as("SELECT user_id, SUM(points) as points FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC;")
         .bind(&guildid.to_string())
         .fetch_all(&mut conn)
         .await?;
@@ -72,7 +72,7 @@ pub async fn get_user_channel_scores(
     channelid: ChannelId,
 ) -> Result<Vec<LeaderboardEntry>, BotError> {
     let mut conn = connect().await?;
-    let result = sqlx::query_as("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC LIMIT 10;")
+    let result = sqlx::query_as("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC;")
         .bind(&guildid.to_string())
         .bind(&channelid.to_string())
         .fetch_all(&mut conn)
