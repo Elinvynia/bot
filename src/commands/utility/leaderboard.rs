@@ -39,7 +39,7 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> Co
     let mut result = String::new();
 
     let mut processed = 0;
-    for (i, x) in rows.iter().enumerate() {
+    for x in rows.iter() {
         if processed == 10 {
             break
         };
@@ -48,7 +48,7 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> Co
             Ok(m) => m.user.clone(),
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", i + 1, user.name, x.points)[..];
+        result += &format!("{}. {} - {}\n", processed, user.name, x.points)[..];
         processed += 1;
     }
 
@@ -65,7 +65,7 @@ async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
     let mut result = String::new();
 
     let mut processed = 0;
-    for (i, x) in rows.iter().enumerate() {
+    for x in rows.iter() {
         if processed == 10 {
             break
         };
@@ -74,7 +74,7 @@ async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
             Ok(m) => m.user.clone(),
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", i + 1, user.name, x.points)[..];
+        result += &format!("{}. {} - {}\n", processed, user.name, x.points)[..];
         processed += 1;
     }
 
