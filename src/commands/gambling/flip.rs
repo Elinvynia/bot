@@ -19,9 +19,9 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let money = get_user_money(guildid, userid).await?;
     let bet: Money = error_return_ok!(args.single());
 
-    let side = match &args.single::<String>()?[..] {
-        "h" | "heads" => true,
-        "t" | "tails" => false,
+    let coin = match &args.single::<String>()?[..] {
+        "h" | "heads" => Coin::Heads,
+        "t" | "tails" => Coin::Tails,
         _ => return Ok(()),
     };
 
@@ -35,17 +35,44 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     };
 
     let roll: bool = rand::thread_rng().gen();
-    let new_amount;
+    let roll_coin: bool = coin.into();
 
-    if roll == side {
-        new_amount = bet * Money(2);
+    let new_amount;
+    if roll == roll_coin {
+        new_amount = money + bet * Money(2);
     } else {
         new_amount = money - bet;
     };
 
+    set_user_money(guildid, userid, new_amount).await?;
+
     msg.channel_id
-        .say(&ctx, &format!("Side: {}\nYou now have: {}", roll, new_amount))
+        .say(&ctx, &format!("Side: {}\nYou now have: {}", coin, new_amount))
         .await?;
 
     Ok(())
+}
+
+#[derive(Debug, Copy, Clone)]
+enum Coin {
+    Heads,
+    Tails,
+}
+
+impl From<Coin> for bool {
+    fn from(coin: Coin) -> Self {
+        match coin {
+            Coin::Heads => true,
+            Coin::Tails => true,
+        }
+    }
+}
+
+impl std::fmt::Display for Coin {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match *self {
+            Coin::Heads => write!(fmt, "Heads"),
+            Coin::Tails => write!(fmt, "Tails"),
+        }
+    }
 }
