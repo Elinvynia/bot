@@ -72,11 +72,13 @@ pub async fn get_user_channel_scores(
     channelid: ChannelId,
 ) -> Result<Vec<LeaderboardEntry>, BotError> {
     let mut conn = connect().await?;
-    let result = sqlx::query_as("SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC;")
-        .bind(&guildid.to_string())
-        .bind(&channelid.to_string())
-        .fetch_all(&mut conn)
-        .await?;
+    let result = sqlx::query_as(
+        "SELECT user_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC;",
+    )
+    .bind(&guildid.to_string())
+    .bind(&channelid.to_string())
+    .fetch_all(&mut conn)
+    .await?;
 
     Ok(result)
 }

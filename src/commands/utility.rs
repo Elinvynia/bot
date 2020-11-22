@@ -1,3 +1,4 @@
+pub mod answer;
 pub mod avatar;
 pub mod choose;
 pub mod emoji;
@@ -6,6 +7,7 @@ pub mod hug;
 pub mod leaderboard;
 pub mod ping;
 pub mod user;
+pub use answer::*;
 pub use avatar::*;
 pub use choose::*;
 pub use emoji::*;

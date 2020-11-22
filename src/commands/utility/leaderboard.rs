@@ -15,12 +15,10 @@ use serenity::{
 async fn leaderboard(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     if args.len() == 1 {
         parse_channel_score(ctx, msg, args).await
-    }
-    else {
+    } else {
         parse_total_score(ctx, msg).await
     }
 }
-
 
 async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
@@ -41,7 +39,7 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> Co
     let mut processed = 0;
     for x in rows.iter() {
         if processed == 10 {
-            break
+            break;
         };
         let id = x.user_id.parse::<u64>()?;
         let user = match guild_id.member(ctx, id).await {
@@ -67,7 +65,7 @@ async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
     let mut processed = 0;
     for x in rows.iter() {
         if processed == 10 {
-            break
+            break;
         };
         let id = x.user_id.parse::<u64>()?;
         let user = match guild_id.member(ctx, id).await {
@@ -81,5 +79,5 @@ async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id
         .say(&ctx, format!("**Leaderboard** - Top 10\n{}", result))
         .await?;
-        Ok(())
+    Ok(())
 }

@@ -49,7 +49,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         "disable" => {
             let kind: LogType = log_kind.try_into()?;
             if kind == LogType::All {
-                log_type = 0 as i64;
+                log_type = 0_i64;
             } else {
                 log_type &= !(kind as i64);
             }
