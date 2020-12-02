@@ -11,9 +11,11 @@ use serenity::{
 #[usage("guild")]
 #[example("guild")]
 async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = msg
+    let guild_id = msg
         .guild_id
-        .ok_or(BotError::NoneError)?
+        .ok_or(BotError::NoneError)?;
+
+    let guild = guild_id
         .to_guild_cached(&ctx)
         .await
         .ok_or(BotError::NoneError)?;
@@ -61,7 +63,7 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
         guild.description.unwrap_or_else(|| "None.".into())
     );
     message += &format!("**Members:** {}\n", guild.member_count);
-    message += &format!("**Created At:** {}\n", guild.member_count);
+    message += &format!("**Created At:** {}\n", guild_id.created_at());
     message += &format!("**Large:** {}\n", guild.large);
     message += &format!("**Premium Tier:** {}\n", tier);
     message += &format!("**Boosters:** {}\n", guild.premium_subscription_count);

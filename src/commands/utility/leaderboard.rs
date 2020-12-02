@@ -42,11 +42,11 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> Co
             break;
         };
         let id = x.user_id.parse::<u64>()?;
-        let user = match guild_id.member(ctx, id).await {
-            Ok(m) => m.user.clone(),
+        let member = match guild_id.member(ctx, id).await {
+            Ok(m) => m,
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", processed + 1, user.name, x.points)[..];
+        result += &format!("{}. {} - {}\n", processed + 1, member.display_name(), x.points)[..];
         processed += 1;
     }
 
@@ -68,11 +68,11 @@ async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
             break;
         };
         let id = x.user_id.parse::<u64>()?;
-        let user = match guild_id.member(ctx, id).await {
-            Ok(m) => m.user.clone(),
+        let member = match guild_id.member(ctx, id).await {
+            Ok(m) => m,
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", processed + 1, user.name, x.points)[..];
+        result += &format!("{}. {} - {}\n", processed + 1, member.display_name(), x.points)[..];
         processed += 1;
     }
 
