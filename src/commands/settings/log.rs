@@ -72,7 +72,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 async fn log_channel(
     ctx: &Context,
     msg: &Message,
-    mut conn: &mut SqliteConnection,
+    conn: &mut SqliteConnection,
     guild_id: GuildId,
     cid: String,
 ) -> CommandResult {
@@ -81,7 +81,7 @@ async fn log_channel(
         sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")
             .bind(&cid)
             .bind(&gid)
-            .execute(&mut conn)
+            .execute(conn)
             .await?;
         let log_channel = get_log_channel(guild_id).await?;
         log_channel.say(&ctx, "Log channel updated!").await?;
@@ -90,7 +90,7 @@ async fn log_channel(
             .bind(&gid)
             .bind(&cid)
             .bind(&(LogType::All).to_string())
-            .execute(&mut conn)
+            .execute(conn)
             .await?;
         msg.channel_id.say(&ctx, "Log channel set!").await?;
     };

@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use serenity::{model::prelude::*, prelude::*};
+use serenity::{model::prelude::*, prelude::*, futures::TryStreamExt};
 use sqlx::prelude::*;
 
 pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_member: Member) {
@@ -32,7 +32,7 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_membe
             .bind(guildid.to_string())
             .fetch(&mut conn);
 
-        if let Ok(Some(row)) = q.next().await {
+        if let Ok(Some(row)) = q.try_next().await {
             let role_id: String = row.get("role_id");
             let rid: u64 = match role_id.parse() {
                 Ok(id) => id,

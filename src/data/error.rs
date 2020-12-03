@@ -14,7 +14,6 @@ pub enum BotError {
     PrefixNotFound,
     LogTypeNotFound,
     LogTypeDisabled,
-    NoRecordYet,
     NegativeMoney,
 }
 
@@ -30,7 +29,6 @@ impl Display for BotError {
             BotError::PrefixNotFound => "Prefix was not found".into(),
             BotError::LogTypeNotFound => "Log type was not found".into(),
             BotError::LogTypeDisabled => "This log type is disabled".into(),
-            BotError::NoRecordYet => "User has no score record yet".into(),
             BotError::NegativeMoney => "The amount of money cannot be negative.".into(),
         };
         msg += &error;

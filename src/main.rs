@@ -63,7 +63,7 @@ async fn main() {
         .group(&UTILITY_GROUP)
         .group(&XP_GROUP);
 
-    let mut client = Client::new(&token)
+    let mut client = Client::builder(&token)
         .add_intent(GatewayIntents::GUILDS)
         .add_intent(GatewayIntents::GUILD_MEMBERS)
         .add_intent(GatewayIntents::GUILD_BANS)

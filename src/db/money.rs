@@ -7,22 +7,28 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<Money, B
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    if let Some(row) = sqlx::query("SELECT money FROM money WHERE guild_id == ?1 AND user_id == ?2;")
+    match sqlx::query("SELECT money FROM money WHERE guild_id == ?1 AND user_id == ?2;")
         .bind(gid)
         .bind(uid)
-        .fetch(&mut conn)
-        .next()
-        .await?
+        .fetch_one(&mut conn)
+        .await
     {
-        let amount: i64 = row.try_get(0)?;
-        Ok(Money(amount as u64))
-    } else {
-        sqlx::query("INSERT INTO money (guild_id, user_id) values (?1, ?2);")
-            .bind(gid)
-            .bind(uid)
-            .execute(&mut conn)
-            .await?;
-        Ok(Money(0))
+        Ok(row) => {
+            let amount: i64 = row.try_get(0)?;
+            Ok(Money(amount as u64))
+        },
+        Err(sqlx::Error::RowNotFound) => {
+            sqlx::query("INSERT INTO money (guild_id, user_id) values (?1, ?2);")
+                .bind(gid)
+                .bind(uid)
+                .execute(&mut conn)
+                .await?;
+            Ok(Money(0))
+        },
+        Err(e) => {
+            Err(e.into())
+        }
+
     }
 }
 

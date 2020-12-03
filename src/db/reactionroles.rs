@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use log::info;
-use serenity::{collector::*, futures::StreamExt, model::prelude::*, prelude::*};
+use serenity::{collector::*, futures::{TryStreamExt, StreamExt}, model::prelude::*, prelude::*};
 use sqlx::prelude::*;
 
 pub async fn start_reactions(ctx: &Context) -> Result<(), BotError> {
@@ -8,7 +8,7 @@ pub async fn start_reactions(ctx: &Context) -> Result<(), BotError> {
 
     let mut q = sqlx::query("SELECT * FROM reactionroles").fetch(&mut conn);
 
-    while let Ok(Some(x)) = q.next().await {
+    while let Ok(Some(x)) = q.try_next().await {
         let message_id: String = x.get("message_id");
         let message_id: u64 = match message_id.parse() {
             Ok(id) => id,

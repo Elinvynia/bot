@@ -5,7 +5,7 @@ pub use help::*;
 pub mod admin;
 pub use admin::*;
 #[group]
-#[commands(ban, kick, purge, sql)]
+#[commands(ban, kick, purge)]
 struct Admin;
 
 pub mod gambling;

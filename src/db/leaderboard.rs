@@ -1,21 +1,20 @@
 use crate::prelude::*;
 use serenity::model::prelude::*;
-use sqlx::prelude::{Cursor, Row, SqliteQueryAs};
+use sqlx::prelude::*;
 
 pub async fn get_user_channel_score(guildid: GuildId, channelid: ChannelId, userid: UserId) -> Result<i64, BotError> {
     let mut conn = connect().await?;
-    let result = match sqlx::query(
+    match sqlx::query(
         "SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;",
     )
     .bind(&guildid.to_string())
     .bind(&channelid.to_string())
     .bind(&userid.to_string())
-    .fetch(&mut conn)
-    .next()
-    .await?
+    .fetch_one(&mut conn)
+    .await
     {
-        Some(row) => row.try_get(0)?,
-        None => {
+        Ok(row) => row.try_get(0).map_err(|e| BotError::DbError(e)),
+        Err(sqlx::Error::RowNotFound) => {
             sqlx::query("INSERT INTO leaderboard (guild_id, channel_id, user_id, points) VALUES (?1, ?2, ?3, ?4);")
                 .bind(&guildid.to_string())
                 .bind(&channelid.to_string())
@@ -23,11 +22,10 @@ pub async fn get_user_channel_score(guildid: GuildId, channelid: ChannelId, user
                 .bind(1)
                 .execute(&mut conn)
                 .await?;
-            1
-        }
-    };
-
-    Ok(result)
+            Ok(1)
+        },
+        Err(e) => Err(BotError::DbError(e))
+    }
 }
 
 pub async fn add_user_channel_score(
@@ -44,10 +42,8 @@ pub async fn add_user_channel_score(
             .bind(&guildid.to_string())
             .bind(&channelid.to_string())
             .bind(&userid.to_string())
-            .fetch(&mut conn)
-            .next()
+            .fetch_one(&mut conn)
             .await?
-            .ok_or(BotError::NoRecordYet)?
             .try_get(0)?;
 
     Ok(result)
