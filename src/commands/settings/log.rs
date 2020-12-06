@@ -59,7 +59,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     }
 
     sqlx::query("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")
-        .bind(&log_type.to_string())
+        .bind(&(log_type as i64).to_string())
         .bind(&guild_id.to_string())
         .execute(&mut conn)
         .await?;
@@ -89,7 +89,7 @@ async fn log_channel(
         sqlx::query("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")
             .bind(&gid)
             .bind(&cid)
-            .bind(&(LogType::All).to_string())
+            .bind(&(LogType::All as i64).to_string())
             .execute(conn)
             .await?;
         msg.channel_id.say(&ctx, "Log channel set!").await?;

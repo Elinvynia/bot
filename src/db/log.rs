@@ -22,20 +22,20 @@ pub async fn log_channel_say(ctx: &Context, guildid: GuildId, message: &str) -> 
 
 pub async fn get_log_channel(guildid: GuildId) -> Result<ChannelId, BotError> {
     let mut conn = connect().await?;
-    let cid: i64 = sqlx::query("SELECT channel_id FROM log WHERE guild_id == ?1;")
+    let cid: String = sqlx::query("SELECT channel_id FROM log WHERE guild_id == ?1;")
         .bind(&guildid.to_string())
         .fetch_one(&mut conn)
         .await?
         .try_get(0)?;
-    Ok(ChannelId(cid as u64))
+    Ok(ChannelId(cid.parse().unwrap()))
 }
 
 pub async fn get_log_type(guildid: GuildId) -> Result<i64, BotError> {
     let mut conn = connect().await?;
-    let log_type = sqlx::query("SELECT log_type FROM log WHERE guild_id == ?1;")
+    let log_type: String = sqlx::query("SELECT log_type FROM log WHERE guild_id == ?1;")
         .bind(&guildid.to_string())
         .fetch_one(&mut conn)
         .await?
         .try_get(0)?;
-    Ok(log_type)
+    Ok(log_type.parse().unwrap())
 }

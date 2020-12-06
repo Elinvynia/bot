@@ -1,5 +1,4 @@
 use crate::data::error::BotError;
-use ::log::error;
 use sqlx::prelude::*;
 use sqlx::sqlite::SqliteConnection;
 use std::{fs::File, path::Path};
@@ -38,7 +37,7 @@ pub async fn connect() -> Result<SqliteConnection, BotError> {
     if !db.exists() {
         match File::create(&db) {
             Ok(_) => (),
-            Err(e) => error!("Failed to create database file: {}", e),
+            Err(e) => ::log::error!("Failed to create database file: {}", e),
         }
     };
     Ok(SqliteConnection::connect("sqlite://db.sqlite3").await?)

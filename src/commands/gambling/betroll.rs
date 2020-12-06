@@ -46,7 +46,7 @@ async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult 
     }
 
     msg.channel_id
-        .say(&ctx, &format!("Roll: {}\nYou now have: {}", roll, new_amount))
+        .say(&ctx, &format!("Roll: {}\nYou now have: **{}**", roll, new_amount))
         .await?;
 
     Ok(())
