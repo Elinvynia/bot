@@ -80,7 +80,7 @@ impl Deref for Money {
 
 impl std::fmt::Display for Money {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(fmt, "{}$", self.0)
+        write!(fmt, "${}", self.0)
     }
 }
 

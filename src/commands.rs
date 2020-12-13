@@ -2,6 +2,9 @@ use serenity::framework::standard::macros::group;
 pub mod help;
 pub use help::*;
 
+pub mod generic;
+pub use generic::*;
+
 pub mod admin;
 pub use admin::*;
 #[group]
@@ -34,7 +37,7 @@ struct Settings;
 pub mod utility;
 pub use utility::*;
 #[group]
-#[commands(avatar, user, leaderboard, guild, emoji, choose, ping, hug, answer)]
+#[commands(avatar, user, leaderboard, guild, emoji, choose, ping, hug, answer, headpat, bonk)]
 struct Utility;
 
 #[group]
