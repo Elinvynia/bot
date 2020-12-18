@@ -16,12 +16,6 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
         return;
     }
 
-    let botowners;
-    {
-        let data = ctx.data.read().await;
-        botowners = none_return!(data.get::<BotOwners>()).clone();
-    }
-
     let message = match ctx.cache.message(&channel.id(), &deleted_message_id).await {
         Some(msg) => {
             let data = ctx.data.read().await;
@@ -39,9 +33,7 @@ pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id
             let mut message = String::from("**Message Deleted**\n");
             message += &format!("ID: {}\n", msg.author.id);
             message += &format!("Tag: {}\n", msg.author.tag());
-            if botowners.iter().find(|&&id| id == msg.author.id).is_none() {
-                message += &format!("Ping: {}\n", msg.author.mention());
-            };
+            message += &format!("Ping: {}\n", msg.author.mention());
             message += &format!("Channel: {}\n", channel);
             message += &format!("Content: \n{}\n", msg.content);
             message

@@ -46,18 +46,10 @@ pub async fn message_update(ctx: Context, old: Option<Message>, new: Option<Mess
         return;
     }
 
-    let botowners;
-    {
-        let data = ctx.data.read().await;
-        botowners = none_return!(data.get::<BotOwners>()).clone();
-    }
-
     let mut message = String::from("**Message Updated**\n");
     message += &format!("ID: {}\n", new_m.author.id);
     message += &format!("Tag: {}\n", new_m.author.tag());
-    if botowners.iter().find(|&&id| id == new_m.author.id).is_none() {
-        message += &format!("Ping: {}\n", new_m.author.mention());
-    };
+    message += &format!("Ping: {}\n", new_m.author.mention());
     message += &format!("Channel: {}\n", channel);
     message += &format!("Old Message: \n{}\n", old_m.content);
     message += "---\n";

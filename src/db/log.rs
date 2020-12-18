@@ -16,7 +16,14 @@ pub async fn check_log_type(log_type: LogType, guildid: GuildId) -> Result<(), B
 
 pub async fn log_channel_say(ctx: &Context, guildid: GuildId, message: &str) -> Result<(), BotError> {
     let log_channel = get_log_channel(guildid).await?;
-    log_channel.say(ctx, message).await?;
+    log_channel.send_message(ctx, |m| {
+        m.content(message);
+        m.allowed_mentions(|am| {
+            am.empty_parse();
+            am
+        });
+        m
+    }).await?;
     Ok(())
 }
 
