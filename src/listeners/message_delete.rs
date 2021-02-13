@@ -1,15 +1,20 @@
 use crate::prelude::*;
 use serenity::{model::prelude::*, prelude::*};
 
-pub async fn message_delete(ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
+pub async fn message_delete(
+    ctx: Context,
+    channel: ChannelId,
+    deleted_message_id: MessageId,
+    guild_id: Option<GuildId>,
+) {
     let channel: Channel = match channel.to_channel(&ctx).await {
         Ok(c) => c,
         Err(_) => return,
     };
 
-    let guildid = match channel.clone() {
-        Channel::Guild(g) => g.guild_id,
-        _ => return,
+    let guildid = match guild_id {
+        Some(g) => g,
+        None => return,
     };
 
     if check_log_type(LogType::MessageDeleted, guildid).await.is_err() {

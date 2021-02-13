@@ -6,8 +6,8 @@ edition = "2018"
 
 
 [dependencies]
-serenity = { version = "0.9.2", features = ["collector"] }
-tokio  = { version = "0.2", features = ["macros", "rt-threaded", "blocking"] }
+serenity = { version = "0.10", features = ["collector"] }
+tokio  = { version = "0.3", features = ["macros", "rt-multi-thread"] }
 dotenv = "0.15"
 config = "0.10"
 env_logger = "0.4"

@@ -60,18 +60,6 @@ pub async fn presence_update(ctx: Context, new_data: PresenceUpdateEvent) {
         change = true;
     };
 
-    if let Some(newa) = new_presence.activity {
-        message += &format!("Activity is now {:?}", newa);
-        if let Some(olda) = old_presence.activity {
-            if olda.name != newa.name {
-                message += &newa.name;
-            }
-        } else {
-            message += &newa.name;
-        };
-        change = true;
-    };
-
     if !change {
         return;
     };

@@ -1,6 +1,11 @@
 use crate::prelude::*;
 use log::info;
-use serenity::{collector::*, futures::{TryStreamExt, StreamExt}, model::prelude::*, prelude::*};
+use serenity::{
+    collector::*,
+    futures::{StreamExt, TryStreamExt},
+    model::prelude::*,
+    prelude::*,
+};
 use sqlx::prelude::*;
 
 pub async fn start_reactions(ctx: &Context) -> Result<(), BotError> {

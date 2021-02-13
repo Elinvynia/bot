@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use serenity::{model::prelude::*, prelude::*, futures::TryStreamExt};
+use serenity::{futures::TryStreamExt, model::prelude::*, prelude::*};
 use sqlx::prelude::*;
 
 pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_member: Member) {

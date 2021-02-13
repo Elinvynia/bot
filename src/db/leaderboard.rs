@@ -4,16 +4,14 @@ use sqlx::prelude::*;
 
 pub async fn get_user_channel_score(guildid: GuildId, channelid: ChannelId, userid: UserId) -> Result<i64, BotError> {
     let mut conn = connect().await?;
-    match sqlx::query(
-        "SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;",
-    )
-    .bind(&guildid.to_string())
-    .bind(&channelid.to_string())
-    .bind(&userid.to_string())
-    .fetch_one(&mut conn)
-    .await
+    match sqlx::query("SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;")
+        .bind(&guildid.to_string())
+        .bind(&channelid.to_string())
+        .bind(&userid.to_string())
+        .fetch_one(&mut conn)
+        .await
     {
-        Ok(row) => row.try_get(0).map_err(|e| BotError::DbError(e)),
+        Ok(row) => row.try_get(0).map_err(BotError::DbError),
         Err(sqlx::Error::RowNotFound) => {
             sqlx::query("INSERT INTO leaderboard (guild_id, channel_id, user_id, points) VALUES (?1, ?2, ?3, ?4);")
                 .bind(&guildid.to_string())
@@ -23,8 +21,8 @@ pub async fn get_user_channel_score(guildid: GuildId, channelid: ChannelId, user
                 .execute(&mut conn)
                 .await?;
             Ok(1)
-        },
-        Err(e) => Err(BotError::DbError(e))
+        }
+        Err(e) => Err(BotError::DbError(e)),
     }
 }
 

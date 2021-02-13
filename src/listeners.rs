@@ -60,8 +60,14 @@ impl EventHandler for Handler {
         message::message(new_message).await
     }
 
-    async fn message_delete(&self, ctx: Context, channel: ChannelId, deleted_message_id: MessageId) {
-        message_delete::message_delete(ctx, channel, deleted_message_id).await
+    async fn message_delete(
+        &self,
+        ctx: Context,
+        channel: ChannelId,
+        deleted_message_id: MessageId,
+        guild_id: Option<GuildId>,
+    ) {
+        message_delete::message_delete(ctx, channel, deleted_message_id, guild_id).await
     }
 
     async fn message_update(

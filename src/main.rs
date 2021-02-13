@@ -64,21 +64,7 @@ async fn main() {
         .group(&XP_GROUP);
 
     let mut client = Client::builder(&token)
-        .add_intent(GatewayIntents::GUILDS)
-        .add_intent(GatewayIntents::GUILD_MEMBERS)
-        .add_intent(GatewayIntents::GUILD_BANS)
-        .add_intent(GatewayIntents::GUILD_EMOJIS)
-        .add_intent(GatewayIntents::GUILD_INTEGRATIONS)
-        .add_intent(GatewayIntents::GUILD_WEBHOOKS)
-        .add_intent(GatewayIntents::GUILD_INVITES)
-        .add_intent(GatewayIntents::GUILD_VOICE_STATES)
-        .add_intent(GatewayIntents::GUILD_PRESENCES)
-        .add_intent(GatewayIntents::GUILD_MESSAGES)
-        .add_intent(GatewayIntents::GUILD_MESSAGE_REACTIONS)
-        .add_intent(GatewayIntents::GUILD_MESSAGE_TYPING)
-        .add_intent(GatewayIntents::DIRECT_MESSAGES)
-        .add_intent(GatewayIntents::DIRECT_MESSAGE_REACTIONS)
-        .add_intent(GatewayIntents::DIRECT_MESSAGE_TYPING)
+        .intents(GatewayIntents::all())
         .event_handler(Handler)
         .framework(framework)
         .await

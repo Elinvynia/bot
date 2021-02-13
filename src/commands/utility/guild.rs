@@ -11,14 +11,9 @@ use serenity::{
 #[usage("guild")]
 #[example("guild")]
 async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = msg
-        .guild_id
-        .ok_or(BotError::NoneError)?;
+    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
 
-    let guild = guild_id
-        .to_guild_cached(&ctx)
-        .await
-        .ok_or(BotError::NoneError)?;
+    let guild = guild_id.to_guild_cached(&ctx).await.ok_or(BotError::NoneError)?;
 
     let owner = guild
         .owner_id

@@ -16,7 +16,7 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<Money, B
         Ok(row) => {
             let amount: i64 = row.try_get(0)?;
             Ok(Money(amount as u64))
-        },
+        }
         Err(sqlx::Error::RowNotFound) => {
             sqlx::query("INSERT INTO money (guild_id, user_id) values (?1, ?2);")
                 .bind(gid)
@@ -24,11 +24,8 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<Money, B
                 .execute(&mut conn)
                 .await?;
             Ok(Money(0))
-        },
-        Err(e) => {
-            Err(e.into())
         }
-
+        Err(e) => Err(e.into()),
     }
 }
 
