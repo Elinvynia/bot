@@ -1,9 +1,3 @@
-mod commands;
-mod data;
-mod db;
-mod listeners;
-mod prelude;
-mod utils;
 use crate::{commands::*, db::setup_db, listeners::Handler, prelude::*, utils::framework::*};
 use serenity::{
     client::bridge::gateway::GatewayIntents, framework::StandardFramework, http::Http, model::prelude::*, prelude::*,
@@ -14,10 +8,16 @@ use std::{
     sync::Arc,
 };
 
+pub mod commands;
+pub mod data;
+pub mod db;
+pub mod listeners;
+pub mod prelude;
+pub mod utils;
+
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().expect("Failed to initialize dotenv.");
-    env_logger::init().expect("Failed to initialize logger.");
 
     let mut settings = config::Config::default();
     settings
@@ -57,11 +57,9 @@ async fn main() {
         .help(&HELP)
         .group(&ADMIN_GROUP)
         .group(&GAMBLING_GROUP)
-        .group(&GAMES_GROUP)
         .group(&ROLES_GROUP)
         .group(&SETTINGS_GROUP)
-        .group(&UTILITY_GROUP)
-        .group(&XP_GROUP);
+        .group(&UTILITY_GROUP);
 
     let mut client = Client::builder(&token)
         .intents(GatewayIntents::all())

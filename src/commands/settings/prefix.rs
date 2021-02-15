@@ -13,19 +13,18 @@ use serenity::{
 #[usage = "prefix <value>"]
 #[example = "prefix !"]
 async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let mut conn = connect().await?;
-    let guildid = msg.guild_id.ok_or(BotError::NoneError)?;
+    let conn = connect()?;
+    let guildid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
     let pref = args.current().unwrap_or("!");
 
-    sqlx::query("INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)")
-        .bind(&guildid.to_string())
-        .bind(pref)
-        .execute(&mut conn)
-        .await?;
+    sql_block!({
+        let mut s = conn.prepare("INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)")?;
+        s.execute(params![guildid.to_string(), pref])?;
+    })?;
 
     {
         let mut data = ctx.data.write().await;
-        let prefixes = data.get_mut::<GuildPrefixes>().ok_or(BotError::NoneError)?;
+        let prefixes = data.get_mut::<GuildPrefixes>().ok_or(anyhow!("Guild prefix not found."))?;
         prefixes.insert(guildid, pref.to_string());
     }
 

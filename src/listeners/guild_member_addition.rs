@@ -1,6 +1,5 @@
 use crate::prelude::*;
-use serenity::{futures::TryStreamExt, model::prelude::*, prelude::*};
-use sqlx::prelude::*;
+use serenity::{model::prelude::*, prelude::*};
 
 pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_member: Member) {
     if check_log_type(LogType::UserJoined, guildid).await.is_err() {
@@ -27,19 +26,30 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_membe
         })
         .await;
 
-    if let Ok(mut conn) = connect().await {
-        let mut q = sqlx::query("SELECT * FROM joinrole WHERE guild_id = ?1")
-            .bind(guildid.to_string())
-            .fetch(&mut conn);
+    let rids = tokio::task::spawn_blocking(move || -> Result<Vec<String>> {
+        let conn = connect()?;
+        let mut s = conn.prepare("SELECT role_id FROM joinrole WHERE guild_id = ?1")?;
+        let q = s.query_and_then(params![guildid.to_string()], |r| r.get(0))?;
 
-        if let Ok(Some(row)) = q.try_next().await {
-            let role_id: String = row.get("role_id");
-            let rid: u64 = match role_id.parse() {
-                Ok(id) => id,
-                Err(_) => return,
-            };
-
-            let _ = new_member.add_role(&ctx, rid).await;
+        let mut v: Vec<String> = vec![];
+        for x in q {
+            v.push(x?)
         }
+
+        Ok(v)
+    }).await;
+
+    let rids = error_return!(rids);
+    let rids = error_return!(rids);
+
+
+
+    for rid in rids {
+        let rid: u64 = match rid.parse() {
+            Ok(id) => id,
+            Err(_) => return,
+        };
+
+        let _ = new_member.add_role(&ctx, rid).await;
     }
 }

@@ -21,9 +21,9 @@ async fn leaderboard(ctx: &Context, msg: &Message, args: Args) -> CommandResult 
 }
 
 async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
+    let guild_id = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
     let channel_id = match parse_chan(
-        &args.quoted().current().ok_or(BotError::NoneError)?.to_string(),
+        &args.quoted().current().ok_or(anyhow!("Argument not found."))?.to_string(),
         Some(&guild_id),
         Some(&ctx),
     )
@@ -58,7 +58,7 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, mut args: Args) -> Co
 }
 
 async fn parse_total_score(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
+    let guild_id = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
     let rows = get_user_total_scores(guild_id).await?;
     let mut result = String::new();
 

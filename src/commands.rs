@@ -8,7 +8,7 @@ pub use generic::*;
 pub mod admin;
 pub use admin::*;
 #[group]
-#[commands(ban, kick, purge)]
+#[commands(ban, kick)]
 struct Admin;
 
 pub mod gambling;
@@ -16,11 +16,6 @@ pub use gambling::*;
 #[group]
 #[commands(setmoney, betroll, money, flip, give)]
 struct Gambling;
-
-pub mod games;
-pub use games::*;
-#[group]
-struct Games;
 
 pub mod roles;
 pub use roles::*;
@@ -39,6 +34,3 @@ pub use utility::*;
 #[group]
 #[commands(avatar, user, leaderboard, guild, emoji, choose, ping, hug, answer, headpat, bonk)]
 struct Utility;
-
-#[group]
-struct Xp;

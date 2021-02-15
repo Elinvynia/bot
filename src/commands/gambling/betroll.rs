@@ -13,13 +13,13 @@ use serenity::{
 #[usage("betroll <amount>")]
 #[example("betroll 100")]
 async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guildid = msg.guild_id.ok_or(BotError::NoneError)?;
+    let guildid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
     let userid = msg.author.id;
 
     let money = get_user_money(guildid, userid).await?;
-    let bet: Money = error_return_ok!(args.single());
+    let bet: i64 = error_return_ok!(args.single());
 
-    if *bet == 0 {
+    if bet == 0 {
         return Ok(());
     };
 
@@ -28,17 +28,17 @@ async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult 
         return Ok(());
     };
 
-    let roll: u32 = rand::thread_rng().gen_range(1, 101);
+    let roll: i64 = rand::thread_rng().gen_range(1, 101);
     let new_amount;
 
     if roll == 100 {
-        new_amount = money + (bet * Money(10));
+        new_amount = money + (bet * 10);
         set_user_money(guildid, userid, new_amount).await?;
     } else if roll > 90 {
-        new_amount = money + (bet * Money(4));
+        new_amount = money + (bet * 4);
         set_user_money(guildid, userid, new_amount).await?;
     } else if roll > 66 {
-        new_amount = money + (bet * Money(2));
+        new_amount = money + (bet * 2);
         set_user_money(guildid, userid, new_amount).await?;
     } else {
         new_amount = money - bet;

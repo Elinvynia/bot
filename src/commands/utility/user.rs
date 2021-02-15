@@ -15,7 +15,7 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id;
     if !args.is_empty() && msg.guild_id.is_some() {
         let name: String = error_return_ok!(args.single());
-        let gid = msg.guild_id.ok_or(BotError::NoneError)?;
+        let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
 
         user_id = none_return_ok!(parse_user(&name, Some(&gid), Some(&ctx)).await);
     } else {
@@ -32,13 +32,13 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         if let Ok(member) = guild.member(&ctx, user_id).await {
             message += &format!(
                 "**Joined At:** {}\n",
-                member.joined_at.ok_or(BotError::NoneError)?.format("%F %T")
+                member.joined_at.ok_or("Member join time not found.")?.format("%F %T")
             );
             message += &format!("**Nickname:** {}\n", member.nick.unwrap_or_else(|| "None.".into()));
 
             let mut roles = vec![];
             for role in member.roles {
-                roles.push(role.to_role_cached(&ctx).await.ok_or(BotError::NoneError)?.name)
+                roles.push(role.to_role_cached(&ctx).await.ok_or(anyhow!("Role not found in cache."))?.name)
             }
             message += &format!("**Roles:** {}\n", roles.join(", "))
         };

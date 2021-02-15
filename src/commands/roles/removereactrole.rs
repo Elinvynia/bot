@@ -13,19 +13,18 @@ use serenity::{
 #[usage("removereactrole <emoji>")]
 #[example("removereactrole :heart:")]
 async fn removereactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let mut conn = connect().await?;
-    let gid = msg.guild_id.ok_or(BotError::NoneError)?;
+    let conn = connect()?;
+    let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
 
     let reaction = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
         Some(r) => r,
         None => return Ok(()),
     };
 
-    sqlx::query("DELETE FROM reactionroles WHERE reaction_id = ?1 AND guild_id = ?2")
-        .bind(reaction.id.to_string())
-        .bind(gid.to_string())
-        .execute(&mut conn)
-        .await?;
+    sql_block!({
+        let mut s = conn.prepare("DELETE FROM reactionroles WHERE reaction_id = ?1 AND guild_id = ?2")?;
+        s.execute(params![reaction.id.to_string(), gid.to_string()])?;
+    })?;
 
     msg.channel_id.say(&ctx, "Reaction role removed!").await?;
 

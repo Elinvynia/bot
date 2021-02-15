@@ -1,87 +1,64 @@
 use crate::prelude::*;
 use serenity::model::prelude::*;
-use sqlx::prelude::*;
 
-pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<Money, BotError> {
-    let mut conn = connect().await?;
+pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<i64> {
+    let conn = connect()?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    match sqlx::query("SELECT money FROM money WHERE guild_id == ?1 AND user_id == ?2;")
-        .bind(gid)
-        .bind(uid)
-        .fetch_one(&mut conn)
-        .await
-    {
-        Ok(row) => {
-            let amount: i64 = row.try_get(0)?;
-            Ok(Money(amount as u64))
-        }
-        Err(sqlx::Error::RowNotFound) => {
-            sqlx::query("INSERT INTO money (guild_id, user_id) values (?1, ?2);")
-                .bind(gid)
-                .bind(uid)
-                .execute(&mut conn)
-                .await?;
-            Ok(Money(0))
-        }
-        Err(e) => Err(e.into()),
-    }
+    let mut s = conn.prepare("SELECT money FROM money WHERE guild_id == ?1 AND user_id == ?2;")?;
+    let r = s.query_row(params![gid, uid], |r| r.get(0));
+
+    if let Err(rusqlite::Error::QueryReturnedNoRows) = r {
+        let mut s = conn.prepare("INSERT INTO money (guild_id, user_id) values (?1, ?2);")?;
+        s.execute(params![gid, uid])?;
+        return Ok(0)
+    };
+
+    Ok(r?)
 }
 
-pub async fn set_user_money(guildid: GuildId, userid: UserId, amount: Money) -> Result<(), BotError> {
-    let mut conn = connect().await?;
+pub async fn set_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Result<()> {
+    let conn = connect()?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    sqlx::query("INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);")
-        .bind(gid)
-        .bind(uid)
-        .bind(amount.0 as i64)
-        .execute(&mut conn)
-        .await?;
+    let mut s = conn.prepare("INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);")?;
+    s.execute(params![gid, uid, amount])?;
 
     Ok(())
 }
 
-pub async fn add_user_money(guildid: GuildId, userid: UserId, amount: Money) -> Result<(), BotError> {
+pub async fn add_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Result<()> {
     let money = get_user_money(guildid, userid).await?;
 
-    let mut conn = connect().await?;
+    let conn = connect()?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    sqlx::query("INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);")
-        .bind(gid)
-        .bind(uid)
-        .bind((money.0 as i64) + (amount.0 as i64))
-        .execute(&mut conn)
-        .await?;
+    let mut s = conn.prepare("INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);")?;
+    s.execute(params![gid, uid, money + amount])?;
 
     Ok(())
 }
 
-pub async fn remove_user_money(guildid: GuildId, userid: UserId, amount: Money) -> Result<(), BotError> {
+pub async fn remove_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Result<()> {
     let money = get_user_money(guildid, userid).await?;
 
     if amount > money {
-        return Err(BotError::NegativeMoney);
+        return Err(anyhow!("Negative money"));
     };
 
-    let mut conn = connect().await?;
+    let conn = connect()?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    sqlx::query("INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);")
-        .bind(gid)
-        .bind(uid)
-        .bind((money.0 as i64) - (amount.0 as i64))
-        .execute(&mut conn)
-        .await?;
+    let mut s = conn.prepare("INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);")?;
+    s.execute(params![gid, uid, money - amount])?;
 
     Ok(())
 }
 
-pub async fn inc_user_money(guildid: GuildId, userid: UserId) -> Result<(), BotError> {
-    add_user_money(guildid, userid, Money(1)).await
+pub async fn inc_user_money(guildid: GuildId, userid: UserId) -> Result<()> {
+    add_user_money(guildid, userid, 1).await
 }

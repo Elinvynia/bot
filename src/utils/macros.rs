@@ -37,3 +37,13 @@ macro_rules! none_return_ok {
         }
     };
 }
+
+#[macro_export]
+macro_rules! sql_block {
+    ($e:expr) => {
+        tokio::task::block_in_place(|| -> anyhow::Result<()> {
+            $e;
+            Ok(())
+        });
+    };
+}

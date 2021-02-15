@@ -13,11 +13,11 @@ use serenity::{
 #[usage("flip <amount> <heads/tails>")]
 #[example("flip 100 heads")]
 async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guildid = msg.guild_id.ok_or(BotError::NoneError)?;
+    let guildid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
     let userid = msg.author.id;
 
     let money = get_user_money(guildid, userid).await?;
-    let bet: Money = error_return_ok!(args.single());
+    let bet: i64 = error_return_ok!(args.single());
 
     let coin = match &args.single::<String>()?[..] {
         "h" | "heads" => Coin::Heads,
@@ -25,7 +25,7 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         _ => return Ok(()),
     };
 
-    if *bet == 0 {
+    if bet == 0 {
         return Ok(());
     };
 
@@ -39,7 +39,7 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
     let new_amount;
     if roll == roll_coin {
-        new_amount = money + bet * Money(2);
+        new_amount = money + (bet * 2);
     } else {
         new_amount = money - bet;
     };
@@ -47,7 +47,7 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     set_user_money(guildid, userid, new_amount).await?;
 
     msg.channel_id
-        .say(&ctx, &format!("Side: {}\nYou now have: {}", coin, new_amount))
+        .say(&ctx, &format!("Your Side: {}\nRolled: {}\nYou now have: {}", coin, roll_coin, new_amount))
         .await?;
 
     Ok(())

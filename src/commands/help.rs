@@ -1,4 +1,4 @@
-use crate::data::error::BotError;
+use crate::prelude::*;
 use serenity::{
     client::Context,
     framework::standard::{macros::help, Args, Command, CommandGroup, CommandResult, HelpOptions, OnlyIn},
@@ -23,7 +23,7 @@ async fn help(
             help_string += &command_help(
                 ctx,
                 groups,
-                args.current().ok_or(BotError::NoneError)?.to_string(),
+                args.current().ok_or(anyhow!("Arguments not found."))?.to_string(),
                 msg,
                 owners,
             )
@@ -42,7 +42,7 @@ async fn command_list(
     groups: &[&'static CommandGroup],
     msg: &Message,
     owners: HashSet<UserId>,
-) -> Result<String, BotError> {
+) -> Result<String> {
     let mut help_list = "Bot made by @Elinvynia".to_string();
     help_list += "\n\n";
 
@@ -54,25 +54,25 @@ async fn command_list(
         }
         let mut group_string = format!("**{}:** ", group.name);
         for command in group.options.commands {
-            let name = command.options.names.first().ok_or(BotError::NoneError)?;
+            let name = command.options.names.first().ok_or(anyhow!("Command name not found."))?;
             let mut got_permission = false;
 
             if let Some(gid) = msg.guild_id {
                 let guild = match gid.to_guild_cached(&ctx).await {
                     Some(g) => g,
-                    None => return Err(BotError::NoneError),
+                    None => return Err(anyhow!("Guild not found in cache.")),
                 };
                 let member = match guild.member(&ctx, msg.author.id).await {
                     Ok(m) => m,
-                    Err(_) => return Err(BotError::NoneError),
+                    Err(_) => return Err(anyhow!("Guild member not found.")),
                 };
                 let rid = match member.highest_role_info(&ctx).await {
                     Some(id) => id,
-                    None => return Err(BotError::NoneError),
+                    None => return Err(anyhow!("Highest role info not found.")),
                 };
                 let role = match rid.0.to_role_cached(&ctx).await {
                     Some(r) => r,
-                    None => return Err(BotError::NoneError),
+                    None => return Err(anyhow!("Role not found in cache.")),
                 };
                 got_permission = role.permissions.contains(command.options.required_permissions);
             };
@@ -103,7 +103,7 @@ async fn command_help(
     arg: String,
     msg: &Message,
     owners: HashSet<UserId>,
-) -> Result<String, BotError> {
+) -> Result<String> {
     let mut help_command = String::new();
 
     let is_owner = owners.get(&msg.author.id).is_some();
@@ -111,7 +111,7 @@ async fn command_help(
     let mut matched_command: Option<&Command> = None;
     for group in groups {
         for command in group.options.commands {
-            let name = command.options.names.first().ok_or(BotError::NoneError)?;
+            let name = command.options.names.first().ok_or(anyhow!("Command name not found."))?;
             if name == &arg {
                 matched_command = Some(command);
             }
@@ -150,7 +150,7 @@ async fn command_help(
 
     help_command += &format!(
         "**Command:** __{}__",
-        command.options.names.first().ok_or(BotError::NoneError)?
+        command.options.names.first().ok_or(anyhow!("Command name not found."))?
     );
 
     help_command += "\n";

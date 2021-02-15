@@ -4,7 +4,6 @@ use serenity::{
     model::prelude::*,
     prelude::*,
 };
-use sqlx::SqliteConnection;
 use std::convert::TryInto;
 
 #[command]
@@ -16,13 +15,13 @@ use std::convert::TryInto;
 #[usage = "log  |  log <enable|disable> <category>"]
 #[example = "log enable join"]
 async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let mut conn = connect().await?;
+    let conn = connect()?;
 
-    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
+    let guild_id = msg.guild_id.ok_or(anyhow!("Guild ID not found"))?;
     let channel_id = msg.channel_id.to_string();
 
     if args.is_empty() {
-        return log_channel(ctx, msg, &mut conn, guild_id, channel_id).await;
+        return log_channel(ctx, msg, conn, guild_id, channel_id).await;
     }
 
     if args.len() == 1 {
@@ -58,11 +57,10 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         _ => return Ok(()),
     }
 
-    sqlx::query("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")
-        .bind(&(log_type as i64).to_string())
-        .bind(&guild_id.to_string())
-        .execute(&mut conn)
-        .await?;
+    sql_block!({
+        let mut s = conn.prepare("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")?;
+        s.execute(&[(log_type as i64).to_string(), guild_id.to_string()])?;
+    })?;
 
     log_channel.say(&ctx, message).await?;
 
@@ -72,26 +70,23 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 async fn log_channel(
     ctx: &Context,
     msg: &Message,
-    conn: &mut SqliteConnection,
+    conn: Connection,
     guild_id: GuildId,
     cid: String,
 ) -> CommandResult {
     let gid = guild_id.to_string();
     if get_log_channel(guild_id).await.is_ok() {
-        sqlx::query("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")
-            .bind(&cid)
-            .bind(&gid)
-            .execute(conn)
-            .await?;
+        sql_block!({
+            let mut s = conn.prepare("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")?;
+            s.execute(params![cid, gid])?;
+        })?;
         let log_channel = get_log_channel(guild_id).await?;
         log_channel.say(&ctx, "Log channel updated!").await?;
     } else {
-        sqlx::query("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")
-            .bind(&gid)
-            .bind(&cid)
-            .bind(&(LogType::All as i64).to_string())
-            .execute(conn)
-            .await?;
+        sql_block!({
+            let mut s = conn.prepare("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")?;
+            s.execute(params![gid, cid, LogType::All as i64])?;
+        })?;
         msg.channel_id.say(&ctx, "Log channel set!").await?;
     };
     Ok(())

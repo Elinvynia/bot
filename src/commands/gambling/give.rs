@@ -12,10 +12,10 @@ use serenity::{
 #[usage("give <user> <amount>")]
 #[example("give Elinvynia 1000")]
 async fn give(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guild_id = msg.guild_id.ok_or(BotError::NoneError)?;
+    let guild_id = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
     let user_arg: String = error_return_ok!(args.single());
     let user_id = none_return_ok!(parse_user(&user_arg, Some(&guild_id), Some(&ctx)).await);
-    let amount: Money = error_return_ok!(args.single());
+    let amount: i64 = error_return_ok!(args.single());
 
     let author = guild_id.member(&ctx, msg.author.id).await?;
     {

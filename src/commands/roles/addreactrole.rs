@@ -15,20 +15,20 @@ use serenity::{
 #[usage("addreactrole <emoji> <role>")]
 #[example("addreactrole :heart: Admin")]
 async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let mut conn = connect().await?;
+    let conn = connect()?;
     let x = msg
         .channel(ctx)
         .await
-        .ok_or(BotError::NoneError)?
+        .ok_or(anyhow!("Channel not found."))?
         .guild()
-        .ok_or(BotError::NoneError)?
+        .ok_or(anyhow!("Guild not found."))?
         .messages(ctx, |builder| builder.before(msg.id).limit(1))
         .await?;
     if x.is_empty() {
         return Ok(());
     };
 
-    let gid = msg.guild_id.ok_or(BotError::NoneError)?;
+    let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
 
     let reaction = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
         Some(r) => r,
@@ -44,7 +44,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     };
 
     let reactionid = reaction.id;
-    let parent_msg = x.get(0).ok_or(BotError::NoneError)?.clone();
+    let parent_msg = x.get(0).ok_or(anyhow!("Parent message not found."))?.clone();
     parent_msg.react(&ctx, reaction).await?;
 
     let roleid = role.id;
@@ -59,13 +59,10 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
 
     msg.delete(&ctx).await?;
 
-    sqlx::query("INSERT INTO reactionroles (guild_id, message_id, role_id, reaction_id) values (?1, ?2, ?3, ?4)")
-        .bind(gid.to_string())
-        .bind(parent_msg.id.to_string())
-        .bind(roleid.to_string())
-        .bind(reactionid.to_string())
-        .execute(&mut conn)
-        .await?;
+    sql_block!({
+        let mut s = conn.prepare("INSERT INTO reactionroles (guild_id, message_id, role_id, reaction_id) values (?1, ?2, ?3, ?4)")?;
+        s.execute(params![gid.to_string(), parent_msg.id.to_string(), roleid.to_string(), reactionid.to_string()])?;
+    })?;
 
     let ctx = ctx.clone();
     tokio::spawn(async move {

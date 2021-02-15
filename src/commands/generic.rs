@@ -14,7 +14,7 @@ macro_rules! text_command {
         #[usage($usage)]
         #[example($example)]
         async fn $cname(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-            let gid = msg.guild_id.ok_or(BotError::NoneError)?;
+            let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
 
             let user_id = none_return_ok!(parse_user(&args.single::<String>()?, Some(&gid), Some(&ctx)).await);
             let author = gid.member(&ctx, msg.author.id).await?;
