@@ -14,10 +14,13 @@ use serenity::{
 #[example("addjoinrole New")]
 async fn addjoinrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let conn = connect()?;
-    let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+    let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
     let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(&ctx)).await {
-        Some(rid) => rid.to_role_cached(&ctx.cache).await.ok_or(anyhow!("Role not found in cache"))?,
+        Some(rid) => rid
+            .to_role_cached(&ctx.cache)
+            .await
+            .ok_or_else(|| anyhow!("Role not found in cache"))?,
         None => return Ok(()),
     };
 

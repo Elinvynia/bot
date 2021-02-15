@@ -23,7 +23,9 @@ async fn help(
             help_string += &command_help(
                 ctx,
                 groups,
-                args.current().ok_or(anyhow!("Arguments not found."))?.to_string(),
+                args.current()
+                    .ok_or_else(|| anyhow!("Arguments not found."))?
+                    .to_string(),
                 msg,
                 owners,
             )
@@ -54,7 +56,11 @@ async fn command_list(
         }
         let mut group_string = format!("**{}:** ", group.name);
         for command in group.options.commands {
-            let name = command.options.names.first().ok_or(anyhow!("Command name not found."))?;
+            let name = command
+                .options
+                .names
+                .first()
+                .ok_or_else(|| anyhow!("Command name not found."))?;
             let mut got_permission = false;
 
             if let Some(gid) = msg.guild_id {
@@ -111,7 +117,11 @@ async fn command_help(
     let mut matched_command: Option<&Command> = None;
     for group in groups {
         for command in group.options.commands {
-            let name = command.options.names.first().ok_or(anyhow!("Command name not found."))?;
+            let name = command
+                .options
+                .names
+                .first()
+                .ok_or_else(|| anyhow!("Command name not found."))?;
             if name == &arg {
                 matched_command = Some(command);
             }
@@ -150,7 +160,11 @@ async fn command_help(
 
     help_command += &format!(
         "**Command:** __{}__",
-        command.options.names.first().ok_or(anyhow!("Command name not found."))?
+        command
+            .options
+            .names
+            .first()
+            .ok_or_else(|| anyhow!("Command name not found."))?
     );
 
     help_command += "\n";

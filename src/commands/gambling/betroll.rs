@@ -13,7 +13,7 @@ use serenity::{
 #[usage("betroll <amount>")]
 #[example("betroll 100")]
 async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guildid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+    let guildid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
     let userid = msg.author.id;
 
     let money = get_user_money(guildid, userid).await?;

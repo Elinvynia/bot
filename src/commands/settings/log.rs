@@ -17,7 +17,7 @@ use std::convert::TryInto;
 async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let conn = connect()?;
 
-    let guild_id = msg.guild_id.ok_or(anyhow!("Guild ID not found"))?;
+    let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found"))?;
     let channel_id = msg.channel_id.to_string();
 
     if args.is_empty() {
@@ -67,13 +67,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     Ok(())
 }
 
-async fn log_channel(
-    ctx: &Context,
-    msg: &Message,
-    conn: Connection,
-    guild_id: GuildId,
-    cid: String,
-) -> CommandResult {
+async fn log_channel(ctx: &Context, msg: &Message, conn: Connection, guild_id: GuildId, cid: String) -> CommandResult {
     let gid = guild_id.to_string();
     if get_log_channel(guild_id).await.is_ok() {
         sql_block!({

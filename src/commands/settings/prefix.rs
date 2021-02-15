@@ -14,7 +14,7 @@ use serenity::{
 #[example = "prefix !"]
 async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let conn = connect()?;
-    let guildid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+    let guildid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
     let pref = args.current().unwrap_or("!");
 
     sql_block!({
@@ -24,7 +24,9 @@ async fn prefix(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 
     {
         let mut data = ctx.data.write().await;
-        let prefixes = data.get_mut::<GuildPrefixes>().ok_or(anyhow!("Guild prefix not found."))?;
+        let prefixes = data
+            .get_mut::<GuildPrefixes>()
+            .ok_or_else(|| anyhow!("Guild prefix not found."))?;
         prefixes.insert(guildid, pref.to_string());
     }
 

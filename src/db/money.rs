@@ -12,7 +12,7 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<i64> {
     if let Err(rusqlite::Error::QueryReturnedNoRows) = r {
         let mut s = conn.prepare("INSERT INTO money (guild_id, user_id) values (?1, ?2);")?;
         s.execute(params![gid, uid])?;
-        return Ok(0)
+        return Ok(0);
     };
 
     Ok(r?)

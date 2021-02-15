@@ -12,11 +12,15 @@ use serenity::{
 #[example = "ping"]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read().await;
-    let shard_manager = data.get::<ShardManagerContainer>().ok_or(anyhow!("Shard manager container not found."))?;
+    let shard_manager = data
+        .get::<ShardManagerContainer>()
+        .ok_or_else(|| anyhow!("Shard manager container not found."))?;
 
     let manager = shard_manager.lock().await;
     let runners = manager.runners.lock().await;
-    let runner = runners.get(&ShardId(ctx.shard_id)).ok_or(anyhow!("Shard not found."))?;
+    let runner = runners
+        .get(&ShardId(ctx.shard_id))
+        .ok_or_else(|| anyhow!("Shard not found."))?;
 
     match runner.latency {
         Some(x) => {

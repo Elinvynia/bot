@@ -15,7 +15,7 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id;
     if !args.is_empty() && msg.guild_id.is_some() {
         let name: String = error_return_ok!(args.single());
-        let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+        let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
         user_id = none_return_ok!(parse_user(&name, Some(&gid), Some(&ctx)).await);
     } else {
@@ -38,7 +38,12 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
             let mut roles = vec![];
             for role in member.roles {
-                roles.push(role.to_role_cached(&ctx).await.ok_or(anyhow!("Role not found in cache."))?.name)
+                roles.push(
+                    role.to_role_cached(&ctx)
+                        .await
+                        .ok_or_else(|| anyhow!("Role not found in cache."))?
+                        .name,
+                )
             }
             message += &format!("**Roles:** {}\n", roles.join(", "))
         };

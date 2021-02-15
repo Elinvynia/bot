@@ -13,7 +13,7 @@ use serenity::{
 #[usage("setmoney <user> <amount>")]
 #[example("setmoney Elinvynia 1000")]
 async fn setmoney(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guild_id = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+    let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
     let user_arg: String = error_return_ok!(args.single());
     let user_id = none_return_ok!(parse_user(&user_arg, Some(&guild_id), Some(&ctx)).await);
 

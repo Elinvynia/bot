@@ -1,10 +1,6 @@
 use crate::prelude::*;
-use serenity::{
-    collector::*,
-    futures::StreamExt,
-    model::prelude::*,
-    prelude::*,
-};
+use log::info;
+use serenity::{collector::*, futures::StreamExt, model::prelude::*, prelude::*};
 
 pub struct ReactionResponse {
     pub message_id: String,
@@ -20,7 +16,7 @@ pub async fn start_reactions(ctx: &Context) -> Result<()> {
     sql_block!({
         let mut s = conn.prepare("SELECT message_id, role_id, reaction_id FROM reactionroles")?;
         let q = s.query_map(NO_PARAMS, |r| {
-            Ok(ReactionResponse{
+            Ok(ReactionResponse {
                 message_id: r.get(0)?,
                 role_id: r.get(1)?,
                 reaction_id: r.get(2)?,
@@ -32,9 +28,7 @@ pub async fn start_reactions(ctx: &Context) -> Result<()> {
         }
     })?;
 
-
-
-   for row in rows {
+    for row in rows {
         let message_id: u64 = match row.message_id.parse() {
             Ok(id) => id,
             Err(_) => continue,

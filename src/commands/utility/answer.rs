@@ -15,7 +15,7 @@ use serenity::{
 async fn answer(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     let answer = ["Yes", "No"]
         .choose(&mut rand::thread_rng())
-        .ok_or(anyhow!("Failed to choose an option."))?;
+        .ok_or_else(|| anyhow!("Failed to choose an option."))?;
 
     msg.channel_id.say(&ctx, answer).await?;
 

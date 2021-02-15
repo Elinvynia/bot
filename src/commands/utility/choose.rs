@@ -16,7 +16,9 @@ async fn choose(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let parsed_args: Result<Vec<String>, _> = args.quoted().iter().quoted().collect();
     let options = error_return_ok!(parsed_args);
 
-    let chosen = options.choose(&mut rand::thread_rng()).ok_or(anyhow!("Failed to choose an option"))?;
+    let chosen = options
+        .choose(&mut rand::thread_rng())
+        .ok_or_else(|| anyhow!("Failed to choose an option"))?;
 
     msg.channel_id.say(&ctx, chosen).await?;
 

@@ -37,12 +37,11 @@ pub async fn guild_member_addition(ctx: Context, guildid: GuildId, mut new_membe
         }
 
         Ok(v)
-    }).await;
+    })
+    .await;
 
     let rids = error_return!(rids);
     let rids = error_return!(rids);
-
-
 
     for rid in rids {
         let rid: u64 = match rid.parse() {

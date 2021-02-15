@@ -13,7 +13,7 @@ use serenity::{
 #[usage("flip <amount> <heads/tails>")]
 #[example("flip 100 heads")]
 async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let guildid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+    let guildid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
     let userid = msg.author.id;
 
     let money = get_user_money(guildid, userid).await?;
@@ -47,7 +47,13 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     set_user_money(guildid, userid, new_amount).await?;
 
     msg.channel_id
-        .say(&ctx, &format!("Your Side: {}\nRolled: {}\nYou now have: {}", coin, roll_coin, new_amount))
+        .say(
+            &ctx,
+            &format!(
+                "Your Side: {}\nRolled: {}\nYou now have: {}",
+                coin, roll_coin, new_amount
+            ),
+        )
         .await?;
 
     Ok(())

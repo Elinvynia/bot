@@ -13,7 +13,7 @@ use serenity::{
 #[example("removejoinrole")]
 async fn removejoinrole(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     let conn = connect()?;
-    let gid = msg.guild_id.ok_or(anyhow!("Guild ID not found."))?;
+    let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
     sql_block!({
         let mut s = conn.prepare("REMOVE FROM joinrole WHERE guild_id = ?1;")?;
