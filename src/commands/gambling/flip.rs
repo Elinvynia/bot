@@ -44,15 +44,14 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         new_amount = money - bet;
     };
 
+    let rolled: Coin = roll.into();
+
     set_user_money(guildid, userid, new_amount).await?;
 
     msg.channel_id
         .say(
             &ctx,
-            &format!(
-                "Your Side: {}\nRolled: {}\nYou now have: {}",
-                coin, roll_coin, new_amount
-            ),
+            &format!("Your Side: {}\nRolled: {}\nYou now have: {}", coin, rolled, new_amount),
         )
         .await?;
 
@@ -65,11 +64,20 @@ enum Coin {
     Tails,
 }
 
+impl From<bool> for Coin {
+    fn from(b: bool) -> Self {
+        match b {
+            true => Coin::Heads,
+            false => Coin::Tails,
+        }
+    }
+}
+
 impl From<Coin> for bool {
     fn from(coin: Coin) -> Self {
         match coin {
             Coin::Heads => true,
-            Coin::Tails => true,
+            Coin::Tails => false,
         }
     }
 }
