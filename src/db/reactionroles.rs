@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use log::info;
 use serenity::{collector::*, futures::StreamExt, model::prelude::*, prelude::*};
 
 pub struct ReactionResponse {

@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use log::info;
 use serenity::{model::prelude::*, prelude::*};
 use std::collections::HashMap;
 

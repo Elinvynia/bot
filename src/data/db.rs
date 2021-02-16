@@ -1,12 +1,6 @@
 use crate::prelude::*;
 use std::convert::TryFrom;
 
-#[derive(Debug)]
-pub struct LeaderboardEntry {
-    pub user_id: String,
-    pub points: i64,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LogType {
     MessageDeleted = 1 << 1,
@@ -46,7 +40,7 @@ impl std::fmt::Display for LogType {
 }
 
 impl TryFrom<String> for LogType {
-    type Error = String;
+    type Error = anyhow::Error;
     fn try_from(s: String) -> Result<Self, Self::Error> {
         match s.as_str() {
             "delete" => Ok(LogType::MessageDeleted),
@@ -61,7 +55,7 @@ impl TryFrom<String> for LogType {
             "voiceupdate" => Ok(LogType::VoiceUpdate),
             "presenceupdate" => Ok(LogType::PresenceUpdate),
             "all" => Ok(LogType::All),
-            _ => Err("Log type not found".into()),
+            _ => Err(anyhow!("Log type not found")),
         }
     }
 }

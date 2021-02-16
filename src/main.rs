@@ -18,6 +18,7 @@ pub mod utils;
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().expect("Failed to initialize dotenv.");
+    env_logger::init();
 
     let mut settings = config::Config::default();
     settings

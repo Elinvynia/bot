@@ -59,7 +59,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 
     sql_block!({
         let mut s = conn.prepare("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")?;
-        s.execute(&[(log_type as i64).to_string(), guild_id.to_string()])?;
+        s.execute(params![(log_type as i64), guild_id.to_string()])?;
     })?;
 
     log_channel.say(&ctx, message).await?;
