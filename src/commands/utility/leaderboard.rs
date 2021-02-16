@@ -52,8 +52,12 @@ async fn parse_user_score(ctx: &Context, msg: &Message, user_id: UserId) -> Comm
     let rows = get_single_scores(guild_id, user_id).await?;
     let member = guild_id.member(ctx, user_id).await?;
 
+    let mut processed = 0;
     let mut result = String::new();
     for row in rows {
+        if processed == 10 {
+            break;
+        }
         let cid = match parse_chan(&row.channel_id, Some(&guild_id), Some(&ctx)).await {
             Some(id) => id,
             None => continue,
@@ -63,6 +67,7 @@ async fn parse_user_score(ctx: &Context, msg: &Message, user_id: UserId) -> Comm
             Err(_) => continue,
         };
         result += &format!("{} - {}\n", channel, row.points)[..];
+        processed += 1;
     }
 
     msg.channel_id
@@ -78,9 +83,10 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, channel_id: ChannelId
     let rows = get_channel_scores(guild_id, channel_id).await?;
     let mut result = String::new();
 
+    let mut user_found = false;
     let mut processed = 0;
     for x in rows.iter() {
-        if processed == 10 {
+        if processed >= 10 && user_found {
             break;
         };
         let id = x.user_id.parse::<u64>()?;
@@ -88,7 +94,16 @@ async fn parse_channel_score(ctx: &Context, msg: &Message, channel_id: ChannelId
             Ok(m) => m,
             Err(_) => continue,
         };
-        result += &format!("{}. {} - {}\n", processed + 1, member.display_name(), x.points)[..];
+        if processed < 10 {
+            result += &format!("{}. {} - {}\n", processed + 1, member.display_name(), x.points)[..];
+            if member.user == msg.author {
+                user_found = true;
+            };
+        } else if member.user == msg.author {
+            result += "...\n";
+            result += &format!("{}. {} - {}\n", processed + 1, member.display_name(), x.points)[..];
+            break;
+        }
         processed += 1;
     }
 
