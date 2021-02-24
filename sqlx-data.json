@@ -1,0 +1,411 @@
+{
+  "db": "SQLite",
+  "0058e95a08844662b1425e9ab4df398ba2e626a268b21da0e26ca18070826173": {
+    "query": "INSERT INTO money (guild_id, user_id) values (?1, ?2);",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "0089a3e1bd4fba764ebde4b6213666f966709fb28a3d726a68e4167eff424c36": {
+    "query": "INSERT INTO leaderboard (guild_id, channel_id, user_id, points) VALUES (?1, ?2, ?3, ?4);",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 4
+      },
+      "nullable": []
+    }
+  },
+  "0b7a51dd40385778ddc576a8f2f03481bd41fcebb5188782ec96041c7cc57849": {
+    "query": "SELECT prefix FROM prefix WHERE guild_id == ?1;",
+    "describe": {
+      "columns": [
+        {
+          "name": "prefix",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "14bdb08b4e4f194045cf603f73aa28e411de8bdb461b8a3b3d450c702f0d20a3": {
+    "query": "UPDATE log SET log_type = ?1 WHERE guild_id = ?2;",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "1dfedc9c3a589107c1c57d05be67356604819e028936e758965e1c5326e6201b": {
+    "query": "SELECT channel_id FROM log WHERE guild_id == ?1;",
+    "describe": {
+      "columns": [
+        {
+          "name": "channel_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "482be488ea24c257245c4c76d51549f4677c31f66051edc60fb61a3ca69f1c34": {
+    "query": "DELETE FROM reactionroles WHERE reaction_id = ?1 AND guild_id = ?2",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "4af1bdce3b303443b5e487486a421c312e93b051de6ee463a726a004874c5c64": {
+    "query": "SELECT user_id, channel_id, SUM(points) as \"points!: i64\" FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC;",
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "channel_id",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "points!: i64",
+          "ordinal": 2,
+          "type_info": "Null"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        null
+      ]
+    }
+  },
+  "5454b5b6047281708b41cd1afb7bd0bb682111b78c480f0fe01d51beb5d201ab": {
+    "query": "SELECT user_id, channel_id, points FROM leaderboard WHERE guild_id == ?1 AND user_id == ?2 ORDER BY points DESC;",
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "channel_id",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "points",
+          "ordinal": 2,
+          "type_info": "Int64"
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "56bbefeb8382e9188480f7c5bd954bbe6db2eac5f0578fa9f7e58d373306b36c": {
+    "query": "SELECT log_type FROM log WHERE guild_id == ?1;",
+    "describe": {
+      "columns": [
+        {
+          "name": "log_type",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "5bd263845be52169a7ed3471e65715571aafc59097c31b2b58d2804afbec0bbd": {
+    "query": "CREATE TABLE IF NOT EXISTS prefix (guild_id TEXT PRIMARY KEY, prefix TEXT NOT NULL);",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
+  "6051e5d58acc61a80d31bf7d43ce992f74536ef7af62ea9840221d0403493a6b": {
+    "query": "INSERT INTO joinrole (guild_id, role_id) values (?1, ?2)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "778613995fafbde4d2788eac7e14e3c8e41c53a255f4e25f0971fccc4f9f0246": {
+    "query": "UPDATE leaderboard SET points = ?1 WHERE guild_id == ?2 AND channel_id == ?3 AND user_id == ?4;",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 4
+      },
+      "nullable": []
+    }
+  },
+  "7c93268302011492f9b4b6efde4ec64351edf4ef2577cdee17ff1da372522f4c": {
+    "query": "CREATE TABLE IF NOT EXISTS joinrole (guild_id TEXT NOT NULL, role_id TEXT NOT NULL, PRIMARY KEY (guild_id, role_id));",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
+  "82b42439de0f711db49123d1503c7c3bd91f3476109b4daa008fff5a949d98cc": {
+    "query": "CREATE TABLE IF NOT EXISTS reactionroles (guild_id TEXT NOT NULL, message_id TEXT NOT NULL, role_id TEXT NOT NULL, reaction_id TEXT NOT NULL, PRIMARY KEY (guild_id, message_id, role_id, reaction_id));",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
+  "8376391c9b758d658c33b6e9d883c7720c415311f01c701e6cb2be225269375c": {
+    "query": "SELECT money FROM money WHERE guild_id == ?1 AND user_id == ?2;",
+    "describe": {
+      "columns": [
+        {
+          "name": "money",
+          "ordinal": 0,
+          "type_info": "Int64"
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "8aa33ebfddf08af77b5d9b5f22066b9eae7e325ba48b672895f31a65e3843729": {
+    "query": "SELECT points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 AND user_id == ?3;",
+    "describe": {
+      "columns": [
+        {
+          "name": "points",
+          "ordinal": 0,
+          "type_info": "Int64"
+        }
+      ],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "a20273424638f557183f0ff917fb994c323e645dc0a6ab3a77a4cfb2909d04ca": {
+    "query": "INSERT INTO reactionroles (guild_id, message_id, role_id, reaction_id) values (?1, ?2, ?3, ?4)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 4
+      },
+      "nullable": []
+    }
+  },
+  "a4f34748e49ccb57e121756f45e887fa5da60d148dc190204ee6b31610e49d6d": {
+    "query": "SELECT message_id, role_id, reaction_id FROM reactionroles",
+    "describe": {
+      "columns": [
+        {
+          "name": "message_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "role_id",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "reaction_id",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "a9d8fa717a04fec476ce5dea60f17ae0f9507296155ade60c7cafec4bc3a2f87": {
+    "query": "INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
+  "bd2e3b92573f374e79776d1fa2246ecb71d53f0bce6dadd19d5829ba51460096": {
+    "query": "DELETE FROM joinrole WHERE guild_id = ?1;",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
+    }
+  },
+  "c1367685c928e2322fa0a41c2f379a39bf6eec83238d59f47b3237b4ee5cbe9e": {
+    "query": "SELECT role_id FROM joinrole WHERE guild_id = ?1",
+    "describe": {
+      "columns": [
+        {
+          "name": "role_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "c295bf6c333e8ae774d9a3cf94f7517fb4cefdc5274a2dc270247f7466fc60fd": {
+    "query": "CREATE TABLE IF NOT EXISTS log (guild_id TEXT PRIMARY KEY, channel_id TEXT NOT NULL, log_type TEXT NOT NULL);",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
+  "d2c92a89316104faacf2d3ed62f38155c672f7a73d87f36631cbf3ee18d83fe8": {
+    "query": "CREATE TABLE IF NOT EXISTS leaderboard (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, channel_id TEXT NOT NULL, points INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY (guild_id, user_id, channel_id));",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
+  "dc3dd3dbb5b9e19d1ca905b0c9b0875b9810dab4ebeb013987197c887858f759": {
+    "query": "UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "dd425c960cbf5cf12ebcf81353821daf1a44bb6893425c4a3edb5fb68ac5f77b": {
+    "query": "INSERT OR REPLACE INTO prefix (guild_id, prefix) values (?1, ?2)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "e8fc61e4c3727cc2489f678361c44e0c57d81ea8045c630d255e756ee2a748cf": {
+    "query": "INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
+  "e9f67106e6575f0afd5abd0be5dfaeb2371865220bdd1c3812535bc2c644278b": {
+    "query": "CREATE TABLE IF NOT EXISTS money (guild_id TEXT NOT NULL, user_id TEXT NOT NULL, money INTEGER DEFAULT 0 NOT NULL, PRIMARY KEY (guild_id, user_id));",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
+  "eea69ed7a41a87deccb209230551e308eb558074507f824d72637e96f8247bde": {
+    "query": "SELECT user_id, channel_id, points FROM leaderboard WHERE guild_id == ?1 AND channel_id == ?2 ORDER BY points DESC;",
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "channel_id",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "points",
+          "ordinal": 2,
+          "type_info": "Int64"
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false,
+        false,
+        false
+      ]
+    }
+  }
+}

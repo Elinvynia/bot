@@ -8,9 +8,13 @@ edition = "2018"
 [dependencies]
 serenity = { version = "0.10", features = ["collector"] }
 tokio  = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-rusqlite = { version = "0.24", features = ["bundled"] }
-rand = "0.7"
+sqlx = { version = "0.5", features = ["runtime-tokio-native-tls", "sqlite", "offline"] }
 anyhow = "1.0"
+
+# Utils
+rand = "0.7"
+
+# Logging
 dotenv = "0.15"
 config = "0.10"
 log = "0.4"

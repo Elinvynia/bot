@@ -2,10 +2,11 @@ use crate::prelude::*;
 use serenity::model::prelude::*;
 
 pub async fn get_prefix(guildid: GuildId) -> Result<String> {
-    let conn = connect()?;
-    let gid: i64 = guildid.into();
+    let mut conn = connect().await?;
+    let gid = guildid.to_string();
 
-    let mut s = conn.prepare("SELECT prefix FROM prefix WHERE guild_id == ?1;")?;
-    let r = s.query_row(params![gid], |r| r.get(0))?;
-    Ok(r)
+    let r = sqlx::query!("SELECT prefix FROM prefix WHERE guild_id == ?1;", gid)
+        .fetch_one(&mut conn)
+        .await?;
+    Ok(r.prefix)
 }

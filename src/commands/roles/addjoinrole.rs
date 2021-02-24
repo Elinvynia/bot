@@ -13,7 +13,7 @@ use serenity::{
 #[usage("addjoinrole <role>")]
 #[example("addjoinrole New")]
 async fn addjoinrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let conn = connect()?;
+    let mut conn = connect().await?;
     let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
     let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(&ctx)).await {
@@ -24,10 +24,10 @@ async fn addjoinrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
         None => return Ok(()),
     };
 
-    sql_block!({
-        let mut s = conn.prepare("INSERT INTO joinrole (guild_id, role_id) values (?1, ?2)")?;
-        s.execute(params![gid.to_string(), role.id.to_string()])?;
-    })?;
+    let (gid, rid) = (gid.to_string(), role.id.to_string());
+    sqlx::query!("INSERT INTO joinrole (guild_id, role_id) values (?1, ?2)", gid, rid)
+        .execute(&mut conn)
+        .await?;
 
     msg.channel_id
         .say(&ctx, format!("Join role {} added!", role.name))

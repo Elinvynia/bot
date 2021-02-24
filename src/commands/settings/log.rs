@@ -15,7 +15,7 @@ use std::convert::TryInto;
 #[usage = "log  |  log <enable|disable> <category>"]
 #[example = "log enable join"]
 async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let conn = connect()?;
+    let mut conn = connect().await?;
 
     let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found"))?;
     let channel_id = msg.channel_id.to_string();
@@ -57,30 +57,39 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         _ => return Ok(()),
     }
 
-    sql_block!({
-        let mut s = conn.prepare("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;")?;
-        s.execute(params![(log_type as i64), guild_id.to_string()])?;
-    })?;
+    let gid = guild_id.to_string();
+    sqlx::query!("UPDATE log SET log_type = ?1 WHERE guild_id = ?2;", log_type, gid)
+        .execute(&mut conn)
+        .await?;
 
     log_channel.say(&ctx, message).await?;
 
     Ok(())
 }
 
-async fn log_channel(ctx: &Context, msg: &Message, conn: Connection, guild_id: GuildId, cid: String) -> CommandResult {
+async fn log_channel(
+    ctx: &Context,
+    msg: &Message,
+    mut conn: SqliteConnection,
+    guild_id: GuildId,
+    cid: String,
+) -> CommandResult {
     let gid = guild_id.to_string();
     if get_log_channel(guild_id).await.is_ok() {
-        sql_block!({
-            let mut s = conn.prepare("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;")?;
-            s.execute(params![cid, gid])?;
-        })?;
+        sqlx::query!("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;", cid, gid)
+            .execute(&mut conn)
+            .await?;
         let log_channel = get_log_channel(guild_id).await?;
         log_channel.say(&ctx, "Log channel updated!").await?;
     } else {
-        sql_block!({
-            let mut s = conn.prepare("INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)")?;
-            s.execute(params![gid, cid, LogType::All as i64])?;
-        })?;
+        sqlx::query!(
+            "INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)",
+            gid,
+            cid,
+            LogType::All as i64
+        )
+        .execute(&mut conn)
+        .await?;
         msg.channel_id.say(&ctx, "Log channel set!").await?;
     };
     Ok(())

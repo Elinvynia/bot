@@ -12,13 +12,13 @@ use serenity::{
 #[usage("removejoinrole")]
 #[example("removejoinrole")]
 async fn removejoinrole(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
-    let conn = connect()?;
+    let mut conn = connect().await?;
     let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
-    sql_block!({
-        let mut s = conn.prepare("REMOVE FROM joinrole WHERE guild_id = ?1;")?;
-        s.execute(params![gid.to_string()])?;
-    })?;
+    let gid = gid.to_string();
+    sqlx::query!("DELETE FROM joinrole WHERE guild_id = ?1;", gid)
+        .execute(&mut conn)
+        .await?;
 
     msg.channel_id.say(&ctx, "Join role removed!").await?;
 

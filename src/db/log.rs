@@ -29,15 +29,19 @@ pub async fn log_channel_say(ctx: &Context, guildid: GuildId, message: &str) -> 
 }
 
 pub async fn get_log_channel(guildid: GuildId) -> Result<ChannelId> {
-    let conn = connect()?;
-    let mut s = conn.prepare("SELECT channel_id FROM log WHERE guild_id == ?1;")?;
-    let cid: String = s.query_row(params![guildid.to_string()], |r| r.get(0))?;
-    Ok(ChannelId(cid.parse().unwrap()))
+    let mut conn = connect().await?;
+    let gid = guildid.to_string();
+    let row = sqlx::query!("SELECT channel_id FROM log WHERE guild_id == ?1;", gid)
+        .fetch_one(&mut conn)
+        .await?;
+    Ok(ChannelId(row.channel_id.parse().unwrap()))
 }
 
 pub async fn get_log_type(guildid: GuildId) -> Result<i64> {
-    let conn = connect()?;
-    let mut s = conn.prepare("SELECT log_type FROM log WHERE guild_id == ?1;")?;
-    let log_type: String = s.query_row(params![guildid.to_string()], |r| r.get(0))?;
-    Ok(log_type.parse().unwrap())
+    let mut conn = connect().await?;
+    let gid = guildid.to_string();
+    let row = sqlx::query!("SELECT log_type FROM log WHERE guild_id == ?1;", gid)
+        .fetch_one(&mut conn)
+        .await?;
+    Ok(row.log_type.parse().unwrap())
 }

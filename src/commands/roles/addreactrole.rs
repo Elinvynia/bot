@@ -15,7 +15,7 @@ use serenity::{
 #[usage("addreactrole <emoji> <role>")]
 #[example("addreactrole :heart: Admin")]
 async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let conn = connect()?;
+    let mut conn = connect().await?;
     let x = msg
         .channel(ctx)
         .await
@@ -59,17 +59,21 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
 
     msg.delete(&ctx).await?;
 
-    sql_block!({
-        let mut s = conn.prepare(
-            "INSERT INTO reactionroles (guild_id, message_id, role_id, reaction_id) values (?1, ?2, ?3, ?4)",
-        )?;
-        s.execute(params![
-            gid.to_string(),
-            parent_msg.id.to_string(),
-            roleid.to_string(),
-            reactionid.to_string()
-        ])?;
-    })?;
+    let (gid, msgid, rid, reaid) = (
+        gid.to_string(),
+        parent_msg.id.to_string(),
+        roleid.to_string(),
+        reactionid.to_string(),
+    );
+    sqlx::query!(
+        "INSERT INTO reactionroles (guild_id, message_id, role_id, reaction_id) values (?1, ?2, ?3, ?4)",
+        gid,
+        msgid,
+        rid,
+        reaid
+    )
+    .execute(&mut conn)
+    .await?;
 
     let ctx = ctx.clone();
     tokio::spawn(async move {
