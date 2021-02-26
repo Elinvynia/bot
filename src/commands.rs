@@ -8,11 +8,11 @@ pub use generic::*;
 pub mod admin;
 pub use admin::*;
 #[group]
-#[commands(ban, kick)]
+#[commands(ban, kick, exec)]
 struct Admin;
 
-pub mod gambling;
-pub use gambling::*;
+pub mod games;
+pub use games::*;
 #[group]
 #[commands(setmoney, betroll, money, flip, give)]
 struct Gambling;

@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use serenity::model::prelude::*;
 
-pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<i64> {
+pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<u64> {
     let mut conn = connect().await?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
@@ -15,7 +15,7 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<i64> {
     .await?;
 
     match result {
-        Some(row) => Ok(row.money),
+        Some(row) => Ok(row.money as u64),
         None => {
             sqlx::query!("INSERT INTO money (guild_id, user_id) values (?1, ?2);", gid, uid)
                 .execute(&mut conn)
@@ -25,16 +25,17 @@ pub async fn get_user_money(guildid: GuildId, userid: UserId) -> Result<i64> {
     }
 }
 
-pub async fn set_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Result<()> {
+pub async fn set_user_money(guildid: GuildId, userid: UserId, amount: u64) -> Result<()> {
     let mut conn = connect().await?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
+    let converted = amount as i64;
     sqlx::query!(
         "INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);",
         gid,
         uid,
-        amount
+        converted
     )
     .execute(&mut conn)
     .await?;
@@ -42,14 +43,14 @@ pub async fn set_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Re
     Ok(())
 }
 
-pub async fn add_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Result<()> {
+pub async fn add_user_money(guildid: GuildId, userid: UserId, amount: u64) -> Result<()> {
     let money = get_user_money(guildid, userid).await?;
 
     let mut conn = connect().await?;
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    let change = money + amount;
+    let change = (money + amount) as i64;
     sqlx::query!(
         "INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);",
         gid,
@@ -62,7 +63,7 @@ pub async fn add_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Re
     Ok(())
 }
 
-pub async fn remove_user_money(guildid: GuildId, userid: UserId, amount: i64) -> Result<()> {
+pub async fn remove_user_money(guildid: GuildId, userid: UserId, amount: u64) -> Result<()> {
     let money = get_user_money(guildid, userid).await?;
 
     if amount > money {
@@ -73,7 +74,7 @@ pub async fn remove_user_money(guildid: GuildId, userid: UserId, amount: i64) ->
     let gid: i64 = guildid.into();
     let uid: i64 = userid.into();
 
-    let change = money - amount;
+    let change = (money - amount) as i64;
     sqlx::query!(
         "INSERT OR REPLACE INTO money (guild_id, user_id, money) values (?1, ?2, ?3);",
         gid,

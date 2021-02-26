@@ -13,6 +13,7 @@ anyhow = "1.0"
 
 # Utils
 rand = "0.7"
+evcxr = "0.8"
 
 # Logging
 dotenv = "0.15"

@@ -17,7 +17,7 @@ async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult 
     let userid = msg.author.id;
 
     let money = get_user_money(guildid, userid).await?;
-    let bet: i64 = error_return_ok!(args.single());
+    let bet: u64 = error_return_ok!(args.single());
 
     if bet == 0 {
         return Ok(());

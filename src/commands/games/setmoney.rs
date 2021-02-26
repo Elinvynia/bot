@@ -17,7 +17,7 @@ async fn setmoney(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult
     let user_arg: String = error_return_ok!(args.single());
     let user_id = none_return_ok!(parse_user(&user_arg, Some(&guild_id), Some(&ctx)).await);
 
-    let amount: i64 = error_return_ok!(args.single());
+    let amount: u64 = error_return_ok!(args.single());
     let member = guild_id.member(&ctx, user_id).await?;
 
     set_user_money(guild_id, user_id, amount).await?;

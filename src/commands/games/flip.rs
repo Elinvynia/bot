@@ -17,7 +17,7 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let userid = msg.author.id;
 
     let money = get_user_money(guildid, userid).await?;
-    let bet: i64 = error_return_ok!(args.single());
+    let bet: u64 = error_return_ok!(args.single());
 
     let coin = match &args.single::<String>()?[..] {
         "h" | "heads" => Coin::Heads,
