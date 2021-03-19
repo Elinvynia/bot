@@ -37,16 +37,16 @@ pub async fn parse_user(name: &str, optional_gid: Option<&GuildId>, optional_ctx
         }
     }
 
-    if let Some(m) = guild.member_named(&name[..]) {
+    if let Some(m) = guild.member_named(name) {
         return Some(m.user.id);
     }
 
-    if let Some(m) = guild.members_starting_with(&name[..], false, true).await.get(0) {
+    if let Some(m) = guild.members_starting_with(name, false, true).await.get(0) {
         let (mem, _) = m;
         return Some(mem.user.id);
     }
 
-    if let Some(m) = guild.members_containing(&name[..], false, true).await.get(0) {
+    if let Some(m) = guild.members_containing(name, false, true).await.get(0) {
         let (mem, _) = m;
         return Some(mem.user.id);
     }

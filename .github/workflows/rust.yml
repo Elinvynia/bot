@@ -1,42 +1,53 @@
 name: Rust
 on:
-  push:
-    branches:
-    - master
   pull_request:
     branches:
     - master
+    paths:
+    - "**.rs"
+    - "**Cargo.lock"
+    - "**Cargo.toml"
+  push:
+    branches:
+    - master
+    paths:
+    - "**.rs"
+    - "**Cargo.lock"
+    - "**Cargo.toml"
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        type: [stable, nightly, windows, macos]
-        include:
-          - type: stable
-            rust: stable
-            os: ubuntu-latest
-          - type: nightly
-            rust: nightly
-            os: ubuntu-latest
-          - type: windows
-            rust: stable
-            os: windows-latest
-          - type: macos
-            rust: stable
-            os: macos-latest
-    runs-on: ${{ matrix.os }}
-    steps:
-    - uses: actions/checkout@v2
-    - run: rustup default ${{ matrix.rust }}
-    - run: cargo build
-    - run: cargo test
-
   clippy:
+    needs: format
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: cargo clippy
+    - uses: Swatinem/rust-cache@v1
+    - run: cargo clippy -- -D warnings
+
+  stable:
+    needs: format
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: Swatinem/rust-cache@v1
+    - run: cargo test
+
+  nightly:
+    needs: format
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: rustup default nightly-2021-01-06
+    - uses: Swatinem/rust-cache@v1
+    - run: cargo test
+
+  windows:
+    needs: format
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: Swatinem/rust-cache@v1
+    - run: cargo test
 
   format:
     runs-on: ubuntu-latest

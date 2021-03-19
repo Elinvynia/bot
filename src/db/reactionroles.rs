@@ -39,45 +39,33 @@ pub async fn start_reactions(ctx: &Context) -> Result<()> {
         tokio::spawn(async move {
             let http = &ctx.http;
             while let Some(event) = collector.next().await {
-                match event.as_ref() {
-                    ReactionAction::Added(a) => {
-                        let uid = match a.user_id {
-                            Some(id) => id,
-                            None => continue,
-                        };
-                        let gid = match a.guild_id {
-                            Some(id) => id,
-                            None => continue,
-                        };
-                        let guild = match gid.to_partial_guild(&http).await {
-                            Ok(g) => g,
-                            Err(_) => continue,
-                        };
-                        let mut member = match guild.member(&ctx, uid).await {
-                            Ok(m) => m,
-                            Err(_) => continue,
-                        };
+                if let ReactionAction::Added(a) = event.as_ref() {
+                    let uid = match a.user_id {
+                        Some(id) => id,
+                        None => continue,
+                    };
+                    let gid = match a.guild_id {
+                        Some(id) => id,
+                        None => continue,
+                    };
+                    let guild = match gid.to_partial_guild(&http).await {
+                        Ok(g) => g,
+                        Err(_) => continue,
+                    };
+                    let mut member = match guild.member(&ctx, uid).await {
+                        Ok(m) => m,
+                        Err(_) => continue,
+                    };
+                    let roles = match member.roles(&ctx).await {
+                        Some(r) => r,
+                        None => continue,
+                    };
+                    if roles.iter().any(|role| role.id == role_id) {
+                        let _ = member.remove_role(&http, role_id).await;
+                    } else {
                         let _ = member.add_role(&http, role_id).await;
                     }
-                    ReactionAction::Removed(r) => {
-                        let uid = match r.user_id {
-                            Some(id) => id,
-                            None => continue,
-                        };
-                        let gid = match r.guild_id {
-                            Some(id) => id,
-                            None => continue,
-                        };
-                        let guild = match gid.to_partial_guild(&http).await {
-                            Ok(g) => g,
-                            Err(_) => continue,
-                        };
-                        let mut member = match guild.member(&ctx, uid).await {
-                            Ok(m) => m,
-                            Err(_) => continue,
-                        };
-                        let _ = member.remove_role(&http, role_id).await;
-                    }
+                    let _ = a.delete(&ctx).await;
                 };
             }
         });

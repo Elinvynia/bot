@@ -22,6 +22,22 @@ async fn removereactrole(ctx: &Context, msg: &Message, mut args: Args) -> Comman
     };
 
     let (rid, gid) = (reaction.id.to_string(), gid.to_string());
+    let result = sqlx::query!(
+        "SELECT message_id FROM reactionroles WHERE reaction_id = ?1 AND guild_id = ?2",
+        rid,
+        gid
+    )
+    .fetch_one(&mut conn)
+    .await?;
+
+    if let Ok(m) = ctx
+        .http
+        .get_message(*msg.channel_id.as_u64(), result.message_id.parse()?)
+        .await
+    {
+        m.delete(&ctx).await?;
+    }
+
     sqlx::query!(
         "DELETE FROM reactionroles WHERE reaction_id = ?1 AND guild_id = ?2",
         rid,

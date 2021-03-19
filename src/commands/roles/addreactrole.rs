@@ -24,6 +24,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
         .ok_or_else(|| anyhow!("Guild not found."))?
         .messages(ctx, |builder| builder.before(msg.id).limit(1))
         .await?;
+
     if x.is_empty() {
         return Ok(());
     };
@@ -47,7 +48,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     let parent_msg = x.get(0).ok_or_else(|| anyhow!("Parent message not found."))?.clone();
     parent_msg.react(&ctx, reaction).await?;
 
-    let roleid = role.id;
+    let role_id = role.id;
     let mut collector = ReactionCollectorBuilder::new(&ctx)
         .message_id(parent_msg.id)
         .removed(true)
@@ -62,7 +63,7 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     let (gid, msgid, rid, reaid) = (
         gid.to_string(),
         parent_msg.id.to_string(),
-        roleid.to_string(),
+        role_id.to_string(),
         reactionid.to_string(),
     );
     sqlx::query!(
@@ -79,45 +80,33 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
     tokio::spawn(async move {
         let http = &ctx.http;
         while let Some(event) = collector.next().await {
-            match event.as_ref() {
-                ReactionAction::Added(a) => {
-                    let uid = match a.user_id {
-                        Some(id) => id,
-                        None => continue,
-                    };
-                    let gid = match a.guild_id {
-                        Some(id) => id,
-                        None => continue,
-                    };
-                    let guild = match gid.to_partial_guild(&http).await {
-                        Ok(g) => g,
-                        Err(_) => continue,
-                    };
-                    let mut member = match guild.member(&ctx, uid).await {
-                        Ok(m) => m,
-                        Err(_) => continue,
-                    };
-                    let _ = member.add_role(&http, roleid).await;
+            if let ReactionAction::Added(a) = event.as_ref() {
+                let uid = match a.user_id {
+                    Some(id) => id,
+                    None => continue,
+                };
+                let gid = match a.guild_id {
+                    Some(id) => id,
+                    None => continue,
+                };
+                let guild = match gid.to_partial_guild(&http).await {
+                    Ok(g) => g,
+                    Err(_) => continue,
+                };
+                let mut member = match guild.member(&ctx, uid).await {
+                    Ok(m) => m,
+                    Err(_) => continue,
+                };
+                let roles = match member.roles(&ctx).await {
+                    Some(r) => r,
+                    None => continue,
+                };
+                if roles.iter().any(|role| role.id == role_id) {
+                    let _ = member.remove_role(&http, role_id).await;
+                } else {
+                    let _ = member.add_role(&http, role_id).await;
                 }
-                ReactionAction::Removed(r) => {
-                    let uid = match r.user_id {
-                        Some(id) => id,
-                        None => continue,
-                    };
-                    let gid = match r.guild_id {
-                        Some(id) => id,
-                        None => continue,
-                    };
-                    let guild = match gid.to_partial_guild(&http).await {
-                        Ok(g) => g,
-                        Err(_) => continue,
-                    };
-                    let mut member = match guild.member(&ctx, uid).await {
-                        Ok(m) => m,
-                        Err(_) => continue,
-                    };
-                    let _ = member.remove_role(&http, roleid).await;
-                }
+                let _ = a.delete(&ctx.http).await;
             };
         }
     });

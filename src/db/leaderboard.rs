@@ -88,14 +88,15 @@ pub async fn get_user_scores(guildid: GuildId) -> Result<Vec<LeaderboardEntry>> 
     let mut conn = connect().await?;
 
     let gid = guildid.to_string();
-    let mut result = sqlx::query!(r#"SELECT user_id, channel_id, SUM(points) as "points!: i64" FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC;"#,
+    let mut result = sqlx::query!(r#"SELECT user_id, SUM(points) as "points!: i64" FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY "points!: i64" DESC;"#,
         gid).fetch(&mut conn);
 
     let mut rows = vec![];
     while let Ok(Some(row)) = result.try_next().await {
+        println!("got user {} with {} points", &row.user_id, row.points);
         rows.push(LeaderboardEntry {
             user_id: row.user_id,
-            channel_id: row.channel_id,
+            channel_id: "".into(),
             points: row.points,
         })
     }
