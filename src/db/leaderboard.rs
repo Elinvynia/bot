@@ -93,7 +93,6 @@ pub async fn get_user_scores(guildid: GuildId) -> Result<Vec<LeaderboardEntry>> 
 
     let mut rows = vec![];
     while let Ok(Some(row)) = result.try_next().await {
-        println!("got user {} with {} points", &row.user_id, row.points);
         rows.push(LeaderboardEntry {
             user_id: row.user_id,
             channel_id: "".into(),

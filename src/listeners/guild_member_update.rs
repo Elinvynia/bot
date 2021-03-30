@@ -52,6 +52,10 @@ pub async fn guild_member_update(ctx: Context, old_if_available: Option<Member>,
                 message.add_file(url.as_str());
             };
             message.content(content);
+            message.allowed_mentions(|am| {
+                am.empty_parse();
+                am
+            });
             message
         })
         .await;
