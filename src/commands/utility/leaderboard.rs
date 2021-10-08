@@ -22,7 +22,7 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
                 .ok_or_else(|| anyhow!("Argument not found."))?
                 .to_string(),
             Some(&guild_id),
-            Some(&ctx),
+            Some(ctx),
         )
         .await
         {
@@ -35,7 +35,7 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
                 .ok_or_else(|| anyhow!("Argument not found."))?
                 .to_string(),
             Some(&guild_id),
-            Some(&ctx),
+            Some(ctx),
         )
         .await
         {
@@ -58,7 +58,7 @@ async fn parse_user_score(ctx: &Context, msg: &Message, user_id: UserId) -> Comm
         if processed == 10 {
             break;
         }
-        let cid = match parse_chan(&row.channel_id, Some(&guild_id), Some(&ctx)).await {
+        let cid = match parse_chan(&row.channel_id, Some(&guild_id), Some(ctx)).await {
             Some(id) => id,
             None => continue,
         };

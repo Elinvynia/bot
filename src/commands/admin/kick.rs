@@ -18,7 +18,7 @@ async fn kick(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
     let kicked_arg: String = error_return_ok!(args.single());
-    let kicked_id = none_return_ok!(parse_user(&kicked_arg, Some(&guild_id), Some(&ctx)).await);
+    let kicked_id = none_return_ok!(parse_user(&kicked_arg, Some(&guild_id), Some(ctx)).await);
 
     let kicked = kicked_id.to_user(ctx).await?;
     let reason = format!("Eli Bot | {}", args.single::<String>().unwrap_or_else(|_| "".into()));

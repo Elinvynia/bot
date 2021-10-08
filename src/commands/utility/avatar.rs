@@ -15,7 +15,7 @@ async fn avatar(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let user_id;
     if args.len() == 1 && msg.guild_id.is_some() {
         let arg: String = error_return_ok!(args.quoted().single());
-        user_id = none_return_ok!(parse_user(&arg, msg.guild_id.as_ref(), Some(&ctx)).await);
+        user_id = none_return_ok!(parse_user(&arg, msg.guild_id.as_ref(), Some(ctx)).await);
     } else {
         user_id = msg.author.id;
     };

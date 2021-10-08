@@ -61,7 +61,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         .execute(&mut conn)
         .await?;
 
-    log_channel_say(&ctx, guild_id, &message).await?;
+    log_channel_say(ctx, guild_id, &message).await?;
 
     Ok(())
 }
@@ -78,7 +78,7 @@ async fn log_channel(
         sqlx::query!("UPDATE log SET channel_id = ?1 WHERE guild_id == ?2;", cid, gid)
             .execute(&mut conn)
             .await?;
-        log_channel_say(&ctx, guild_id, "Log channel updated!").await?;
+        log_channel_say(ctx, guild_id, "Log channel updated!").await?;
     } else {
         sqlx::query!(
             "INSERT INTO log (guild_id, channel_id, log_type) values (?1, ?2, ?3)",

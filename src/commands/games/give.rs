@@ -14,7 +14,7 @@ use serenity::{
 async fn give(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
     let user_arg: String = error_return_ok!(args.single());
-    let user_id = none_return_ok!(parse_user(&user_arg, Some(&guild_id), Some(&ctx)).await);
+    let user_id = none_return_ok!(parse_user(&user_arg, Some(&guild_id), Some(ctx)).await);
     let amount: u64 = error_return_ok!(args.single());
 
     let author = guild_id.member(&ctx, msg.author.id).await?;

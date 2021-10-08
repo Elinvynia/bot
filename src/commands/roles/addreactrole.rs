@@ -31,12 +31,12 @@ async fn addreactrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
 
     let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
-    let reaction = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
+    let reaction = match parse_reaction(&args.single::<String>()?, &gid, ctx).await {
         Some(r) => r,
         None => return Ok(()),
     };
 
-    let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(&ctx)).await {
+    let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(ctx)).await {
         Some(rid) => match rid.to_role_cached(&ctx.cache).await {
             Some(r) => r,
             None => return Ok(()),

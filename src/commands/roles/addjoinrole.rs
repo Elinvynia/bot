@@ -16,7 +16,7 @@ async fn addjoinrole(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
     let mut conn = connect().await?;
     let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
-    let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(&ctx)).await {
+    let role = match parse_rol(&args.single::<String>()?, Some(&gid), Some(ctx)).await {
         Some(rid) => rid
             .to_role_cached(&ctx.cache)
             .await

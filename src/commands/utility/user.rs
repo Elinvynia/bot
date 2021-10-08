@@ -17,7 +17,7 @@ async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         let name: String = error_return_ok!(args.single());
         let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
-        user_id = none_return_ok!(parse_user(&name, Some(&gid), Some(&ctx)).await);
+        user_id = none_return_ok!(parse_user(&name, Some(&gid), Some(ctx)).await);
     } else {
         user_id = msg.author.id
     }

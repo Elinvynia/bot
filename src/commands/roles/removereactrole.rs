@@ -16,7 +16,7 @@ async fn removereactrole(ctx: &Context, msg: &Message, mut args: Args) -> Comman
     let mut conn = connect().await?;
     let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
-    let reaction = match parse_reaction(&args.single::<String>()?, &gid, &ctx).await {
+    let reaction = match parse_reaction(&args.single::<String>()?, &gid, ctx).await {
         Some(r) => r,
         None => return Ok(()),
     };

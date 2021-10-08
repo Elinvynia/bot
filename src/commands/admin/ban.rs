@@ -18,7 +18,7 @@ async fn ban(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
     let banned_arg: String = error_return_ok!(args.single());
-    let banned_id = none_return_ok!(parse_user(&banned_arg, Some(&guild_id), Some(&ctx)).await);
+    let banned_id = none_return_ok!(parse_user(&banned_arg, Some(&guild_id), Some(ctx)).await);
 
     let banned = banned_id.to_user(ctx).await?;
     let reason = format!("Eli Bot | {}", args.single::<String>().unwrap_or_else(|_| "".into()));
