@@ -8,7 +8,7 @@ pub use generic::*;
 pub mod admin;
 pub use admin::*;
 #[group]
-#[commands(ban, kick, exec)]
+#[commands(ban, kick)]
 struct Admin;
 
 pub mod games;

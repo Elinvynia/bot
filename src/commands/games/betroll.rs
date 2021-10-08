@@ -28,7 +28,7 @@ async fn betroll(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult 
         return Ok(());
     };
 
-    let roll: i64 = rand::thread_rng().gen_range(1, 101);
+    let roll: i64 = rand::thread_rng().gen_range(1..=100);
     let new_amount;
 
     if roll == 100 {

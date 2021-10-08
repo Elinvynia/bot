@@ -17,7 +17,6 @@ pub mod utils;
 
 #[tokio::main]
 async fn main() {
-    evcxr::runtime_hook();
     dotenv::dotenv().expect("Failed to initialize dotenv.");
     env_logger::init();
 

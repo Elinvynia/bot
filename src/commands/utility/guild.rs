@@ -65,7 +65,6 @@ async fn guild(ctx: &Context, msg: &Message) -> CommandResult {
     message += &format!("**Premium Tier:** {}\n", tier);
     message += &format!("**Boosters:** {}\n", guild.premium_subscription_count);
     message += &format!("**Owner:** {}\n", owner);
-    message += &format!("**Region:** {}\n", guild.region);
     message += &format!("**Content Filter:** {}\n", filter);
     message += &format!("**Notification Level:** {}\n", notifications);
     message += &format!("**Verification Level:** {}\n", verification);

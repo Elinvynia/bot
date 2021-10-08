@@ -12,11 +12,10 @@ sqlx = { version = "0.5", features = ["runtime-tokio-rustls", "sqlite", "offline
 anyhow = "1.0"
 
 # Utils
-rand = "0.7"
-evcxr = "0.8"
+rand = "0.8"
 
 # Logging
 dotenv = "0.15"
-config = "0.10"
+config = "0.11"
 log = "0.4"
-env_logger = "0.8"
+env_logger = "0.9"

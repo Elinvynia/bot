@@ -76,36 +76,6 @@
       "nullable": []
     }
   },
-  "4af1bdce3b303443b5e487486a421c312e93b051de6ee463a726a004874c5c64": {
-    "query": "SELECT user_id, channel_id, SUM(points) as \"points!: i64\" FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY points DESC;",
-    "describe": {
-      "columns": [
-        {
-          "name": "user_id",
-          "ordinal": 0,
-          "type_info": "Text"
-        },
-        {
-          "name": "channel_id",
-          "ordinal": 1,
-          "type_info": "Text"
-        },
-        {
-          "name": "points!: i64",
-          "ordinal": 2,
-          "type_info": "Null"
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        null
-      ]
-    }
-  },
   "5454b5b6047281708b41cd1afb7bd0bb682111b78c480f0fe01d51beb5d201ab": {
     "query": "SELECT user_id, channel_id, points FROM leaderboard WHERE guild_id == ?1 AND user_id == ?2 ORDER BY points DESC;",
     "describe": {
@@ -162,6 +132,24 @@
         "Right": 0
       },
       "nullable": []
+    }
+  },
+  "5cc455c1448ebe9b838acd87cdf2ae2bc77904e6045cda4e6650c4588d1de9e0": {
+    "query": "SELECT message_id FROM reactionroles WHERE reaction_id = ?1 AND guild_id = ?2",
+    "describe": {
+      "columns": [
+        {
+          "name": "message_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "6051e5d58acc61a80d31bf7d43ce992f74536ef7af62ea9840221d0403493a6b": {
@@ -288,6 +276,30 @@
         "Right": 3
       },
       "nullable": []
+    }
+  },
+  "afb0536b8a870a51b48c76771a5d4bff8d9c562b2dd5d2749a5d718f6cbe3651": {
+    "query": "SELECT user_id, SUM(points) as \"points!: i64\" FROM leaderboard WHERE guild_id == ?1 GROUP BY user_id ORDER BY \"points!: i64\" DESC;",
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "points!: i64",
+          "ordinal": 1,
+          "type_info": "Null"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        null
+      ]
     }
   },
   "bd2e3b92573f374e79776d1fa2246ecb71d53f0bce6dadd19d5829ba51460096": {
