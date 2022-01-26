@@ -1,4 +1,4 @@
-[![ci-badge][]][ci]
+[![ci-badge]][ci]
 
 # Elin Bot
 

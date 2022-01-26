@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: rustup default nightly-2021-01-06
+    - run: rustup default nightly-2022-01-25
     - uses: Swatinem/rust-cache@v1
     - run: cargo test
 

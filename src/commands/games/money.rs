@@ -15,12 +15,11 @@ use serenity::{
 async fn money(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
 
-    let user_id;
-    if !args.is_empty() {
+    let user_id = if !args.is_empty() {
         let name: String = error_return_ok!(args.single());
-        user_id = none_return_ok!(parse_user(&name, Some(&guild_id), Some(ctx)).await);
+        none_return_ok!(parse_user(&name, Some(&guild_id), Some(ctx)).await)
     } else {
-        user_id = msg.author.id;
+        msg.author.id
     };
 
     let money = get_user_money(guild_id, user_id).await?;

@@ -37,11 +37,10 @@ async fn flip(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let roll: bool = rand::thread_rng().gen();
     let roll_coin: bool = coin.into();
 
-    let new_amount;
-    if roll == roll_coin {
-        new_amount = money + (bet * 2);
+    let new_amount = if roll == roll_coin {
+        money + (bet * 2)
     } else {
-        new_amount = money - bet;
+        money - bet
     };
 
     let rolled: Coin = roll.into();

@@ -16,11 +16,7 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
     if args.len() == 1 {
         let guild_id = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
         if let Some(uid) = parse_user(
-            &args
-                .quoted()
-                .current()
-                .ok_or_else(|| anyhow!("Argument not found."))?
-                .to_string(),
+            args.quoted().current().ok_or_else(|| anyhow!("Argument not found."))?,
             Some(&guild_id),
             Some(ctx),
         )
@@ -29,11 +25,7 @@ async fn leaderboard(ctx: &Context, msg: &Message, mut args: Args) -> CommandRes
             return parse_user_score(ctx, msg, uid).await;
         };
         if let Some(chid) = parse_chan(
-            &args
-                .quoted()
-                .current()
-                .ok_or_else(|| anyhow!("Argument not found."))?
-                .to_string(),
+            args.quoted().current().ok_or_else(|| anyhow!("Argument not found."))?,
             Some(&guild_id),
             Some(ctx),
         )

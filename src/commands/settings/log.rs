@@ -42,7 +42,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             } else {
                 log_type |= kind as i64;
             }
-            message = format!("{} messages will now be logged!", kind.to_string());
+            message = format!("{} messages will now be logged!", kind);
         }
         "disable" => {
             let kind: LogType = log_kind.try_into()?;
@@ -51,7 +51,7 @@ async fn log(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             } else {
                 log_type &= !(kind as i64);
             }
-            message = format!("{} messages will no longer be logged!", kind.to_string());
+            message = format!("{} messages will no longer be logged!", kind);
         }
         _ => return Ok(()),
     }

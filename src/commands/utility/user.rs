@@ -12,15 +12,13 @@ use serenity::{
 #[usage("user <optional: person>")]
 #[example("user Elinvynia")]
 async fn user(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
-    let user_id;
-    if !args.is_empty() && msg.guild_id.is_some() {
+    let user_id = if !args.is_empty() && msg.guild_id.is_some() {
         let name: String = error_return_ok!(args.single());
         let gid = msg.guild_id.ok_or_else(|| anyhow!("Guild ID not found."))?;
-
-        user_id = none_return_ok!(parse_user(&name, Some(&gid), Some(ctx)).await);
+        none_return_ok!(parse_user(&name, Some(&gid), Some(ctx)).await)
     } else {
-        user_id = msg.author.id
-    }
+        msg.author.id
+    };
 
     let user = user_id.to_user(ctx).await?;
     let mut message = String::from("User found!\n");

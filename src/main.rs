@@ -28,14 +28,13 @@ async fn main() {
     setup_db().await.expect("Failed to set up database.");
 
     //If a token exists in the dotenv, prefer to use that.
-    let token;
-    if let Ok(x) = env::var("DISCORD_TOKEN") {
-        token = x;
+    let token = if let Ok(x) = env::var("DISCORD_TOKEN") {
+        x
     } else {
-        token = settings
+        settings
             .get_str("discord_token")
-            .expect("discord_token not found in config.");
-    }
+            .expect("discord_token not found in config.")
+    };
 
     let http = Http::new_with_token(&token);
 

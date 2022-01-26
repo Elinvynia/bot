@@ -2,7 +2,7 @@
 name = "bot"
 version = "0.1.0"
 authors = ["Elinvynia <59487684+Elinvynia@users.noreply.github.com>"]
-edition = "2018"
+edition = "2021"
 
 
 [dependencies]
